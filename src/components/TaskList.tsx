@@ -1,22 +1,7 @@
 import React from 'react'
 import { View, ScrollView, StyleSheet } from 'react-native'
 import { Text } from 'components/text'
-
-interface TaskData {
-	id: string
-	name: string
-	time: string
-	active: boolean
-}
-
-const tasks = [
-	{ id: '1', name: 'Programming', time: '8:00', active: false },
-	{ id: '2', name: 'Workout', time: '12:30', active: true },
-	{ id: '3', name: 'Clean Home', time: '14:00', active: false },
-	{ id: '4', name: 'Pay Bills', time: '15:00', active: false },
-	{ id: '5', name: 'Clean Home', time: '14:00', active: false },
-	{ id: '6', name: 'Clean Home', time: '14:00', active: false },
-]
+import { useStore } from 'models'
 
 const DayStatus = () => {
 	const dateStr = 'Monday, Jul 24'
@@ -44,14 +29,15 @@ export const AddTask = () => {
 }
 
 export const TaskList = () => {
-	const renderTask = ({ item }: { item: TaskData }) => (
-		<Task key={item.id} {...item} />
-	)
+	const { schedule } = useStore()
+
 	return (
 		<View>
 			<ScrollView>
 				<DayStatus />
-				{tasks.map(item => renderTask({ item }))}
+				{schedule.tasks.map(item => (
+					<Task key={item.id} {...item} />
+				))}
 				<AddTask />
 			</ScrollView>
 		</View>

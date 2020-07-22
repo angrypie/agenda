@@ -1,15 +1,18 @@
 import React from 'react'
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, SafeAreaView, View } from 'react-native'
+import { StyleSheet, SafeAreaView } from 'react-native'
+import { StoreProvider, rootStore } from 'models'
 
 import { TaskList } from 'components/TaskList'
 
 export default function App() {
 	return (
-		<SafeAreaView style={styles.container}>
-			<TaskList />
-			<StatusBar style='auto' />
-		</SafeAreaView>
+		<StoreProvider value={rootStore}>
+			<SafeAreaView style={styles.container}>
+				<TaskList />
+				<StatusBar style='auto' />
+			</SafeAreaView>
+		</StoreProvider>
 	)
 }
 
