@@ -14,7 +14,7 @@ const DayStatus = () => {
 				alignItems: 'center',
 			}}
 		>
-			<Text style={{ opacity: 0.6, fontWeight: '500' }}>{dateStr}</Text>
+			<Text style={{ opacity: 0.6, fontSize: 14 }}>{dateStr}</Text>
 			<Text style={{ fontSize: 25, fontWeight: '600', marginTop: -10 }}>+</Text>
 		</View>
 	)
@@ -23,7 +23,7 @@ const DayStatus = () => {
 export const AddTask = () => {
 	return (
 		<View style={{ alignItems: 'center' }}>
-			<Text style={{ fontSize: 30, fontWeight: '500' }}>+</Text>
+			<Text style={{ fontSize: 30 }}>+</Text>
 		</View>
 	)
 }
