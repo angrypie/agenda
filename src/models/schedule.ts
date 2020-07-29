@@ -4,11 +4,16 @@ export const Task = types
 	.model({
 		id: types.string,
 		name: types.string,
-		time: types.string,
+		time: types.number,
+		duration: types.number,
 	})
-	.views(self => ({
-		get active(): boolean {
-			return Number(self.time.split(':')[0]) === new Date().getHours()
+	.actions(self => ({
+		active(): boolean {
+			const { duration, time } = self
+			//TODO use Date.now() instead of stub
+			//const currentTime = Date.now()
+			const currentTime = 1595970000 + 12 * 3600
+			return currentTime > time && currentTime < time + duration
 		},
 	}))
 
@@ -16,14 +21,12 @@ export const Schedule = types
 	.model({
 		tasks: types.optional(types.array(Task), []),
 	})
-	.views(self => ({
-		get currentTasks(): ITask[] {
-			return self.tasks.filter(task => task.active)
-		},
-	}))
 	.actions(self => ({
 		addTask(task: Instance<typeof Task>) {
 			self.tasks.push(task)
+		},
+		currentTasks(): ITask[] {
+			return self.tasks.filter(task => task.active())
 		},
 	}))
 

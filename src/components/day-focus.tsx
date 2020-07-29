@@ -8,7 +8,8 @@ import { useStore } from 'models'
 export const DayFocus = () => {
 	const { schedule } = useStore()
 
-	const tasks = schedule.currentTasks
+	//TODO pass real current time
+	const tasks = schedule.currentTasks()
 
 	if (tasks.length === 0) {
 		return (
