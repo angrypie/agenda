@@ -1,7 +1,8 @@
 import React from 'react'
 import { View, ScrollView, StyleSheet } from 'react-native'
 import { Text } from 'components/text'
-import { useStore } from 'models'
+import { useStore, ITask } from 'models'
+import { observer } from 'mobx-react-lite'
 
 const DayStatus = () => {
 	const dateStr = 'Monday, Jul 24'
@@ -35,8 +36,8 @@ export const TaskList = () => {
 		<View>
 			<ScrollView>
 				<DayStatus />
-				{schedule.tasks.map(item => (
-					<Task key={item.id} {...item} />
+				{schedule.tasks.map(task => (
+					<Task key={task.id} task={task} />
 				))}
 				<AddTask />
 			</ScrollView>
@@ -44,8 +45,10 @@ export const TaskList = () => {
 	)
 }
 
-export const Task = ({ name, time, active }: any) => {
+export const Task = observer(({ task }: { task: ITask }) => {
+	const { name, time, active } = task
 	const style = { opacity: active ? 1 : 0.5 }
+
 	return (
 		<View style={[styles.task, style]}>
 			<View style={styles.header}>
@@ -58,7 +61,7 @@ export const Task = ({ name, time, active }: any) => {
 			</View>
 		</View>
 	)
-}
+})
 
 const Header = ({ children }: any) => (
 	<Text style={{ fontWeight: 'bold', fontSize: 30 }}>{children}</Text>
@@ -76,7 +79,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		width: 340,
 	},
 	sub: {
 		height: 40,

@@ -1,4 +1,5 @@
 import { useContext, createContext } from 'react'
+import 'mobx-react-lite/batchingForReactNative'
 import { RootModel } from './root'
 import { Instance } from 'mobx-state-tree'
 export { rootStore } from './root'
@@ -15,3 +16,5 @@ export function useStore() {
 }
 
 export const StoreProvider = storeContext.Provider
+
+export * from './schedule'
