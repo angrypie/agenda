@@ -1,4 +1,5 @@
 import { types, Instance } from 'mobx-state-tree'
+import dayjs from 'dayjs'
 
 export const Task = types
 	.model({
@@ -10,10 +11,8 @@ export const Task = types
 	.actions(self => ({
 		active(): boolean {
 			const { duration, time } = self
-			//TODO use Date.now() instead of stub
-			//const currentTime = Date.now()
-			const currentTime = 1595970000 + 12 * 3600
-			return currentTime > time && currentTime < time + duration
+			const now = dayjs().unix()
+			return now > time && now < time + duration
 		},
 	}))
 

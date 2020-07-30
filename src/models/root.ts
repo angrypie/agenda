@@ -1,12 +1,13 @@
 import { types, onSnapshot } from 'mobx-state-tree'
 import { Schedule } from './schedule'
+import dayjs from 'dayjs'
 
 export const RootModel = types.model({
 	schedule: Schedule,
 })
 
 function t(hours: number): number {
-	return 1595970000 + hours * 3600
+	return dayjs().startOf('day').add(hours, 'hour').unix()
 }
 
 function d(hours: number): number {
@@ -22,7 +23,7 @@ export const rootStore = RootModel.create({
 			{ id: '4', duration: d(1), name: 'Pay Bills', time: t(15) },
 			{ id: '5', duration: d(4), name: 'Work Session', time: t(16) },
 			{ id: '6', duration: d(3), name: 'Practice', time: t(20) },
-			{ id: '7', duration: d(9), name: 'Practice', time: t(23) },
+			{ id: '7', duration: d(9), name: 'Sleep', time: t(23) },
 		],
 	},
 })
