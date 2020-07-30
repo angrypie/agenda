@@ -1,14 +1,12 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Text } from 'components/text'
-import { Task } from 'components/task-list'
+import { Task, TaskTime } from 'components/task-list'
 import { useStore } from 'models'
 
-//TODO pass data to Task component
 export const DayFocus = () => {
 	const { schedule } = useStore()
 
-	//TODO pass real current time
 	const tasks = schedule.currentTasks()
 
 	if (tasks.length === 0) {
@@ -23,7 +21,7 @@ export const DayFocus = () => {
 	return (
 		<View style={styles.dayFocus}>
 			<View>
-				<Text>12:30</Text>
+				<TaskTime time={task.time} />
 			</View>
 			<View>
 				<Task task={task} />

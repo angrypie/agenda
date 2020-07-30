@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, ScrollView, StyleSheet } from 'react-native'
-import { Text } from 'components/text'
+import { Text, Header } from 'components/text'
 import { useStore, ITask } from 'models'
 import { observer } from 'mobx-react-lite'
 import dayjs from 'dayjs'
@@ -48,13 +48,16 @@ export const TaskList = () => {
 
 export const Task = observer(({ task }: { task: ITask }) => {
 	const { name, time } = task
-	const style = { opacity: task.active() ? 1 : 0.5 }
+	const active = task.active()
+	const { schedule } = useStore()
 
+	const displayTime = active ? schedule.clock.now : time
+	const style = { opacity: active ? 1 : 0.5 }
 	return (
 		<View style={[styles.task, style]}>
 			<View style={styles.header}>
 				<Header>{name}</Header>
-				<Header>{dayjs(time * 1000).format('HH:mm')}</Header>
+				<TaskTime time={displayTime} />
 			</View>
 			<View style={styles.sub}>
 				<Text>Some subtask</Text>
@@ -64,8 +67,8 @@ export const Task = observer(({ task }: { task: ITask }) => {
 	)
 })
 
-const Header = ({ children }: any) => (
-	<Text style={{ fontWeight: 'bold', fontSize: 30 }}>{children}</Text>
+export const TaskTime = ({ time }: any) => (
+	<Header>{dayjs(time).format('HH:mm')}</Header>
 )
 
 const styles = StyleSheet.create({

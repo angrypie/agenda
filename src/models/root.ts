@@ -7,11 +7,11 @@ export const RootModel = types.model({
 })
 
 function t(hours: number): number {
-	return dayjs().startOf('day').add(hours, 'hour').unix()
+	return dayjs().startOf('day').add(hours, 'hour').valueOf()
 }
 
 function d(hours: number): number {
-	return hours * 3600
+	return hours * 3600000
 }
 
 export const rootStore = RootModel.create({
@@ -25,6 +25,7 @@ export const rootStore = RootModel.create({
 			{ id: '6', duration: d(3), name: 'Practice', time: t(20) },
 			{ id: '7', duration: d(9), name: 'Sleep', time: t(23) },
 		],
+		clock: {},
 	},
 })
 

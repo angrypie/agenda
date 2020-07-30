@@ -6,3 +6,7 @@ export const Text = ({ children, style }: any) => (
 		{children}
 	</NativeText>
 )
+
+export const Header = ({ children }: any) => (
+	<Text style={{ fontWeight: 'bold', fontSize: 30 }}>{children}</Text>
+)
