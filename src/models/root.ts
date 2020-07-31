@@ -21,8 +21,8 @@ export const rootStore = RootModel.create({
 	schedule: {
 		tasks: [
 			{ id: '0', duration: d(7), name: 'Sleep', time: t(0) },
-			{ id: '1', duration: d(2), name: 'Workout', time: t(8) },
 			{ id: '2', duration: d(4), name: 'Work Session', time: t(10) },
+			{ id: '1', duration: d(2), name: 'Workout', time: t(8) },
 			{ id: '3', duration: d(1), name: 'Clean Home', time: t(14) },
 			{ id: '4', duration: d(1), name: 'Pay Bills', time: t(15) },
 			{ id: '6', duration: d(3), name: 'Practice', time: t(19) },

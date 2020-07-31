@@ -20,19 +20,24 @@ export interface ITask extends Instance<typeof Task> {}
 
 export const Schedule = types
 	.model({
+		//TODO use spots structure to manage taken and available
+		//time spots for tasks.
 		tasks: types.optional(types.array(Task), []),
 		currentId: types.optional(types.integer, -1),
 	})
 	.actions(self => ({
+		afterCreate() {
+			self.tasks = self.tasks.sort((a, b) => a.time - b.time)
+		},
 		update() {
 			this.setCurrentTasks()
 		},
 		addTask(task: Instance<typeof Task>) {
+			//TODO find in sorted array where to put new item
 			self.tasks.push(task)
 		},
 		setCurrentTasks() {
 			self.currentId = self.tasks.findIndex(task => task.active())
-			console.log('set', self.currentId)
 		},
 		getNextTask(task: ITask): ITask | void {
 			const index = self.tasks.findIndex(t => t.id === task.id)

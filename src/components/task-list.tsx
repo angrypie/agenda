@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 
 const DayStatus = observer(() => {
 	const { clock } = useStore()
-	const dateStr = dayjs(clock.now).format('dddd, MMM D        ss')
+	const dateStr = dayjs(clock.now).format('ss \t dddd, MMM D')
 
 	return (
 		<View
