@@ -3,13 +3,14 @@ import { View, StyleSheet } from 'react-native'
 import { Text } from 'components/text'
 import { Task, TaskTime } from 'components/task-list'
 import { useStore } from 'models'
+import { observer } from 'mobx-react-lite'
 
-export const DayFocus = () => {
+export const DayFocus = observer(() => {
 	const { schedule } = useStore()
 
-	const tasks = schedule.current
+	const id = schedule.currentId
 
-	if (tasks.length === 0) {
+	if (id === -1) {
 		return (
 			<View>
 				<Text>There is no tasks today</Text>
@@ -17,7 +18,7 @@ export const DayFocus = () => {
 		)
 	}
 
-	const task = tasks[0]
+	const task = schedule.tasks[id]
 	const nextTask = schedule.getNextTask(task)
 	return (
 		<View style={styles.dayFocus}>
@@ -31,7 +32,7 @@ export const DayFocus = () => {
 			{!nextTask ? null : <Task task={nextTask} hideSub />}
 		</View>
 	)
-}
+})
 
 //some color
 const styles = StyleSheet.create({

@@ -8,6 +8,7 @@ export const Clock = types
 	.actions(self => ({
 		update() {
 			self.now = dayjs().valueOf()
+			console.log('update', self.now)
 		},
 	}))
 	.actions(function (self) {

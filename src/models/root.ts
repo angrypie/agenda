@@ -1,4 +1,4 @@
-import { types, onSnapshot } from 'mobx-state-tree'
+import { types, onPatch } from 'mobx-state-tree'
 import { Schedule } from './schedule'
 import { Clock } from './clock'
 import dayjs from 'dayjs'
@@ -20,6 +20,7 @@ export const rootStore = RootModel.create({
 	clock: {},
 	schedule: {
 		tasks: [
+			{ id: '0', duration: d(7), name: 'Sleep', time: t(0) },
 			{ id: '1', duration: d(2), name: 'Workout', time: t(8) },
 			{ id: '2', duration: d(4), name: 'Work Session', time: t(10) },
 			{ id: '3', duration: d(1), name: 'Clean Home', time: t(14) },
@@ -31,4 +32,6 @@ export const rootStore = RootModel.create({
 	},
 })
 
-onSnapshot(rootStore, snapshot => console.log('Snapshot: ', snapshot))
+onPatch(rootStore.clock, () => {
+	rootStore.schedule.update()
+})

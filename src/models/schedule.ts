@@ -21,17 +21,18 @@ export interface ITask extends Instance<typeof Task> {}
 export const Schedule = types
 	.model({
 		tasks: types.optional(types.array(Task), []),
-		current: types.optional(types.array(Task), []),
+		currentId: types.optional(types.integer, -1),
 	})
 	.actions(self => ({
+		update() {
+			this.setCurrentTasks()
+		},
 		addTask(task: Instance<typeof Task>) {
 			self.tasks.push(task)
 		},
 		setCurrentTasks() {
-			const filtered = self.tasks.filter(task => task.active())
-			if (filtered.length !== 0) {
-				self.current.push(filtered[0])
-			}
+			self.currentId = self.tasks.findIndex(task => task.active())
+			console.log('set', self.currentId)
 		},
 		getNextTask(task: ITask): ITask | void {
 			const index = self.tasks.findIndex(t => t.id === task.id)

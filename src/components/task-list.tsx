@@ -5,8 +5,9 @@ import { useStore, ITask } from 'models'
 import { observer } from 'mobx-react-lite'
 import dayjs from 'dayjs'
 
-const DayStatus = () => {
-	const dateStr = 'Monday, Jul 24'
+const DayStatus = observer(() => {
+	const { clock } = useStore()
+	const dateStr = dayjs(clock.now).format('dddd, MMM D        ss')
 
 	return (
 		<View
@@ -20,7 +21,7 @@ const DayStatus = () => {
 			<Text style={{ fontSize: 25, fontWeight: '600', marginTop: -10 }}>+</Text>
 		</View>
 	)
-}
+})
 
 export const AddTask = () => {
 	return (
