@@ -18,24 +18,32 @@ export const DayFocus = () => {
 	}
 
 	const task = tasks[0]
+	const nextTask = schedule.getNextTask(task)
 	return (
 		<View style={styles.dayFocus}>
-			<View>
+			<View style={[styles.right, styles.dim]}>
+				<View />
 				<TaskTime time={task.time} />
 			</View>
 			<View>
 				<Task task={task} />
 			</View>
-
-			<View>
-				<Text>18:30</Text>
-			</View>
+			{!nextTask ? null : <Task task={nextTask} hideSub />}
 		</View>
 	)
 }
 
+//some color
 const styles = StyleSheet.create({
 	dayFocus: {
 		flex: 1,
+		justifyContent: 'space-between',
+	},
+	dim: {
+		opacity: 0.5,
+	},
+	right: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 	},
 })

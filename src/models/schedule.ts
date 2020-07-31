@@ -28,7 +28,7 @@ export const Clock = types
 		},
 	}))
 	.actions(function (self) {
-		let timer: any
+		let timer: number
 
 		return {
 			afterCreate() {
@@ -51,5 +51,9 @@ export const Schedule = types
 		},
 		currentTasks(): ITask[] {
 			return self.tasks.filter(task => task.active())
+		},
+		getNextTask(task: ITask): ITask | void {
+			const index = self.tasks.findIndex(t => t.id === task.id)
+			return self.tasks[index + 1]
 		},
 	}))

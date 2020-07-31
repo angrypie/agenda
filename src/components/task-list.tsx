@@ -46,26 +46,33 @@ export const TaskList = () => {
 	)
 }
 
-export const Task = observer(({ task }: { task: ITask }) => {
-	const { name, time } = task
-	const active = task.active()
-	const { schedule } = useStore()
+export const Task = observer(
+	({ task, hideSub = false }: { task: ITask; hideSub?: boolean }) => {
+		const { name, time } = task
+		const active = task.active()
+		const { schedule } = useStore()
 
-	const displayTime = active ? schedule.clock.now : time
-	const style = { opacity: active ? 1 : 0.5 }
-	return (
-		<View style={[styles.task, style]}>
-			<View style={styles.header}>
-				<Header>{name}</Header>
-				<TaskTime time={displayTime} />
+		const displayTime = active ? schedule.clock.now : time
+		const style = {
+			opacity: active ? 1 : 0.5,
+			height: hideSub ? 100 : 200,
+		}
+		return (
+			<View style={[styles.task, style]}>
+				<View style={styles.header}>
+					<Header>{name}</Header>
+					<TaskTime time={displayTime} />
+				</View>
+				{hideSub ? null : (
+					<View style={styles.sub}>
+						<Text>Some subtask</Text>
+						<Text>Another subtask</Text>
+					</View>
+				)}
 			</View>
-			<View style={styles.sub}>
-				<Text>Some subtask</Text>
-				<Text>Another subtask</Text>
-			</View>
-		</View>
-	)
-})
+		)
+	}
+)
 
 export const TaskTime = ({ time }: any) => (
 	<Header>{dayjs(time).format('HH:mm')}</Header>
@@ -73,7 +80,6 @@ export const TaskTime = ({ time }: any) => (
 
 const styles = StyleSheet.create({
 	task: {
-		height: 200,
 		flexDirection: 'column',
 		justifyContent: 'center',
 		opacity: 1,
