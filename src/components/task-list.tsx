@@ -50,9 +50,9 @@ export const Task = observer(
 	({ task, hideSub = false }: { task: ITask; hideSub?: boolean }) => {
 		const { name, time } = task
 		const active = task.active()
-		const { schedule } = useStore()
+		const { clock } = useStore()
 
-		const displayTime = active ? schedule.clock.now : time
+		const displayTime = active ? clock.now : time
 		const style = {
 			opacity: active ? 1 : 0.5,
 			height: hideSub ? 100 : 200,

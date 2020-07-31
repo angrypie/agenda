@@ -7,7 +7,7 @@ import { useStore } from 'models'
 export const DayFocus = () => {
 	const { schedule } = useStore()
 
-	const tasks = schedule.currentTasks()
+	const tasks = schedule.current
 
 	if (tasks.length === 0) {
 		return (

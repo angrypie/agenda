@@ -18,39 +18,20 @@ export const Task = types
 
 export interface ITask extends Instance<typeof Task> {}
 
-export const Clock = types
-	.model({
-		now: types.optional(types.integer, () => dayjs().valueOf()),
-	})
-	.actions(self => ({
-		update() {
-			self.now = dayjs().valueOf()
-		},
-	}))
-	.actions(function (self) {
-		let timer: number
-
-		return {
-			afterCreate() {
-				timer = setInterval(() => self.update(), 1000)
-			},
-			beforeDestroy() {
-				clearInterval(timer)
-			},
-		}
-	})
-
 export const Schedule = types
 	.model({
 		tasks: types.optional(types.array(Task), []),
-		clock: Clock,
+		current: types.optional(types.array(Task), []),
 	})
 	.actions(self => ({
 		addTask(task: Instance<typeof Task>) {
 			self.tasks.push(task)
 		},
-		currentTasks(): ITask[] {
-			return self.tasks.filter(task => task.active())
+		setCurrentTasks() {
+			const filtered = self.tasks.filter(task => task.active())
+			if (filtered.length !== 0) {
+				self.current.push(filtered[0])
+			}
 		},
 		getNextTask(task: ITask): ITask | void {
 			const index = self.tasks.findIndex(t => t.id === task.id)
