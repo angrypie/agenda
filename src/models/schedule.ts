@@ -20,22 +20,24 @@ export interface ITask extends Instance<typeof Task> {}
 
 export const Clock = types
 	.model({
-		now: types.optional(types.Date, () => new Date()),
+		now: types.optional(types.integer, () => dayjs().valueOf()),
 	})
-	.actions(self => {
+	.actions(self => ({
+		update() {
+			self.now = dayjs().valueOf()
+		},
+	}))
+	.actions(function (self) {
 		let timer: any
-		const start = () => {
-			timer = setInterval(() => {
-				;(self as any).update()
-			}, 1000)
+
+		return {
+			afterCreate() {
+				timer = setInterval(() => self.update(), 1000)
+			},
+			beforeDestroy() {
+				clearInterval(timer)
+			},
 		}
-		const afterCreate = () => {
-			self.now = new Date(Date.now())
-		}
-		const beforeDestroy = () => {
-			clearInterval(timer)
-		}
-		return { start, stop: beforeDestroy, update: afterCreate }
 	})
 
 export const Schedule = types
