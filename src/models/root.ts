@@ -27,7 +27,7 @@ export const rootStore = RootModel.create(
 				{ id: '3', duration: d(1), name: 'Clean Home', time: t(14) },
 				{ id: '4', duration: d(1), name: 'Pay Bills', time: t(15) },
 				{ id: '6', duration: d(3), name: 'Practice', time: t(19) },
-				{ id: '5', duration: d(4), name: 'Work Session', time: t(16) },
+				{ id: '5', duration: d(3), name: 'Work Session', time: t(16) },
 				{ id: '7', duration: d(9), name: 'Sleep', time: t(23) },
 			],
 		},

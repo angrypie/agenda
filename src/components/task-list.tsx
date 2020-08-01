@@ -38,7 +38,7 @@ export const TaskList = () => {
 		<View>
 			<ScrollView>
 				<DayStatus />
-				{schedule.tasks.map(task => (
+				{schedule.todayTasks.map(task => (
 					<Task key={task.id} task={task} />
 				))}
 				<AddTask />

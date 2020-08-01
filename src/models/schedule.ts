@@ -1,17 +1,16 @@
-import { types, Instance } from 'mobx-state-tree'
-import dayjs from 'dayjs'
+import { types, Instance, getEnv } from 'mobx-state-tree'
 
 export const Task = types
 	.model({
-		id: types.string,
+		id: types.identifier,
 		name: types.string,
 		time: types.number,
 		duration: types.number,
 	})
 	.actions(self => ({
 		active(): boolean {
+			const now = getEnv(self).clock().now
 			const { duration, time } = self
-			const now = dayjs().valueOf()
 			return now > time && now < time + duration
 		},
 	}))
@@ -25,10 +24,12 @@ export const Schedule = types
 		tasks: types.optional(types.array(Task), []),
 		currentTask: types.safeReference(Task),
 	})
-	.actions(self => ({
-		afterCreate() {
-			self.tasks = self.tasks.sort((a, b) => a.time - b.time)
+	.views(self => ({
+		get todayTasks(): ITask[] {
+			return self.tasks.slice().sort((a, b) => a.time - b.time)
 		},
+	}))
+	.actions(self => ({
 		update() {
 			this.setCurrentTasks()
 		},
