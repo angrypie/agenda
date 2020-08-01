@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import { Text } from 'components/text'
+import { Text, Header } from 'components/text'
 import { Task, TaskTime } from 'components/task-list'
 import { useStore } from 'models'
 import { observer } from 'mobx-react-lite'
@@ -8,9 +8,9 @@ import { observer } from 'mobx-react-lite'
 export const DayFocus = observer(() => {
 	const { schedule } = useStore()
 
-	const id = schedule.currentId
+	const task = schedule.currentTask
 
-	if (id === -1) {
+	if (task === undefined) {
 		return (
 			<View>
 				<Text>There is no tasks today</Text>
@@ -18,18 +18,23 @@ export const DayFocus = observer(() => {
 		)
 	}
 
-	const task = schedule.tasks[id]
 	const nextTask = schedule.getNextTask(task)
 	return (
 		<View style={styles.dayFocus}>
-			<View style={[styles.right, styles.dim]}>
+			<View style={[styles.right, { opacity: 0.2 }]}>
 				<View />
 				<TaskTime time={task.time} />
 			</View>
-			<View>
+			<View style={{ top: -40 }}>
 				<Task task={task} />
 			</View>
-			{!nextTask ? null : <Task task={nextTask} hideSub />}
+			<View style={{ opacity: 0.4 }}>
+				{!nextTask ? (
+					<Header>Fee Time</Header>
+				) : (
+					<Task task={nextTask} hideSub />
+				)}
+			</View>
 		</View>
 	)
 })
@@ -39,9 +44,6 @@ const styles = StyleSheet.create({
 	dayFocus: {
 		flex: 1,
 		justifyContent: 'space-between',
-	},
-	dim: {
-		opacity: 0.5,
 	},
 	right: {
 		flexDirection: 'row',

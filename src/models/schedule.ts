@@ -23,7 +23,7 @@ export const Schedule = types
 		//TODO use spots structure to manage taken and available
 		//time spots for tasks.
 		tasks: types.optional(types.array(Task), []),
-		currentId: types.optional(types.integer, -1),
+		currentTask: types.safeReference(Task),
 	})
 	.actions(self => ({
 		afterCreate() {
@@ -37,8 +37,9 @@ export const Schedule = types
 			self.tasks.push(task)
 		},
 		setCurrentTasks() {
-			self.currentId = self.tasks.findIndex(task => task.active())
+			self.currentTask = self.tasks.find(task => task.active())
 		},
+		//TODO use spots list to find next task
 		getNextTask(task: ITask): ITask | void {
 			const index = self.tasks.findIndex(t => t.id === task.id)
 			return self.tasks[index + 1]
