@@ -3,11 +3,11 @@ import { View, ScrollView, StyleSheet } from 'react-native'
 import { Text, Header } from 'components/text'
 import { useStore, ITask } from 'models'
 import { observer } from 'mobx-react-lite'
-import dayjs from 'dayjs'
+import { formatDate, formatTime } from 'lib/time'
 
 const DayStatus = observer(() => {
 	const { clock } = useStore()
-	const dateStr = dayjs(clock.now).format('ss \t dddd, MMM D')
+	const dateStr = formatDate(clock.now)
 
 	return (
 		<View
@@ -75,9 +75,7 @@ export const Task = observer(
 	}
 )
 
-export const TaskTime = ({ time }: any) => (
-	<Header>{dayjs(time).format('HH:mm')}</Header>
-)
+export const TaskTime = ({ time }: any) => <Header>{formatTime(time)}</Header>
 
 const styles = StyleSheet.create({
 	task: {

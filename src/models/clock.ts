@@ -1,13 +1,13 @@
 import { types } from 'mobx-state-tree'
-import dayjs from 'dayjs'
+import { getUnixTimeMs } from 'lib/time'
 
 export const Clock = types
 	.model({
-		now: types.optional(types.integer, () => dayjs().valueOf()),
+		now: types.optional(types.integer, () => getUnixTimeMs()),
 	})
 	.actions(self => ({
 		update() {
-			self.now = dayjs().valueOf()
+			self.now = getUnixTimeMs()
 		},
 	}))
 	.actions(function (self) {
