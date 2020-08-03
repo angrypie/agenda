@@ -1,19 +1,20 @@
 import { types } from 'mobx-state-tree'
-import { getUnixTimeMs } from 'lib/time'
+import { getEnv } from './utils'
 
 export const Clock = types
 	.model({
-		now: types.optional(types.integer, () => getUnixTimeMs()),
+		now: types.optional(types.integer, 0),
 	})
 	.actions(self => ({
 		update() {
-			self.now = getUnixTimeMs()
+			self.now = getEnv(self).getUnixTimeMs()
 		},
 	}))
 	.actions(function (self) {
 		let timer: number
 
 		return {
+			//TODO update clock from outside
 			afterCreate() {
 				timer = setInterval(() => self.update(), 1000)
 			},

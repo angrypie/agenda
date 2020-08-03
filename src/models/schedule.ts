@@ -1,4 +1,5 @@
-import { types, Instance, getEnv } from 'mobx-state-tree'
+import { types, Instance } from 'mobx-state-tree'
+import { getEnv } from './utils'
 
 export const Task = types
 	.model({
@@ -9,7 +10,7 @@ export const Task = types
 	})
 	.actions(self => ({
 		active(): boolean {
-			const now = getEnv(self).clock().now
+			const now = getEnv(self).getUnixTimeMs()
 			const { duration, time } = self
 			return now > time && now < time + duration
 		},

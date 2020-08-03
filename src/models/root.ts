@@ -2,6 +2,7 @@ import { types, onPatch } from 'mobx-state-tree'
 import { Schedule } from './schedule'
 import { Clock } from './clock'
 import dayjs from 'dayjs'
+import { createEnv } from './utils'
 
 export const RootModel = types.model({
 	schedule: Schedule,
@@ -32,9 +33,8 @@ export const rootStore = RootModel.create(
 			],
 		},
 	},
-	{
-		clock: () => rootStore.clock,
-	}
+	//Use typesafe getEnv from 'models/utils.ts'
+	createEnv()
 )
 
 onPatch(rootStore.clock, () => {
