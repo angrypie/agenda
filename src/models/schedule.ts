@@ -1,5 +1,4 @@
-import { types, Instance, cast } from 'mobx-state-tree'
-import { getEnv } from './utils'
+import { types, Instance } from 'mobx-state-tree'
 
 export const Task = types
 	.model({
@@ -7,12 +6,11 @@ export const Task = types
 		name: types.string,
 		time: types.number,
 		duration: types.number,
+		active: types.optional(types.boolean, false),
 	})
 	.actions(self => ({
-		active(): boolean {
-			const now = getEnv(self).getUnixTimeMs()
-			const { duration, time } = self
-			return now > time && now < time + duration
+		setActive(active: boolean) {
+			self.active = active
 		},
 	}))
 
@@ -30,29 +28,24 @@ export const Schedule = types
 		currentTask: types.safeReference(Task),
 	})
 	.actions(self => ({
-		//TODO use external spots manager to update tasks state
-		update() {
-			const now = getEnv(self).getUnixTimeMs()
-			const tasks = self.tasks
-				.slice()
-				.filter(t => t.time + t.duration > now)
-				.sort((a, b) => a.time - b.time)
+		setTodayTasks(tasks: ITask[]) {
 			self.todayTasks.replace(tasks)
-			this.setCurrentTasks()
 		},
-		addTask(task: Instance<typeof Task>) {
+		addTask(task: ITask) {
 			//TODO find in sorted array where to put new item
 			self.tasks.push(task)
 		},
-		setCurrentTasks() {
-			self.currentTask = self.tasks.find(task => task.active())
+		setCurrentTask(task: ITask | undefined) {
+			self.currentTask = task
 		},
 		//TODO use spots list to find next task
 		getNextTask(task: ITask): ITask | void {
-			const nextIndex = self.tasks.findIndex(t => t.id === task.id) + 1
-			if (self.tasks.length >= nextIndex) {
+			const { todayTasks } = self
+			const nextIndex = todayTasks.findIndex(t => t.id === task.id) + 1
+			console.log(nextIndex, todayTasks.length)
+			if (todayTasks.length <= nextIndex) {
 				return
 			}
-			return self.tasks[nextIndex]
+			return todayTasks[nextIndex]
 		},
 	}))

@@ -49,8 +49,7 @@ export const TaskList = () => {
 
 export const Task = observer(
 	({ task, hideSub = false }: { task: ITask; hideSub?: boolean }) => {
-		const { name, time } = task
-		const active = task.active()
+		const { name, time, active } = task
 		const { clock } = useStore()
 
 		const displayTime = active ? clock.now : time

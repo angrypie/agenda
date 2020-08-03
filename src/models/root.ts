@@ -1,4 +1,4 @@
-import { types, onPatch } from 'mobx-state-tree'
+import { types, Instance } from 'mobx-state-tree'
 import { Schedule } from './schedule'
 import { Clock } from './clock'
 import dayjs from 'dayjs'
@@ -38,6 +38,36 @@ export const rootStore = RootModel.create(
 	createEnv()
 )
 
-onPatch(rootStore.clock, () => {
-	rootStore.schedule.update()
-})
+export const scheduler = CreateScheduler(rootStore)
+
+export function CreateScheduler(root: Instance<typeof rootStore>) {
+	const env = createEnv()
+
+	const updateSchedule = () => {
+		const { schedule } = root
+		const now = env.getUnixTimeMs()
+		//Set Active tasks
+		schedule.tasks.forEach(task => {
+			const { duration, time } = task
+			task.setActive(now > time && now < time + duration)
+		})
+
+		//Set today tasks
+		const tasks = schedule.tasks
+			.filter(t => t.time + t.duration > now)
+			.sort((a, b) => a.time - b.time)
+		schedule.setTodayTasks(tasks)
+
+		schedule.setCurrentTask(schedule.tasks.find(task => task.active))
+	}
+
+	const timer: number = setInterval(() => {
+		updateSchedule()
+		root.clock.update(env.getUnixTimeMs())
+	}, 1000)
+	return {
+		stop() {
+			clearInterval(timer)
+		},
+	}
+}
