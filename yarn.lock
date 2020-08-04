@@ -5533,6 +5533,11 @@ querystringify@^2.1.1:
   resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.1.1.tgz#60e5a5fd64a7f8bfa4d2ab2ed6fdf4c85bad154e"
   integrity sha512-w7fLxIRCRT7U8Qu53jQnJyPkYZIaR4n5151KMfcJlO/A9397Wxb1amJvROTK6TOnp7PfoAmg/qXiNHI+08jRfA==
 
+rambda@^5.11.0:
+  version "5.11.0"
+  resolved "https://registry.yarnpkg.com/rambda/-/rambda-5.11.0.tgz#59e2c714775ff539a3bb838c23499d29515c48b7"
+  integrity sha512-IwUN0KmyM5UYZT1h7p4K09TF04EgMkK1Y0m97XlDjIZxH7W9TJ9YuzvCE1WuagpfcT6aLzugTiV4L3V+YE5seQ==
+
 range-parser@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
