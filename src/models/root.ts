@@ -1,9 +1,8 @@
 import { types, Instance } from 'mobx-state-tree'
-import { Schedule, ITask } from './schedule'
+import { Schedule } from './schedule'
 import { Clock } from './clock'
 import dayjs from 'dayjs'
 import { createEnv } from './utils'
-import { createSpots, todaySpots, isCurrentSpot } from 'lib/scheduler'
 
 export const RootModel = types.model({
 	schedule: Schedule,
@@ -44,32 +43,10 @@ export const scheduler = CreateScheduler(rootStore)
 export function CreateScheduler(root: Instance<typeof rootStore>) {
 	const env = createEnv()
 
-	const updateSchedule = () => {
-		const { schedule } = root
-		const spots = createSpots(schedule.tasks)
-		const now = env.getUnixTimeMs()
-
-		//Set Active tasks
-		schedule.tasks.forEach(task => task.setActive(isCurrentSpot(now, task)))
-
-		const tasks: ITask[] = []
-
-		todaySpots(now, spots).order.forEach(spot => {
-			const task = schedule.tasks.find(task => task.id === spot.id)
-			if (task) {
-				tasks.push(task)
-			}
-		})
-
-		//Set today tasks
-		schedule.setTodayTasks(tasks)
-
-		schedule.setCurrentTask(schedule.tasks.find(task => task.active))
-	}
-
 	const timer: number = setInterval(() => {
-		updateSchedule()
-		root.clock.update(env.getUnixTimeMs())
+		const now = env.getUnixTimeMs()
+		root.schedule.update(now)
+		root.clock.update(now)
 	}, 1000)
 	return {
 		stop() {

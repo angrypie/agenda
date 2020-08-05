@@ -1,4 +1,5 @@
 import { types, Instance } from 'mobx-state-tree'
+import { isCurrentSpot, newSpots } from 'lib/spots'
 
 export const Task = types
 	.model({
@@ -18,8 +19,6 @@ export interface ITask extends Instance<typeof Task> {}
 
 export const Schedule = types
 	.model({
-		//TODO use spots structure to manage taken and available
-		//time spots for tasks.
 		tasks: types.optional(types.array(Task), []),
 		todayTasks: types.optional(
 			types.array(types.safeReference(Task, { acceptsUndefined: false })),
@@ -27,25 +26,20 @@ export const Schedule = types
 		),
 		currentTask: types.safeReference(Task),
 	})
-	.actions(self => ({
-		setTodayTasks(tasks: ITask[]) {
-			self.todayTasks.replace(tasks)
-		},
-		addTask(task: ITask) {
-			//TODO find in sorted array where to put new item
-			self.tasks.push(task)
-		},
-		setCurrentTask(task: ITask | undefined) {
-			self.currentTask = task
-		},
-		//TODO use spots list to find next task
-		getNextTask(task: ITask): ITask | void {
-			const { todayTasks } = self
-			const nextIndex = todayTasks.findIndex(t => t.id === task.id) + 1
-			console.log(nextIndex, todayTasks.length)
-			if (todayTasks.length <= nextIndex) {
-				return
-			}
-			return todayTasks[nextIndex]
-		},
-	}))
+	.actions(function (self) {
+		return {
+			update(now: number) {
+				//Set Active tasks
+				self.tasks.forEach(task => task.setActive(isCurrentSpot(now, task)))
+				const spots = newSpots(self.tasks.slice())
+				//Set today tasks
+				self.todayTasks.replace(spots.todaySpots(now).get())
+				//Set current task
+				self.currentTask = self.tasks.find(task => task.active)
+			},
+
+			getNextTask(task: ITask): ITask | void {
+				return newSpots(self.tasks.slice()).next(task)
+			},
+		}
+	})
