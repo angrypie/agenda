@@ -3,11 +3,15 @@ import { View, ScrollView, StyleSheet } from 'react-native'
 import { Text, Header } from 'components/text'
 import { useStore, ITask } from 'models'
 import { observer } from 'mobx-react-lite'
-import { formatDate, formatTime } from 'lib/time'
+import { formatDate, formatTime, Day, getDayStart } from 'lib/time'
+import Swiper from 'react-native-swiper'
 
-const DayStatus = observer(() => {
-	const { clock } = useStore()
-	const dateStr = formatDate(clock.now)
+interface DayProps {
+	day: Day
+}
+
+const DayStatus = ({ day }: DayProps) => {
+	const dateStr = formatDate(getDayStart(day))
 
 	return (
 		<View
@@ -21,7 +25,7 @@ const DayStatus = observer(() => {
 			<Text style={{ fontSize: 25, fontWeight: '600', marginTop: -10 }}>+</Text>
 		</View>
 	)
-})
+}
 
 export const AddTask = () => {
 	return (
@@ -31,14 +35,31 @@ export const AddTask = () => {
 	)
 }
 
-export const TaskList = () => {
+export const TaskListScreen = () => {
+	const days = [
+		{ day: 7, month: 7, year: 2020 },
+		{ day: 8, month: 7, year: 2020 },
+		{ day: 9, month: 7, year: 2020 },
+	]
+
+	return (
+		<Swiper>
+			{days.map((day, key) => (
+				<TaskList key={key} day={day} />
+			))}
+		</Swiper>
+	)
+}
+
+export const TaskList = ({ day }: DayProps) => {
 	const { schedule } = useStore()
+	const dayTasks = schedule.getDayTaks(day)
 
 	return (
 		<View>
 			<ScrollView>
-				<DayStatus />
-				{schedule.todayTasks.map(task => (
+				<DayStatus day={day} />
+				{dayTasks.map(task => (
 					<Task key={task.id} task={task} />
 				))}
 				<AddTask />

@@ -5,7 +5,7 @@ import { StoreProvider, rootStore } from 'models'
 import { NavigationContainer, DarkTheme } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 
-import { TaskList } from 'components/task-list'
+import { TaskListScreen } from 'components/task-list'
 import { DayFocus } from 'components/day-focus'
 
 const Stack = createStackNavigator()
@@ -27,7 +27,7 @@ export default function App() {
 							),
 						})}
 					/>
-					<Stack.Screen name='Today' component={TaskList} />
+					<Stack.Screen name='Today' component={TaskListScreen} />
 				</Stack.Navigator>
 				<StatusBar style='light' />
 			</StoreProvider>
