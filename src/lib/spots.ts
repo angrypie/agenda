@@ -33,6 +33,7 @@ export const newSpots = <T extends Spot>(tasks: T[]) => {
 	}
 
 	return {
+		//todaySpots returns spots from now to end of the day
 		todaySpots: (now: number): Spots<T> => sliceByTime(now, endOfDayTime(now)),
 		get: (): T[] => spots,
 		next,

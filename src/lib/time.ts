@@ -13,12 +13,14 @@ export function formatTime(ms: number): string {
 	return dayjs(ms).format('HH:mm')
 }
 
-export interface Day {
-	year: number
-	month: number
-	day: number
+export const getDayStart = (time: number): number => {
+	return dayjs(time).startOf('day').valueOf()
 }
 
-export const getDayStart = (d: Day): number => {
-	return dayjs().year(d.year).month(d.month).date(d.day).valueOf()
-}
+//TODO refactor this :)
+export const shiftDay = (time: number, diff: number): number =>
+	diff > 0
+		? dayjs(time).add(diff, 'day').valueOf()
+		: dayjs(time)
+				.subtract(diff * -1, 'day')
+				.valueOf()

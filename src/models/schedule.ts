@@ -1,7 +1,6 @@
 import { types, Instance } from 'mobx-state-tree'
 import { isCurrentSpot, newSpots } from 'lib/spots'
-import dayjs from 'dayjs'
-import { Day, getDayStart } from 'lib/time'
+import { getDayStart } from 'lib/time'
 
 export const Task = types
 	.model({
@@ -40,11 +39,8 @@ export const Schedule = types
 				self.currentTask = self.tasks.find(task => task.active)
 			},
 
-			getDayTaks(day: Day): ITask[] {
-				const spots = newSpots(self.tasks.slice())
-				//Set today tasks
-				const start = getDayStart(day)
-				return spots.todaySpots(start).get()
+			getDayTaks(time: number): ITask[] {
+				return newSpots(self.tasks.slice()).todaySpots(getDayStart(time)).get()
 			},
 
 			getNextTask(task: ITask): ITask | void {

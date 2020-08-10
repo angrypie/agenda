@@ -2,56 +2,59 @@ import React from 'react'
 import { View, ScrollView, StyleSheet } from 'react-native'
 import { Text, Header } from 'components/text'
 import { useStore, ITask } from 'models'
-import { observer } from 'mobx-react-lite'
-import { formatDate, formatTime, Day, getDayStart } from 'lib/time'
+import { observer, useLocalStore } from 'mobx-react-lite'
+import { formatDate, formatTime, shiftDay } from 'lib/time'
 import Swiper from 'react-native-swiper'
 
 interface DayProps {
-	day: Day
+	//unix time start of the day
+	day: number
 }
 
-const DayStatus = ({ day }: DayProps) => {
-	const dateStr = formatDate(getDayStart(day))
+export const TaskListScreen = () => <DaysSwiper />
+
+export const initSwiperDays = (now: number, size: number) =>
+	[...Array(size).keys()].map((_, i) => shiftDay(now, i === size - 1 ? -1 : i))
+
+export const DaysSwiper = () => {
+	const { clock } = useStore()
+	const { now } = clock
+	const size = 3
+	const store = useLocalStore(() => ({
+		days: initSwiperDays(now, size),
+		current: 0,
+		setCurrent(index: number) {
+			const { current } = store
+			const d = current - index
+			const forward = d === -1 || d > 1
+			const i = store.days.findIndex((_, i) => i !== current && i !== index)
+			if (i !== undefined) {
+				store.days[i] = shiftDay(store.days[i], forward ? 3 : -3)
+			}
+			store.current = index
+		},
+	}))
+
+	const shiftDays = (index: number) => {
+		store.setCurrent(index)
+	}
 
 	return (
-		<View
-			style={{
-				flexDirection: 'row',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-			}}
-		>
-			<Text style={{ opacity: 0.6, fontSize: 14 }}>{dateStr}</Text>
-			<Text style={{ fontSize: 25, fontWeight: '600', marginTop: -10 }}>+</Text>
-		</View>
-	)
-}
-
-export const AddTask = () => {
-	return (
-		<View style={{ alignItems: 'center' }}>
-			<Text style={{ fontSize: 30 }}>+</Text>
-		</View>
-	)
-}
-
-export const TaskListScreen = () => {
-	const days = [
-		{ day: 7, month: 7, year: 2020 },
-		{ day: 8, month: 7, year: 2020 },
-		{ day: 9, month: 7, year: 2020 },
-	]
-
-	return (
-		<Swiper>
-			{days.map((day, key) => (
-				<TaskList key={key} day={day} />
+		<Swiper onIndexChanged={shiftDays}>
+			{store.days.map((_, i) => (
+				<TaskListPage key={i} store={store} index={i} />
 			))}
 		</Swiper>
 	)
 }
 
-export const TaskList = ({ day }: DayProps) => {
+//TaskListPage needs to watch local store in DaySwiper for changes
+export const TaskListPage = observer(({ store, index }: any) => {
+	const day = store.days[index]
+	return <TaskList day={day} />
+})
+
+export const TaskList = observer(({ day }: DayProps) => {
 	const { schedule } = useStore()
 	const dayTasks = schedule.getDayTaks(day)
 
@@ -66,7 +69,7 @@ export const TaskList = ({ day }: DayProps) => {
 			</ScrollView>
 		</View>
 	)
-}
+})
 
 export const Task = observer(
 	({ task, hideSub = false }: { task: ITask; hideSub?: boolean }) => {
@@ -96,6 +99,30 @@ export const Task = observer(
 )
 
 export const TaskTime = ({ time }: any) => <Header>{formatTime(time)}</Header>
+
+const DayStatus = ({ day }: DayProps) => {
+	const dateStr = formatDate(day)
+
+	return (
+		<View
+			style={{
+				flexDirection: 'row',
+				justifyContent: 'space-between',
+				alignItems: 'center',
+			}}
+		>
+			<Text style={{ opacity: 0.6, fontSize: 14 }}>{dateStr}</Text>
+		</View>
+	)
+}
+
+export const AddTask = () => {
+	return (
+		<View style={{ alignItems: 'center' }}>
+			<Text style={{ fontSize: 30 }}>+</Text>
+		</View>
+	)
+}
 
 const styles = StyleSheet.create({
 	task: {
