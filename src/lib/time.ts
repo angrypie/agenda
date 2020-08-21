@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { Enum7, Enum12 } from './types/enumerate'
 
 export function getUnixTimeMs(): number {
 	return dayjs().valueOf()
@@ -24,3 +25,23 @@ export const shiftDay = (time: number, diff: number): number =>
 		: dayjs(time)
 				.subtract(diff * -1, 'day')
 				.valueOf()
+
+interface TimeTags {
+	weekday: Enum7
+	month: Enum12
+}
+
+//getTimeTags get nttt
+export const parseTime = (time: number): TimeTags => {
+	const d = dayjs(time)
+	const month = d.month() as Enum12
+	const weekday = d.day() as Enum7
+
+	if (Enum12[month] === undefined) {
+		throw Error('dayjs returns invalid month index')
+	}
+	if (Enum7[weekday] === undefined) {
+		throw Error('dayjs returns invalid weekday index')
+	}
+	return { weekday, month }
+}

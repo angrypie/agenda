@@ -1,5 +1,5 @@
 //import { initSwiperDays } from './task-list'
-import { shiftDay } from 'lib/time'
+import { shiftDay, parseTime } from 'lib/time'
 import dayjs from 'dayjs'
 
 test('shiftDay forward and backward', () => {
@@ -12,3 +12,18 @@ test('shiftDay forward and backward', () => {
 		expect(shiftDay(now, -1 * i)).toBe(now - i * msPerDay)
 	})
 })
+
+//TODO havy test this stuf due to type casting
+test('parseTime on random time', () => {
+	for (let i = 0; i < 100; i++) {
+		const ms = randomMs()
+		const d = dayjs(ms)
+		const tags = parseTime(ms)
+		expect(tags.month).toBe(d.month())
+		expect(tags.weekday).toBe(d.day())
+	}
+})
+
+function randomMs(): number {
+	return Math.round(Date.now() * Math.random())
+}
