@@ -23,15 +23,14 @@ interface IValue {
 }
 
 const newtag = <T extends IValue>(tag: T) => (value: T['value']): T => {
-	tag.value = value
-	return tag
+	return { ...tag, value }
 }
 
-type Month = Tag<12>
-export const newMonth = newtag({ range: 12 } as Month)
+export type Month = Tag<12>
+export const Month = newtag({ range: 12 } as Month)
 
-type Weekday = Tag<7>
-export const newWeekday = newtag({ range: 7 } as Weekday)
+export type Weekday = Tag<7>
+export const Weekday = newtag({ range: 7 } as Weekday)
 
 //interface TimeTags {
 //weekday: WeekdayTag
