@@ -1,7 +1,10 @@
 import { Enumerate, EnumVariants } from 'lib/types'
 import { parseTime } from 'lib/time'
 
-type Features = number[]
+export type Features = number[]
+
+export const timeToFeatures = (time: number): Features =>
+	timeTagsToFeatures(getTimeTags(time))
 
 interface Tag<T extends EnumVariants> {
 	value: Enumerate<T>
@@ -26,9 +29,6 @@ interface TimeTags {
 	weekday: Weekday
 	month: Month
 }
-
-export const timeToFeatures = (time: number): Features =>
-	timeTagsToFeatures(getTimeTags(time))
 
 function getTimeTags(time: number): TimeTags {
 	const t = parseTime(time)

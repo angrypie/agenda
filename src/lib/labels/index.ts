@@ -1,3 +1,5 @@
+import { Features, timeToFeatures } from './tags'
+
 export interface Task {
 	id: string
 	tags: string[]
@@ -11,6 +13,10 @@ export function newMatcher() {
 	const trainModel = () => {
 		//TODO train set using tasks log
 	}
+	const matchByFeatures = (features: Features): Task[] => {
+		//TODO
+		return []
+	}
 
 	return {
 		//log adds tasks to train set
@@ -19,6 +25,9 @@ export function newMatcher() {
 			trainModel()
 		},
 
-		match(time: number): string[] {},
+		match(time: number): Task[] {
+			const features = timeToFeatures(time)
+			return matchByFeatures(features)
+		},
 	}
 }
