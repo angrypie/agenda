@@ -1,6 +1,7 @@
 import { Month, Weekday } from 'lib/labels/tags'
 import { Enum7, Enum12 } from 'lib/types/enumerate'
-//import { Enumerate } from 'lib/types'
+import { newMatcher } from 'lib/labels'
+import { stubTasks } from 'models/root'
 
 test('create new month tags', () => {
 	Enum12.forEach((value, expected) => {
@@ -16,4 +17,12 @@ test('create new weekday tags', () => {
 		expect(variant.value).toBe(expected)
 		expect(variant.range).toBe(7)
 	})
+})
+
+test('test matchig tasks by time', () => {
+	const matcher = newMatcher()
+	matcher.log(stubTasks)
+	const tasks = matcher.match(1)
+
+	expect(tasks.length).toBe(3)
 })

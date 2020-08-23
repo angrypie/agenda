@@ -2,7 +2,6 @@ import { Features, timeToFeatures } from './tags'
 
 export interface Task {
 	id: string
-	tags: string[]
 	time: number
 	duration: number
 }
@@ -14,8 +13,8 @@ export function newMatcher() {
 		//TODO train set using tasks log
 	}
 	const matchByFeatures = (features: Features): Task[] => {
-		//TODO
-		return []
+		//TODO use trained NN here
+		return [...log.values()].slice(Math.max(log.size - 3), 1)
 	}
 
 	return {
