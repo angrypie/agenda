@@ -1,6 +1,7 @@
 import { types, Instance } from 'mobx-state-tree'
 import { isCurrentSpot, newSpots } from 'lib/spots'
 import { getDayStart } from 'lib/time'
+import { newMatcher } from 'lib/labels'
 
 export const Task = types
 	.model({
@@ -28,23 +29,26 @@ export const Schedule = types
 		currentTask: types.safeReference(Task),
 	})
 	.actions(function (self) {
+		const spots = newSpots(self.tasks.slice())
+		const matcher = newMatcher<ITask>()
 		return {
 			update(now: number) {
 				//Set Active tasks
 				self.tasks.forEach(task => task.setActive(isCurrentSpot(now, task)))
-				const spots = newSpots(self.tasks.slice())
-				//Set today tasks
 				self.todayTasks.replace(spots.todaySpots(now).get())
-				//Set current task
 				self.currentTask = self.tasks.find(task => task.active)
 			},
 
+			suggestByTime(time: number): ITask[] {
+				return matcher.match(time)
+			},
+
 			getDayTaks(time: number): ITask[] {
-				return newSpots(self.tasks.slice()).todaySpots(getDayStart(time)).get()
+				return spots.todaySpots(getDayStart(time)).get()
 			},
 
 			getNextTask(task: ITask): ITask | void {
-				return newSpots(self.tasks.slice()).next(task)
+				return spots.next(task)
 			},
 		}
 	})
