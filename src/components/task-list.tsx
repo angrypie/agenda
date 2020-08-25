@@ -5,6 +5,8 @@ import { useStore, ITask } from 'models'
 import { observer, useLocalStore } from 'mobx-react-lite'
 import { formatDate, formatTime, shiftDay } from 'lib/time'
 import Swiper from 'react-native-swiper'
+import { useNavigation } from '@react-navigation/native'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 interface DayProps {
 	//unix time start of the day
@@ -117,9 +119,14 @@ const DayStatus = ({ day }: DayProps) => {
 }
 
 export const AddTask = () => {
+	const navigation = useNavigation()
+	const onPress = () => navigation.navigate('MyModal')
+
 	return (
 		<View style={{ alignItems: 'center' }}>
-			<Text style={{ fontSize: 30 }}>+</Text>
+			<TouchableOpacity onPress={onPress}>
+				<Text style={{ fontSize: 30 }}>+</Text>
+			</TouchableOpacity>
 		</View>
 	)
 }
