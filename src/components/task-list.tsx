@@ -24,12 +24,12 @@ export const DaysSwiper = () => {
 		days: initSwiperDays(now, size),
 		current: 0,
 		setCurrent(index: number) {
-			const { current } = store
+			const { current, days } = store
 			const d = current - index
 			const forward = d === -1 || d > 1
-			const i = store.days.findIndex((_, i) => i !== current && i !== index)
+			const i = days.findIndex((_, i) => i !== current && i !== index)
 			if (i !== undefined) {
-				store.days[i] = shiftDay(store.days[i], forward ? 3 : -3)
+				days[i] = shiftDay(days[i], forward ? 3 : -3)
 			}
 			store.current = index
 		},
@@ -40,7 +40,7 @@ export const DaysSwiper = () => {
 	}
 
 	return (
-		<Swiper onIndexChanged={shiftDays}>
+		<Swiper showsPagination={false} onIndexChanged={shiftDays}>
 			{store.days.map((_, i) => (
 				<TaskListPage key={i} store={store} index={i} />
 			))}
