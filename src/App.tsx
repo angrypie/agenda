@@ -6,20 +6,23 @@ import { NavigationContainer, DarkTheme } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 
 import { TaskListScreen } from 'components/task-list'
-import { DayFocus } from 'components/day-focus'
+import { DayFocusScreen } from 'components/day-focus'
 import { AddTaskScreen } from 'components/add-taks'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 const MainStack = createStackNavigator()
 const RootStack = createStackNavigator()
 
 export default function App() {
 	return (
-		<NavigationContainer theme={DarkTheme}>
-			<StoreProvider value={rootStore}>
-				<RootStackScreen />
-				<StatusBar style='light' />
-			</StoreProvider>
-		</NavigationContainer>
+		<SafeAreaProvider>
+			<NavigationContainer theme={DarkTheme}>
+				<StoreProvider value={rootStore}>
+					<RootStackScreen />
+					<StatusBar style='light' />
+				</StoreProvider>
+			</NavigationContainer>
+		</SafeAreaProvider>
 	)
 }
 
@@ -41,7 +44,7 @@ function MainStackScreen() {
 		<MainStack.Navigator initialRouteName='Focus'>
 			<MainStack.Screen
 				name='Focus'
-				component={DayFocus}
+				component={DayFocusScreen}
 				options={({ navigation }) => ({
 					headerRight: () => (
 						<Button

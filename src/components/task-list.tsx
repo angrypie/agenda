@@ -7,13 +7,18 @@ import { formatDate, formatTime, shiftDay } from 'lib/time'
 import Swiper from 'react-native-swiper'
 import { useNavigation } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { SafeView } from 'components/safe-area'
 
 interface DayProps {
 	//unix time start of the day
 	day: number
 }
 
-export const TaskListScreen = () => <DaysSwiper />
+export const TaskListScreen = () => (
+	<SafeView>
+		<DaysSwiper />
+	</SafeView>
+)
 
 export const initSwiperDays = (now: number, size: number) =>
 	[...Array(size).keys()].map((_, i) => shiftDay(now, i === size - 1 ? -1 : i))

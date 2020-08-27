@@ -1,22 +1,25 @@
 import React, { useState } from 'react'
 import { View, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
+import { SafeView } from 'components/safe-area'
 
 export function AddTaskScreen({ navigation }: any) {
 	return (
-		<KeyboardAvoidingView
-			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			style={{ flex: 1 }}
-		>
-			<View
-				style={{
-					flex: 1,
-					alignItems: 'stretch',
-					justifyContent: 'center',
-				}}
+		<SafeView>
+			<KeyboardAvoidingView
+				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+				style={{ flex: 1 }}
 			>
-				<InputName />
-			</View>
-		</KeyboardAvoidingView>
+				<View
+					style={{
+						flex: 1,
+						alignItems: 'stretch',
+						justifyContent: 'center',
+					}}
+				>
+					<InputName />
+				</View>
+			</KeyboardAvoidingView>
+		</SafeView>
 	)
 }
 

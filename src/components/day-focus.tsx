@@ -4,6 +4,13 @@ import { Text, Header } from 'components/text'
 import { Task, TaskTime } from 'components/task-list'
 import { useStore } from 'models'
 import { observer } from 'mobx-react-lite'
+import { SafeView } from 'components/safe-area'
+
+export const DayFocusScreen = () => (
+	<SafeView>
+		<DayFocus />
+	</SafeView>
+)
 
 export const DayFocus = observer(() => {
 	const { schedule } = useStore()
