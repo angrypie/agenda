@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { View, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
 import { SafeView } from 'components/safe-area'
+import { useStore } from 'models'
+import { useNavigation } from '@react-navigation/native'
 
 export function AddTaskScreen({ navigation }: any) {
 	return (
@@ -26,6 +28,12 @@ export function AddTaskScreen({ navigation }: any) {
 
 const InputName = () => {
 	const [value, onChangeText] = useState('')
+	const { schedule } = useStore()
+	const navigation = useNavigation()
+	const addPlan = () => {
+		schedule.addPlan(value)
+		navigation.goBack()
+	}
 
 	return (
 		<TextInput
@@ -36,6 +44,7 @@ const InputName = () => {
 			placeholder='Task name...'
 			placeholderTextColor='rgba(255,255,255,.2)'
 			value={value}
+			onSubmitEditing={addPlan}
 			autoFocus
 		/>
 	)

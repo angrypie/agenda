@@ -50,5 +50,10 @@ export const Schedule = types
 			getNextTask(task: ITask): ITask | void {
 				return spots.next(task)
 			},
+
+			//TODO Add Plan to plan backlog
+			addPlan(name: string) {
+				console.log('TODO: add-task -> add plan:', name)
+			},
 		}
 	})
