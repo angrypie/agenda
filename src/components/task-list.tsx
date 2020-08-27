@@ -120,7 +120,7 @@ const DayStatus = ({ day }: DayProps) => {
 
 export const AddTask = () => {
 	const navigation = useNavigation()
-	const onPress = () => navigation.navigate('MyModal')
+	const onPress = () => navigation.navigate('AddTaskModal')
 
 	return (
 		<View style={{ alignItems: 'center' }}>
