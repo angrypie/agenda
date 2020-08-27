@@ -17,6 +17,7 @@ export function AddTaskScreen({ navigation }: any) {
 					}}
 				>
 					<InputName />
+					<View style={{ height: 100 }} />
 				</View>
 			</KeyboardAvoidingView>
 		</SafeView>
@@ -35,6 +36,7 @@ const InputName = () => {
 			placeholder='Task name...'
 			placeholderTextColor='rgba(255,255,255,.2)'
 			value={value}
+			autoFocus
 		/>
 	)
 }

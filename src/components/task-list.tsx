@@ -14,11 +14,7 @@ interface DayProps {
 	day: number
 }
 
-export const TaskListScreen = () => (
-	<SafeView>
-		<DaysSwiper />
-	</SafeView>
-)
+export const TaskListScreen = () => <DaysSwiper />
 
 export const initSwiperDays = (now: number, size: number) =>
 	[...Array(size).keys()].map((_, i) => shiftDay(now, i === size - 1 ? -1 : i))
@@ -49,7 +45,9 @@ export const DaysSwiper = () => {
 	return (
 		<Swiper showsPagination={false} onIndexChanged={shiftDays}>
 			{store.days.map((_, i) => (
-				<TaskListPage key={i} store={store} index={i} />
+				<SafeView key={i}>
+					<TaskListPage store={store} index={i} />
+				</SafeView>
 			))}
 		</Swiper>
 	)
