@@ -8,6 +8,8 @@ import Swiper from 'react-native-swiper'
 import { useNavigation } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeView } from 'components/safe-area'
+import { gapsBetweenSpots } from 'lib/spots'
+import dayjs from 'dayjs'
 
 interface DayProps {
 	//unix time start of the day
@@ -62,19 +64,38 @@ export const TaskListPage = observer(({ store, index }: any) => {
 export const TaskList = observer(({ day }: DayProps) => {
 	const { schedule } = useStore()
 	const dayTasks = schedule.getDayTaks(day)
+	const gaps = gapsBetweenSpots(dayTasks)
 
 	return (
 		<View>
 			<ScrollView>
 				<DayStatus day={day} />
-				{dayTasks.map(task => (
-					<Task key={task.id} task={task} />
+				{dayTasks.map((task, index) => (
+					<View key={task.id}>
+						<Task task={task} />
+						<TasksGap gap={gaps(index)} />
+					</View>
 				))}
 				<AddTask />
 			</ScrollView>
 		</View>
 	)
 })
+
+const TasksGap = ({ gap }: { gap: number }) => {
+	if (gap === 0) {
+		return null
+	}
+	return (
+		<Header style={{ fontSize: 18 }}>{formatDuration(gap)} hours gap</Header>
+	)
+}
+
+const formatDuration = (time: number) => {
+	const now = dayjs()
+	const next = dayjs(now.valueOf() + time)
+	return next.diff(now, 'hour')
+}
 
 export const Task = observer(
 	({ task, hideSub = false }: { task: ITask; hideSub?: boolean }) => {

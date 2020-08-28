@@ -1,12 +1,40 @@
 import { sort, curry, slice, findIndex } from 'rambda'
 import dayjs from 'dayjs'
 
+export interface Spot {
+	id: string
+	time: number
+	duration: number
+}
+
+export interface Spots<T> {
+	todaySpots: (now: number) => Spots<T>
+	get: () => T[]
+}
+
 const createIndex = <T extends Spot>(spots: T[]) => {
 	const index = spots.reduce(
 		(p, c, i) => p.set(c.id, i),
 		new Map<string, number>()
 	)
 	return (id: string) => index.get(id)
+}
+
+const spotsDistance = (before: Spot, after: Spot) =>
+	after.time - (before.time + before.duration)
+
+export const gapsBetweenSpots = (spots: Spot[]): ((i: number) => number) => {
+	const gaps = new Map<number, number>()
+	spots.forEach((spot, i) => {
+		const next = spots[i + 1]
+		if (next === undefined) {
+			gaps.set(i, 0)
+			return
+		}
+		const gap = Math.max(spotsDistance(spot, next), 0)
+		gaps.set(i, gap)
+	})
+	return (index: number) => gaps.get(index) || 0
 }
 
 export const newSpots = <T extends Spot>(tasks: T[]) => {
@@ -38,17 +66,6 @@ export const newSpots = <T extends Spot>(tasks: T[]) => {
 		get: (): T[] => spots,
 		next,
 	}
-}
-
-export interface Spot {
-	id: string
-	time: number
-	duration: number
-}
-
-export interface Spots<T> {
-	todaySpots: (now: number) => Spots<T>
-	get: () => T[]
 }
 
 const sortSpots = <T extends Spot>(list: T[]): T[] =>
