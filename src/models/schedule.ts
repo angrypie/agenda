@@ -47,8 +47,8 @@ export const Schedule = types
 				return spots.todaySpots(getDayStart(time)).get()
 			},
 
-			getNextTask(task: ITask): ITask | void {
-				return spots.next(task)
+			getNextTask(now: number): ITask | undefined {
+				return spots.next(now)
 			},
 
 			//TODO Add Plan to plan backlog

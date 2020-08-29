@@ -13,33 +13,32 @@ export const DayFocusScreen = () => (
 )
 
 export const DayFocus = observer(() => {
-	const { schedule } = useStore()
+	const { schedule, clock } = useStore()
 
 	const task = schedule.currentTask
 
-	if (task === undefined) {
-		return (
-			<View>
-				<Text>There is no tasks today</Text>
-			</View>
-		)
-	}
-
-	const nextTask = schedule.getNextTask(task)
+	const nextTask = schedule.getNextTask(clock.now)
 	return (
 		<View style={styles.dayFocus}>
 			<View style={[styles.right, { opacity: 0.2 }]}>
 				<View />
-				<TaskTime time={task.time} />
+				{task ? <TaskTime time={task.time} /> : null}
 			</View>
 			<View style={{ top: -40 }}>
-				<Task task={task} />
+				{task ? (
+					<Task task={task} />
+				) : (
+					<View>
+						<Header>Fee Time</Header>
+						<Text> Tap to pick a task for now</Text>
+					</View>
+				)}
 			</View>
 			<View style={{ opacity: 0.4 }}>
-				{!nextTask ? (
-					<Header>Fee Time</Header>
-				) : (
+				{nextTask ? (
 					<Task task={nextTask} hideSub />
+				) : (
+					<Header>Fee Time</Header>
 				)}
 			</View>
 		</View>
