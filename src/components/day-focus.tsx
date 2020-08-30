@@ -15,19 +15,19 @@ export const DayFocusScreen = () => (
 export const DayFocus = observer(() => {
 	const { schedule, clock } = useStore()
 
-	const task = schedule.currentTask
-
+	const spot = schedule.getCurrentSpot(clock.now)
 	const nextTask = schedule.getNextTask(clock.now)
 	return (
 		<View style={styles.dayFocus}>
 			<View style={[styles.right, { opacity: 0.2 }]}>
 				<View />
-				{task ? <TaskTime time={task.time} /> : null}
+				{spot ? <TaskTime time={spot.time} /> : null}
 			</View>
 			<View style={{ top: -40 }}>
-				{task ? (
-					<Task task={task} />
+				{spot ? (
+					<Task task={spot} />
 				) : (
+					//TODO Make sure this ariant will never appear
 					<View>
 						<Header>Fee Time</Header>
 						<Text> Tap to pick a task for now</Text>

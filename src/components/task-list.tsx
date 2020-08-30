@@ -64,38 +64,19 @@ export const TaskListPage = observer(({ store, index }: any) => {
 export const TaskList = observer(({ day }: DayProps) => {
 	const { schedule } = useStore()
 	const dayTasks = schedule.getDayTask(day)
-	const gaps = gapsBetweenSpots(dayTasks)
 
 	return (
 		<View>
 			<ScrollView>
 				<DayStatus day={day} />
-				{dayTasks.map((task, index) => (
-					<View key={task.id}>
-						<Task task={task} />
-						<TasksGap gap={gaps(index)} />
-					</View>
+				{dayTasks.map(task => (
+					<Task key={task.id} task={task} />
 				))}
 				<AddTask />
 			</ScrollView>
 		</View>
 	)
 })
-
-const TasksGap = ({ gap }: { gap: number }) => {
-	if (gap === 0) {
-		return null
-	}
-	return (
-		<Header style={{ fontSize: 18 }}>{formatDuration(gap)} hours gap</Header>
-	)
-}
-
-const formatDuration = (time: number) => {
-	const now = dayjs()
-	const next = dayjs(now.valueOf() + time)
-	return next.diff(now, 'hour')
-}
 
 interface TaskProps {
 	hideSub?: boolean

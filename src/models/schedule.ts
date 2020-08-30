@@ -47,8 +47,12 @@ export const Schedule = types
 				return spots.todaySpots(getDayStart(time)).get()
 			},
 
-			getNextTask(now: number): ITask | undefined {
-				return spots.next(now)
+			getCurrentSpot(time: number): Spot | undefined {
+				return spots.get().find(task => isCurrentSpot(time, task))
+			},
+
+			getNextTask(time: number): Spot | undefined {
+				return spots.next(time)
 			},
 
 			//TODO Add Plan to plan backlog
