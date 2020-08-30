@@ -45,3 +45,5 @@ export const parseTime = (time: number): TimeTags => {
 	}
 	return { weekday, month }
 }
+
+export const endOfDayTime = (now: number) => dayjs(now).endOf('day').valueOf()

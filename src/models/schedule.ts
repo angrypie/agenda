@@ -1,5 +1,5 @@
 import { types, Instance } from 'mobx-state-tree'
-import { isCurrentSpot, newSpots } from 'lib/spots'
+import { isCurrentSpot, newSpots, Spot } from 'lib/spots'
 import { getDayStart } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 
@@ -35,7 +35,7 @@ export const Schedule = types
 			update(now: number) {
 				//Set Active tasks
 				self.tasks.forEach(task => task.setActive(isCurrentSpot(now, task)))
-				self.todayTasks.replace(spots.todaySpots(now).get())
+				self.todayTasks.replace(spots.todaySpots(now).underlyingList())
 				self.currentTask = self.tasks.find(task => task.active)
 			},
 
@@ -43,7 +43,7 @@ export const Schedule = types
 				return matcher.match(time)
 			},
 
-			getDayTaks(time: number): ITask[] {
+			getDayTask(time: number): Spot[] {
 				return spots.todaySpots(getDayStart(time)).get()
 			},
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, ScrollView, StyleSheet } from 'react-native'
 import { Text, Header } from 'components/text'
-import { useStore, ITask } from 'models'
+import { useStore } from 'models'
 import { observer, useLocalStore } from 'mobx-react-lite'
 import { formatDate, formatTime, shiftDay } from 'lib/time'
 import Swiper from 'react-native-swiper'
@@ -63,7 +63,7 @@ export const TaskListPage = observer(({ store, index }: any) => {
 
 export const TaskList = observer(({ day }: DayProps) => {
 	const { schedule } = useStore()
-	const dayTasks = schedule.getDayTaks(day)
+	const dayTasks = schedule.getDayTask(day)
 	const gaps = gapsBetweenSpots(dayTasks)
 
 	return (
@@ -97,32 +97,35 @@ const formatDuration = (time: number) => {
 	return next.diff(now, 'hour')
 }
 
-export const Task = observer(
-	({ task, hideSub = false }: { task: ITask; hideSub?: boolean }) => {
-		const { name, time, active } = task
-		const { clock } = useStore()
+interface TaskProps {
+	hideSub?: boolean
+	task: { name: string; time: number; active: boolean }
+}
 
-		const displayTime = active ? clock.now : time
-		const style = {
-			opacity: active ? 1 : 0.5,
-			height: hideSub ? 100 : 200,
-		}
-		return (
-			<View style={[styles.task, style]}>
-				<View style={styles.header}>
-					<Header>{name}</Header>
-					<TaskTime time={displayTime} />
-				</View>
-				{hideSub ? null : (
-					<View style={styles.sub}>
-						<Text>Some subtask</Text>
-						<Text>Another subtask</Text>
-					</View>
-				)}
-			</View>
-		)
+export const Task = observer(({ task, hideSub = false }: TaskProps) => {
+	const { name, time, active } = task
+	const { clock } = useStore()
+
+	const displayTime = active ? clock.now : time
+	const style = {
+		opacity: active ? 1 : 0.5,
+		height: hideSub ? 100 : 200,
 	}
-)
+	return (
+		<View style={[styles.task, style]}>
+			<View style={styles.header}>
+				<Header>{name}</Header>
+				<TaskTime time={displayTime} />
+			</View>
+			{hideSub ? null : (
+				<View style={styles.sub}>
+					<Text>Some subtask</Text>
+					<Text>Another subtask</Text>
+				</View>
+			)}
+		</View>
+	)
+})
 
 export const TaskTime = ({ time }: any) => <Header>{formatTime(time)}</Header>
 
