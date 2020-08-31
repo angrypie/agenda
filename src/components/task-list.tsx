@@ -63,6 +63,7 @@ export const TaskListPage = observer(({ store, index }: any) => {
 export const TaskList = observer(({ day }: DayProps) => {
 	const { schedule } = useStore()
 	const dayTasks = schedule.getDayTask(day)
+	console.log(dayTasks.length)
 
 	return (
 		<View>

@@ -7,7 +7,7 @@ export interface Spot extends TimeSpan {
 }
 
 export interface Spots<T> {
-	todaySpots: (now: number) => Spots<T>
+	todaySpots: (now: number) => Spot[]
 	get: () => Spot[]
 	underlyingList: () => T[]
 	next: (now: number) => Spot | undefined
@@ -16,16 +16,9 @@ export interface Spots<T> {
 export const newSpots = <T extends Spot>(tasks: T[]): Spots<T> => {
 	const spots = sortSpots(tasks)
 
-	const sliceByTime = (start: number, end: number): Spots<T> =>
-		newSpots(
-			slice(firstNextSpot(start, spots), firstNextSpot(end, spots) + 1, spots)
-		)
-
-	//TODO do something with this ugly checks (do not validate - parse)
-
 	const getSpots = (): Spot[] => {
 		const gaps = gapsBetweenSpots(spots)
-		return spots.flatMap((spot, index) => {
+		const arr = spots.flatMap((spot, index) => {
 			const arr: Spot[] = [spot]
 			const gap = gaps(index)
 			if (gap !== 0) {
@@ -38,6 +31,33 @@ export const newSpots = <T extends Spot>(tasks: T[]): Spots<T> => {
 			}
 			return arr
 		})
+		const last = arr[arr.length - 1]
+		arr.push({
+			id: 'endoftime',
+			name: 'End Gap',
+			duration: Infinity,
+			time: arr.length === 0 ? 0 : last.time + last.duration,
+		})
+		if (last !== undefined) {
+			arr.unshift({
+				id: 'startoftime',
+				name: 'Start Gap',
+				duration: arr[0].time,
+				time: 0,
+			})
+		}
+
+		return arr
+	}
+
+	//TODO do something with this ugly checks (do not validate - parse)
+	const sliceByTime = (start: number, end: number): Spot[] => {
+		const spots = getSpots()
+		return slice(
+			firstNextSpot(start, spots),
+			firstNextSpot(end, spots) + 1,
+			getSpots()
+		)
 	}
 
 	const next = (now: number): Spot | undefined => {
@@ -51,7 +71,7 @@ export const newSpots = <T extends Spot>(tasks: T[]): Spots<T> => {
 
 	return {
 		//todaySpots returns spots from now to end of the day
-		todaySpots: (now: number): Spots<T> => sliceByTime(now, endOfDayTime(now)),
+		todaySpots: (now: number): Spot[] => sliceByTime(now, endOfDayTime(now)),
 		get: getSpots,
 		underlyingList: (): T[] => spots,
 		next,

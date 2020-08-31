@@ -22,14 +22,14 @@ export const stubTasks = [
 	{ id: '1', duration: d(1), name: 'Workout', time: t(9) },
 	{ id: '2', duration: d(4), name: 'Work Session', time: t(10) },
 	{ id: '3', duration: d(1), name: 'Clean Home', time: t(14) },
-	{ id: '5', duration: d(3), name: 'Work Session', time: t(16) },
-	{ id: '6', duration: d(3), name: 'Practice', time: t(19) },
-	{ id: '7', duration: d(9), name: 'Sleep', time: t(24) },
+	{ id: '5', duration: d(4), name: 'Work Session', time: t(16) },
+	{ id: '6', duration: d(3), name: 'Practice', time: t(20) },
+	{ id: '7', duration: d(8), name: 'Sleep', time: t(24) },
 ]
 
 export const rootStore = RootModel.create(
 	{
-		clock: {},
+		clock: { now: t(1) },
 		schedule: {
 			tasks: stubTasks,
 		},
@@ -45,7 +45,6 @@ export function CreateScheduler(root: Instance<typeof rootStore>) {
 
 	const timer = setInterval(() => {
 		const now = env.getUnixTimeMs()
-		root.schedule.update(now)
 		root.clock.update(now)
 	}, 1000)
 	return {
