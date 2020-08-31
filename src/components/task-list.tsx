@@ -8,8 +8,7 @@ import Swiper from 'react-native-swiper'
 import { useNavigation } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeView } from 'components/safe-area'
-import { gapsBetweenSpots } from 'lib/spots'
-import dayjs from 'dayjs'
+import { isCurrentSpot } from 'lib/spots'
 
 interface DayProps {
 	//unix time start of the day
@@ -80,12 +79,18 @@ export const TaskList = observer(({ day }: DayProps) => {
 
 interface TaskProps {
 	hideSub?: boolean
-	task: { name: string; time: number; active: boolean }
+	task: {
+		id: string
+		duration: number
+		name: string
+		time: number
+	}
 }
 
 export const Task = observer(({ task, hideSub = false }: TaskProps) => {
-	const { name, time, active } = task
+	const { name, time } = task
 	const { clock } = useStore()
+	const active = isCurrentSpot(clock.now, task)
 
 	const displayTime = active ? clock.now : time
 	const style = {

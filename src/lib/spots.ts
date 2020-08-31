@@ -1,13 +1,9 @@
 import { sort, curry, slice, findIndex } from 'rambda'
 import { endOfDayTime } from 'lib/time'
 
-export interface Spot {
+export interface Spot extends TimeSpan {
 	id: string
 	name: string
-	time: number
-	duration: number
-	//TODO remove active flag from spot and task
-	active: boolean
 }
 
 export interface Spots<T> {
@@ -38,7 +34,6 @@ export const newSpots = <T extends Spot>(tasks: T[]): Spots<T> => {
 					name: 'Free time',
 					duration: gap,
 					time: spot.time + spot.duration,
-					active: false,
 				})
 			}
 			return arr
@@ -87,9 +82,13 @@ const firstNextSpot = (time: number, spots: Spot[]): number =>
 	findIndex(curry(isActiveSpot)(time), spots)
 
 //isActiveSpot return true if spot is not end yet
-const isActiveSpot = (now: number, spot: Spot): boolean =>
+const isActiveSpot = (now: number, spot: TimeSpan): boolean =>
 	now < spot.time + spot.duration
 
 //isCurrentSpot return true if spot belong to current time
-export const isCurrentSpot = (now: number, { time, duration }: Spot): boolean =>
-	now > time && now < time + duration
+interface TimeSpan {
+	time: number
+	duration: number
+}
+export const isCurrentSpot = (now: number, t: TimeSpan): boolean =>
+	now > t.time && now < t.time + t.duration
