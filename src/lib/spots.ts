@@ -6,14 +6,13 @@ export interface Spot extends TimeSpan {
 	name: string
 }
 
-export interface Spots<T> {
+export interface Spots {
 	todaySpots: (now: number) => Spot[]
 	get: () => Spot[]
-	underlyingList: () => T[]
 	next: (now: number) => Spot | undefined
 }
 
-export const newSpots = <T extends Spot>(tasks: T[]): Spots<T> => {
+export const newSpots = (tasks: Spot[]): Spots => {
 	const spots = sortSpots(tasks)
 
 	const getSpots = (): Spot[] => {
@@ -73,7 +72,6 @@ export const newSpots = <T extends Spot>(tasks: T[]): Spots<T> => {
 		//todaySpots returns spots from now to end of the day
 		todaySpots: (now: number): Spot[] => sliceByTime(now, endOfDayTime(now)),
 		get: getSpots,
-		underlyingList: (): T[] => spots,
 		next,
 	}
 }
