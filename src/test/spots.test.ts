@@ -27,6 +27,6 @@ test('spots tree to flat array', () => {
 	tasks.forEach(task => {
 		const node = root.childs.find(child => task.id === child.spot.id)
 		expect(node).toBeDefined()
-		expect(task).toEqual(node)
+		expect(task).toEqual(node?.spot)
 	})
 })

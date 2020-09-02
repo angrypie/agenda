@@ -28,11 +28,11 @@ export const Schedule = types
 				return spots.todaySpots(getDayStart(time))
 			},
 
-			getCurrentSpot(time: number): Spot | undefined {
-				return spots.get().find(task => isCurrentSpot(time, task))
+			getCurrentSpot(time: number): Spot {
+				return spots.current(time)
 			},
 
-			getNextTask(time: number): Spot | undefined {
+			getNextTask(time: number): Spot {
 				return spots.next(time)
 			},
 
