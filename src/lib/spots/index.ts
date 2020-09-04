@@ -56,7 +56,7 @@ const firstNextSpot = (time: number, spots: Spot[]): number =>
 	spots.findIndex(curry(isActiveSpot)(time))
 
 //isActiveSpot return true if spot is not end yet
-const isActiveSpot = (now: number, spot: TimeSpan): boolean =>
+export const isActiveSpot = (now: number, spot: TimeSpan): boolean =>
 	now < timeSpanEnd(spot)
 
 export const isCurrentSpot = (now: number, t: TimeSpan): boolean =>

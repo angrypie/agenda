@@ -10,12 +10,11 @@ export function formatDate(ms: number): string {
 	return dayjs(ms).format('dddd, MMM D')
 }
 
+//TODO pass clock with today time as dependencies to
+export const isToday = (ms: number): boolean => dayjs().isSame(ms, 'day')
+
 export function formatTime(ms: number): string {
 	return dayjs(ms).format('HH:mm')
-}
-
-export const getDayStart = (time: number): number => {
-	return dayjs(time).startOf('day').valueOf()
 }
 
 //TODO refactor this :)
@@ -46,4 +45,8 @@ export const parseTime = (time: number): TimeTags => {
 	return { weekday, month }
 }
 
-export const endOfDayTime = (now: number) => dayjs(now).endOf('day').valueOf()
+export const getDayStart = (time: number): number =>
+	dayjs(time).startOf('day').valueOf()
+
+export const endOfDayTime = (time: number): number =>
+	dayjs(time).endOf('day').valueOf()

@@ -3,12 +3,13 @@ import { View, ScrollView } from 'react-native'
 import { Text } from 'components/text'
 import { useStore } from 'models'
 import { observer, useLocalStore } from 'mobx-react-lite'
-import { formatDate, shiftDay } from 'lib/time'
+import { formatDate, shiftDay, isToday } from 'lib/time'
 import Swiper from 'react-native-swiper'
 import { useNavigation } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeView } from 'components/safe-area'
 import { Task } from 'components/task'
+import { isActiveSpot, Spot } from 'lib/spots'
 
 interface DayProps {
 	//unix time start of the day
@@ -60,22 +61,27 @@ export const TaskListPage = observer(({ store, index }: any) => {
 	return <TaskList day={day} />
 })
 
-export const TaskList = ({ day }: DayProps) => {
-	const { schedule } = useStore()
+export const TaskList = observer(({ day }: DayProps) => {
+	const { schedule, clock } = useStore()
 	const dayTasks = schedule.getDayTask(day)
+
+	const renderTasks = (tasks: Spot[]) =>
+		tasks.map(task => <Task key={task.id} task={task} />)
+
+	const tasks = isToday(day)
+		? dayTasks.filter(task => isActiveSpot(clock.now, task))
+		: dayTasks
 
 	return (
 		<View>
 			<ScrollView>
 				<DayStatus day={day} />
-				{dayTasks.map(task => (
-					<Task key={task.id} task={task} />
-				))}
+				{renderTasks(tasks)}
 				<AddTask />
 			</ScrollView>
 		</View>
 	)
-}
+})
 
 const DayStatus = ({ day }: DayProps) => {
 	const dateStr = formatDate(day)
