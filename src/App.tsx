@@ -41,7 +41,7 @@ function RootStackScreen() {
 
 function MainStackScreen() {
 	return (
-		<MainStack.Navigator initialRouteName='Focus'>
+		<MainStack.Navigator initialRouteName='Today'>
 			<MainStack.Screen
 				name='Focus'
 				component={DayFocusScreen}

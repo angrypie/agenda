@@ -1,14 +1,14 @@
 import React from 'react'
-import { View, ScrollView, StyleSheet } from 'react-native'
-import { Text, Header } from 'components/text'
+import { View, ScrollView } from 'react-native'
+import { Text } from 'components/text'
 import { useStore } from 'models'
 import { observer, useLocalStore } from 'mobx-react-lite'
-import { formatDate, formatTime, shiftDay } from 'lib/time'
+import { formatDate, shiftDay } from 'lib/time'
 import Swiper from 'react-native-swiper'
 import { useNavigation } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeView } from 'components/safe-area'
-import { isCurrentSpot } from 'lib/spots'
+import { Task } from 'components/task'
 
 interface DayProps {
 	//unix time start of the day
@@ -60,7 +60,7 @@ export const TaskListPage = observer(({ store, index }: any) => {
 	return <TaskList day={day} />
 })
 
-export const TaskList = observer(({ day }: DayProps) => {
+export const TaskList = ({ day }: DayProps) => {
 	const { schedule } = useStore()
 	const dayTasks = schedule.getDayTask(day)
 
@@ -75,45 +75,7 @@ export const TaskList = observer(({ day }: DayProps) => {
 			</ScrollView>
 		</View>
 	)
-})
-
-interface TaskProps {
-	hideSub?: boolean
-	task: {
-		id: string
-		duration: number
-		name: string
-		time: number
-	}
 }
-
-export const Task = observer(({ task, hideSub = false }: TaskProps) => {
-	const { name, time } = task
-	const { clock } = useStore()
-	const active = isCurrentSpot(clock.now, task)
-
-	const displayTime = active ? clock.now : time
-	const style = {
-		opacity: active ? 1 : 0.5,
-		height: hideSub ? 100 : 200,
-	}
-	return (
-		<View style={[styles.task, style]}>
-			<View style={styles.header}>
-				<Header>{name}</Header>
-				<TaskTime time={displayTime} />
-			</View>
-			{hideSub ? null : (
-				<View style={styles.sub}>
-					<Text>Some subtask</Text>
-					<Text>Another subtask</Text>
-				</View>
-			)}
-		</View>
-	)
-})
-
-export const TaskTime = ({ time }: any) => <Header>{formatTime(time)}</Header>
 
 const DayStatus = ({ day }: DayProps) => {
 	const dateStr = formatDate(day)
@@ -143,21 +105,3 @@ export const AddTask = () => {
 		</View>
 	)
 }
-
-const styles = StyleSheet.create({
-	task: {
-		flexDirection: 'column',
-		justifyContent: 'center',
-		opacity: 1,
-	},
-	header: {
-		height: 120,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-	sub: {
-		height: 40,
-		justifyContent: 'space-around',
-	},
-})

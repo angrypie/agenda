@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import { Text, Header } from 'components/text'
-import { Task, TaskTime } from 'components/task-list'
+import { Task, TaskTime } from 'components/task'
 import { useStore } from 'models'
 import { observer } from 'mobx-react-lite'
 import { SafeView } from 'components/safe-area'

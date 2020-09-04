@@ -1,5 +1,5 @@
 import { types, Instance } from 'mobx-state-tree'
-import { isCurrentSpot, newSpots, Spot } from 'lib/spots'
+import { newSpots, Spot } from 'lib/spots'
 import { getDayStart } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 
