@@ -62,13 +62,13 @@ const styles = StyleSheet.create({
 		opacity: 1,
 	},
 	header: {
-		height: 120,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 	},
 	sub: {
 		height: 40,
+		marginTop: 40,
 		justifyContent: 'space-around',
 	},
 })

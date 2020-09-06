@@ -94,7 +94,9 @@ const DayStatus = ({ day }: DayProps) => {
 				alignItems: 'center',
 			}}
 		>
-			<Text style={{ opacity: 0.6, fontSize: 14 }}>{dateStr}</Text>
+			<Text style={{ opacity: 0.6, fontSize: 14, marginTop: 30 }}>
+				{dateStr}
+			</Text>
 		</View>
 	)
 }

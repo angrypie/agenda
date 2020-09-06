@@ -28,7 +28,7 @@ export default function App() {
 
 function RootStackScreen() {
 	return (
-		<RootStack.Navigator mode='modal'>
+		<RootStack.Navigator screenOptions={{ headerShown: false }} mode='modal'>
 			<RootStack.Screen
 				name='Main'
 				component={MainStackScreen}
@@ -41,7 +41,10 @@ function RootStackScreen() {
 
 function MainStackScreen() {
 	return (
-		<MainStack.Navigator initialRouteName='Today'>
+		<MainStack.Navigator
+			screenOptions={{ headerShown: false }}
+			initialRouteName='Today'
+		>
 			<MainStack.Screen
 				name='Focus'
 				component={DayFocusScreen}
