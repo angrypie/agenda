@@ -18,13 +18,23 @@ interface DayProps {
 
 export const TaskListScreen = () => <DaysSwiper />
 
-export const initSwiperDays = (now: number, size: number) =>
-	[...Array(size).keys()].map((_, i) => shiftDay(now, i === size - 1 ? -1 : i))
+export const initSwiperDays = (now: number, size: number) => {
+	console.log(
+		[...Array(size).keys()].map((_, i) =>
+			i > Math.floor(size / 2) ? i - size : i
+		)
+	)
+	return [...Array(size).keys()].map((_, i) =>
+		shiftDay(now, i > Math.floor(size / 2) ? i - size : i)
+	)
+}
 
+//TODO onIndexChanged do not allow to make two fast swipes,
+//its fires only once in such situation.
 export const DaysSwiper = () => {
 	const { clock } = useStore()
 	const { now } = clock
-	const size = 3
+	const size = 5
 	const store = useLocalStore(() => ({
 		days: initSwiperDays(now, size),
 		current: 0,
@@ -32,13 +42,18 @@ export const DaysSwiper = () => {
 			const { current, days } = store
 			const d = current - index
 			const forward = d === -1 || d > 1
-			const i = days.findIndex((_, i) => i !== current && i !== index)
+			const distance = Math.floor(size / 2)
+			const i = days.findIndex(
+				(_, i) => i === (index + (forward ? distance : distance + 1)) % size
+			)
+			console.log(current, index, i)
 			if (i !== undefined) {
-				days[i] = shiftDay(days[i], forward ? 3 : -3)
+				days[i] = shiftDay(days[i], forward ? size : -size)
 			}
 			store.current = index
 		},
 	}))
+	console.log(store.days)
 
 	const shiftDays = (index: number) => {
 		store.setCurrent(index)
