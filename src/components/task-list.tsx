@@ -1,10 +1,9 @@
-import React from 'react'
-import { View, ScrollView } from 'react-native'
+import React, { useRef } from 'react'
+import { View, ScrollView, FlatList, Dimensions } from 'react-native'
 import { Text } from 'components/text'
 import { useStore } from 'models'
 import { observer, useLocalStore } from 'mobx-react-lite'
 import { formatDate, shiftDay, isToday } from 'lib/time'
-import Swiper from 'react-native-swiper'
 import { useNavigation } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeView } from 'components/safe-area'
@@ -16,17 +15,16 @@ interface DayProps {
 	day: number
 }
 
+const { width } = Dimensions.get('window')
+
 export const TaskListScreen = () => <DaysSwiper />
 
 export const initSwiperDays = (now: number, size: number) => {
-	console.log(
-		[...Array(size).keys()].map((_, i) =>
-			i > Math.floor(size / 2) ? i - size : i
-		)
+	const half = Math.floor(size / 2)
+	const diffs = [...Array(size).keys()].map((_, i) =>
+		i < half ? -(half - i) : i - half
 	)
-	return [...Array(size).keys()].map((_, i) =>
-		shiftDay(now, i > Math.floor(size / 2) ? i - size : i)
-	)
+	return diffs.map(diff => shiftDay(now, diff))
 }
 
 //TODO onIndexChanged do not allow to make two fast swipes,
@@ -34,39 +32,62 @@ export const initSwiperDays = (now: number, size: number) => {
 export const DaysSwiper = () => {
 	const { clock } = useStore()
 	const { now } = clock
-	const size = 5
+	//TODO decide how many screens needed and solve problem with
+	//multiple swipes lag when sreens buffer size is not enough
+	const size = 7
+	const half = Math.floor(size / 2)
+	const ref = useRef(null)
 	const store = useLocalStore(() => ({
 		days: initSwiperDays(now, size),
-		current: 0,
+		current: half,
 		setCurrent(index: number) {
 			const { current, days } = store
-			const d = current - index
-			const forward = d === -1 || d > 1
-			const distance = Math.floor(size / 2)
-			const i = days.findIndex(
-				(_, i) => i === (index + (forward ? distance : distance + 1)) % size
-			)
-			console.log(current, index, i)
-			if (i !== undefined) {
-				days[i] = shiftDay(days[i], forward ? size : -size)
+			if (current === index) {
+				return
 			}
-			store.current = index
+			const d = current - index
+			//const forward = d === -1 || d > 1
+			store.days.forEach((day, i) => (days[i] = shiftDay(day, -d)))
+			ref.current.scrollToIndex({ index: half, animated: false })
 		},
 	}))
-	console.log(store.days)
 
 	const shiftDays = (index: number) => {
 		store.setCurrent(index)
 	}
 
+	const onChanged = useRef(({ viewableItems }: any) => {
+		if (viewableItems.length !== 1) {
+			return
+		}
+		shiftDays(viewableItems[0].index)
+	})
 	return (
-		<Swiper showsPagination={false} onIndexChanged={shiftDays}>
-			{store.days.map((_, i) => (
-				<SafeView key={i}>
-					<TaskListPage store={store} index={i} />
-				</SafeView>
-			))}
-		</Swiper>
+		<FlatList
+			ref={ref}
+			onViewableItemsChanged={onChanged.current}
+			data={store.days}
+			keyExtractor={item => item.toString()}
+			renderItem={({ item, index }) => (
+				<View style={{ width }}>
+					<SafeView>
+						<TaskListPage store={store} index={index} />
+					</SafeView>
+				</View>
+			)}
+			onScrollToIndexFailed={info => {
+				//TODO what to do with such situation?
+				console.log('failed', info.index)
+			}}
+			initialScrollIndex={half}
+			getItemLayout={(data, index) => ({
+				length: width,
+				offset: width * index,
+				index,
+			})}
+			pagingEnabled
+			horizontal
+		/>
 	)
 }
 
@@ -88,7 +109,7 @@ export const TaskList = observer(({ day }: DayProps) => {
 		: dayTasks
 
 	return (
-		<View>
+		<View style={{ flex: 1 }}>
 			<ScrollView>
 				<DayStatus day={day} />
 				{renderTasks(tasks)}
