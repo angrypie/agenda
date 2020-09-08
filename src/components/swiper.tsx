@@ -2,11 +2,15 @@ import React, { useRef } from 'react'
 import { View, FlatList, Dimensions } from 'react-native'
 import { useLocalStore, observer } from 'mobx-react-lite'
 
+//TODO BUGS:
+// - flickering if scrolling during scrollToIndex call
+
 //TODO get rid of mobx and publish on github
 
 //TODO
 // - shift screens without scrollToIndex
 // - add more screens on the fly and recycle them
+// - use linked list instead indexes to avoid int overflow?
 
 const { width } = Dimensions.get('window')
 export const initSwiperScreens = (size: number) => {
@@ -24,7 +28,6 @@ interface SwiperProps {
 export const Swiper = ({ renderItem }: SwiperProps) => {
 	//TODO decide how many screens needed and solve problem with
 	//multiple swipes lag when sreens buffer size is not enough
-	console.log('rerender111')
 	const size = 9
 	const half = Math.floor(size / 2)
 	const ref = useRef<FlatList>(null)
