@@ -45,8 +45,8 @@ export const TaskList = observer(({ day }: DayProps) => {
 
 	return (
 		<View style={{ flex: 1 }}>
+			<DayStatus day={day} />
 			<ScrollView>
-				<DayStatus day={day} />
 				{renderTasks(tasks)}
 				<AddTask />
 			</ScrollView>
@@ -63,11 +63,10 @@ const DayStatus = ({ day }: DayProps) => {
 				flexDirection: 'row',
 				justifyContent: 'space-between',
 				alignItems: 'center',
+				height: 50,
 			}}
 		>
-			<Text style={{ opacity: 0.6, fontSize: 14, marginTop: 30 }}>
-				{dateStr}
-			</Text>
+			<Text style={{ opacity: 0.6, fontSize: 14 }}>{dateStr}</Text>
 		</View>
 	)
 }
