@@ -24,14 +24,13 @@ export const DaysSwiper = () => {
 		<Swiper
 			renderItem={index => (
 				<SafeView>
-					<TaskList day={shiftDay(clock.now, index)} />
+					<TaskList day={shiftDay(clock.today, index)} />
 				</SafeView>
 			)}
 		/>
 	)
 }
 
-//TODO use FlatList instead scroll view
 export const TaskList = observer(({ day }: DayProps) => {
 	const { schedule, clock } = useStore()
 	const dayTasks = schedule.getDayTask(day)

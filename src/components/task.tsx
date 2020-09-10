@@ -8,6 +8,8 @@ import { formatTime } from 'lib/time'
 
 const subtasks = ['Some subtask', 'Another subtask']
 
+export const TaskFullHeight = 200
+
 export const Task = observer(({ task, hideSub = false }: TaskProps) => {
 	const { name, time } = task
 	const { clock } = useStore()
@@ -16,7 +18,7 @@ export const Task = observer(({ task, hideSub = false }: TaskProps) => {
 
 	const style = {
 		opacity: isCurrent ? 1 : 0.5,
-		height: hideSub ? 100 : 200,
+		height: hideSub ? 100 : TaskFullHeight,
 	}
 
 	return (

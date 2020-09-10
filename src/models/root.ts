@@ -29,7 +29,7 @@ export const stubTasks = [
 
 export const rootStore = RootModel.create(
 	{
-		clock: { now: t(1) },
+		clock: { now: t(1), today: t(1) },
 		schedule: {
 			tasks: stubTasks,
 		},
