@@ -29,7 +29,7 @@ export const treeToSpots = ({ spot, childs }: Node): Spot[] => {
 		if (gap !== 0) {
 			arr.push({
 				id: spot.id + '+gap',
-				name: 'Free time',
+				name: 'Free spot',
 				duration: gap,
 				time: timeSpanEnd(spot),
 			})
