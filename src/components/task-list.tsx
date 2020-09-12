@@ -44,16 +44,13 @@ export const TaskList = observer(({ day }: DayProps) => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<DayStatus day={day} />
-			<ScrollView>
-				{renderTasks(tasks)}
-				<AddTask />
-			</ScrollView>
+			<DayHeader day={day} />
+			<ScrollView>{renderTasks(tasks)}</ScrollView>
 		</View>
 	)
 })
 
-const DayStatus = ({ day }: DayProps) => {
+const DayHeader = ({ day }: DayProps) => {
 	const dateStr = formatDate(day)
 
 	return (
@@ -66,10 +63,12 @@ const DayStatus = ({ day }: DayProps) => {
 			}}
 		>
 			<Text style={{ opacity: 0.6, fontSize: 14 }}>{dateStr}</Text>
+			<AddTask />
 		</View>
 	)
 }
 
+//TODO use svg icon instead text, make touchaple area biger
 export const AddTask = () => {
 	const navigation = useNavigation()
 	const onPress = () => navigation.navigate('AddTaskModal')
@@ -77,7 +76,9 @@ export const AddTask = () => {
 	return (
 		<View style={{ alignItems: 'center' }}>
 			<TouchableOpacity onPress={onPress}>
-				<Text style={{ fontSize: 30 }}>+</Text>
+				<Text style={{ marginTop: -7, fontSize: 30, fontWeight: '200' }}>
+					+
+				</Text>
 			</TouchableOpacity>
 		</View>
 	)

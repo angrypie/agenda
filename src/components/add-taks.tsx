@@ -4,7 +4,7 @@ import { SafeView } from 'components/safe-area'
 import { useStore } from 'models'
 import { useNavigation } from '@react-navigation/native'
 
-export function AddTaskScreen({ navigation }: any) {
+export function AddTaskScreen() {
 	return (
 		<SafeView>
 			<KeyboardAvoidingView
