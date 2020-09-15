@@ -1,10 +1,11 @@
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { Text, Header } from 'components/text'
 import { observer } from 'mobx-react-lite'
 import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore } from 'models'
 import { formatTime } from 'lib/time'
+import { useNavigation } from '@react-navigation/native'
 
 const subtasks = ['Some subtask', 'Another subtask']
 
@@ -36,10 +37,14 @@ export const Task = observer(({ task, hideSub = false }: TaskProps) => {
 })
 
 const FreeSpotSuggestion = ({ spot }: { spot: Spot }) => {
+	const navigation = useNavigation()
+	const onPress = () => navigation.navigate('SpotManager', { spot })
 	return (
-		<View style={styles.spotSuggestion}>
-			<Text>Tap to schedule task</Text>
-		</View>
+		<TouchableOpacity onPress={onPress}>
+			<View style={styles.spotSuggestion}>
+				<Text>Tap to schedule task</Text>
+			</View>
+		</TouchableOpacity>
 	)
 }
 

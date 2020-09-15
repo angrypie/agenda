@@ -4,6 +4,7 @@ import { SafeView } from 'components/safe-area'
 import { useStore } from 'models'
 import { useNavigation } from '@react-navigation/native'
 
+//TODO move react navigaiton dependencie outside
 export function AddTaskScreen() {
 	return (
 		<SafeView>
