@@ -3,17 +3,17 @@ import { StatusBar } from 'expo-status-bar'
 import { Button } from 'react-native'
 import { StoreProvider, rootStore } from 'models'
 import { NavigationContainer, DarkTheme } from '@react-navigation/native'
-import { createStackNavigator, StackScreenProps } from '@react-navigation/stack'
+import { createStackNavigator } from '@react-navigation/stack'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { TaskListScreen } from 'components/task-list'
 import { DayFocusScreen } from 'components/day-focus'
 import { AddTaskScreen } from 'components/add-taks'
 import { SpotManager } from 'components/spot-manager'
-import { Spot } from 'lib/spots'
+import { RootScreenParams, RootScreensProps } from 'navigation'
 
 const MainStack = createStackNavigator()
-const RootStack = createStackNavigator()
+const RootStack = createStackNavigator<RootScreenParams>()
 
 export default function App() {
 	return (
@@ -27,13 +27,6 @@ export default function App() {
 		</SafeAreaProvider>
 	)
 }
-
-//TODO move such dependencies from navigation
-type RootStackParamList = {
-	SpotManager: { spot: Spot }
-}
-
-type SpotManagerProps = StackScreenProps<RootStackParamList, 'SpotManager'>
 
 function RootStackScreen() {
 	return (
@@ -49,7 +42,7 @@ function RootStackScreen() {
 	)
 }
 
-const SpotManagerScreen = (props: SpotManagerProps) => (
+const SpotManagerScreen = (props: RootScreensProps['SpotManager']) => (
 	<SpotManager {...props.route.params} />
 )
 

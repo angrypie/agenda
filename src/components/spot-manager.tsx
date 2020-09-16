@@ -4,7 +4,11 @@ import { SafeView } from 'components/safe-area'
 import { Text } from 'components/text'
 import { Spot } from 'lib/spots'
 
-export const SpotManager = ({ spot }: { spot: Spot }) => {
+export interface SpotManagerProps {
+	spot: Spot
+}
+
+export const SpotManager = ({ spot }: SpotManagerProps) => {
 	return (
 		<SafeView>
 			<View>
