@@ -10,11 +10,18 @@ export const Task = types.model({
 	duration: types.number,
 })
 
+export const Plan = types.model({
+	id: types.identifier,
+	name: types.string,
+})
+
 export interface ITask extends Instance<typeof Task> {}
+export interface IPlan extends Instance<typeof Plan> {}
 
 export const Schedule = types
 	.model({
 		tasks: types.optional(types.array(Task), []),
+		plans: types.optional(types.array(Plan), []),
 	})
 	.actions(function (self) {
 		const spots = newSpots(self.tasks.slice())

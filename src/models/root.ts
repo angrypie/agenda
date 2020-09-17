@@ -27,11 +27,20 @@ export const stubTasks = [
 	{ id: '7', duration: d(8), name: 'Sleep', time: t(23) },
 ]
 
+export const stubPlans = [
+	{ id: '11', name: 'Clean Home' },
+	{ id: '12', name: 'Work Session' },
+	{ id: '13', name: 'Grocery shoping' },
+	{ id: '14', name: 'Practice' },
+	{ id: '15', name: 'Workout' },
+]
+
 export const rootStore = RootModel.create(
 	{
 		clock: { now: t(1), today: t(1) },
 		schedule: {
 			tasks: stubTasks,
+			plans: stubPlans,
 		},
 	},
 	//Use typesafe getEnv from 'models/utils.ts'
