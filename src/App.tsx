@@ -30,14 +30,22 @@ export default function App() {
 
 function RootStackScreen() {
 	return (
-		<RootStack.Navigator screenOptions={{ headerShown: false }} mode='modal'>
+		<RootStack.Navigator screenOptions={{ headerShown: true }} mode='modal'>
 			<RootStack.Screen
 				name='Main'
 				component={MainStackScreen}
-				options={{ headerShown: false }}
+				options={{ headerShown: false, title: 'Agenda' }}
 			/>
-			<RootStack.Screen name='AddTaskModal' component={AddTaskScreen} />
-			<RootStack.Screen name='SpotManager' component={SpotManagerScreen} />
+			<RootStack.Screen
+				options={{ title: 'Add Task' }}
+				name='AddTaskModal'
+				component={AddTaskScreen}
+			/>
+			<RootStack.Screen
+				options={{ title: 'Schedule Task' }}
+				name='SpotManager'
+				component={SpotManagerScreen}
+			/>
 		</RootStack.Navigator>
 	)
 }
