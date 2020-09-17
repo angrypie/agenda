@@ -40,7 +40,7 @@ const FreeSpotSuggestion = ({ spot }: { spot: Spot }) => {
 	const navigation = useNavigation()
 	const onPress = () => navigation.navigate('SpotManager', { spot })
 	return (
-		<TouchableOpacity onPress={onPress}>
+		<TouchableOpacity activeOpacity={0.7} delayPressIn={500} onPress={onPress}>
 			<View style={styles.spotSuggestion}>
 				<Text>Tap to schedule task</Text>
 			</View>
