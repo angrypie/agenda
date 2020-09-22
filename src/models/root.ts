@@ -33,6 +33,11 @@ export const stubPlans = [
 	{ id: '13', name: 'Grocery shoping' },
 	{ id: '14', name: 'Practice' },
 	{ id: '15', name: 'Workout' },
+	{ id: '16', name: 'Clean Home' },
+	{ id: '17', name: 'Work Session' },
+	{ id: '18', name: 'Grocery shoping' },
+	{ id: '19', name: 'Practice' },
+	{ id: '20', name: 'Workout' },
 ]
 
 export const rootStore = RootModel.create(

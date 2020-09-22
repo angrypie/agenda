@@ -30,7 +30,7 @@ export default function App() {
 
 function RootStackScreen() {
 	return (
-		<RootStack.Navigator screenOptions={{ headerShown: true }} mode='modal'>
+		<RootStack.Navigator screenOptions={{ headerShown: false }} mode='modal'>
 			<RootStack.Screen
 				name='Main'
 				component={MainStackScreen}

@@ -50,3 +50,7 @@ export const getDayStart = (time: number): number =>
 
 export const endOfDayTime = (time: number): number =>
 	dayjs(time).endOf('day').valueOf()
+
+//TODO use RelativeTIme plugin for dayjs
+export const formatDifference = (start: number, end: number): number =>
+	dayjs(start).diff(end, 'hour')

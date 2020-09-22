@@ -1,11 +1,12 @@
 import React from 'react'
-import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import { Text, Header } from 'components/text'
 import { observer } from 'mobx-react-lite'
 import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore } from 'models'
 import { formatTime } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
+import { BorderArea } from './touchable'
 
 const subtasks = ['Some subtask', 'Another subtask']
 
@@ -38,13 +39,12 @@ export const Task = observer(({ task, hideSub = false }: TaskProps) => {
 
 const FreeSpotSuggestion = ({ spot }: { spot: Spot }) => {
 	const navigation = useNavigation()
-	const onPress = () => navigation.navigate('SpotManager', { spot })
 	return (
-		<TouchableOpacity activeOpacity={0.7} delayPressIn={500} onPress={onPress}>
-			<View style={styles.spotSuggestion}>
-				<Text>Tap to schedule task</Text>
-			</View>
-		</TouchableOpacity>
+		<BorderArea
+			style={{ marginTop: 30 }}
+			text='Tap to schedule task'
+			onPress={() => navigation.navigate('SpotManager', { spot })}
+		/>
 	)
 }
 
@@ -53,7 +53,7 @@ const isFreeSpot = (spot: Spot): boolean => {
 	return spot.name === 'Free spot'
 }
 
-const TaskHeader = ({ name, time }: { name: string; time: number }) => {
+export const TaskHeader = ({ name, time }: { name: string; time: number }) => {
 	return (
 		<View style={styles.header}>
 			<Header>{name}</Header>
