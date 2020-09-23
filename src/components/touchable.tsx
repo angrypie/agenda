@@ -5,6 +5,7 @@ import {
 	View,
 	GestureResponderEvent,
 	ViewStyle,
+	TextStyle,
 } from 'react-native'
 import { Text } from 'components/text'
 
@@ -24,13 +25,40 @@ export const BorderArea = ({ text, onPress, style }: BorderAreaProps) => {
 	)
 }
 
-export interface TextButtonProps {
+export interface ButtonProps {
 	onPress: (event: GestureResponderEvent) => void
 	children: React.ReactNode
+	disabled?: boolean
 }
 
-export const TextButton = ({ onPress, children }: TextButtonProps) => (
-	<TouchableOpacity onPress={onPress}>{children}</TouchableOpacity>
+export const Button = ({ disabled = false, ...rest }: ButtonProps) => (
+	<TouchableOpacity
+		style={{ opacity: disabled ? 0.3 : 1 }}
+		disabled={disabled}
+		{...rest}
+	/>
+)
+
+export interface TextButtonProps extends ButtonProps {
+	children: React.ReactText
+	style?: TextStyle
+}
+
+//TODO increase touchable area
+export const TextButton = ({ children, style, ...button }: TextButtonProps) => (
+	<Button {...button}>
+		<Text style={{ fontSize: 16, ...style }}>{children}</Text>
+	</Button>
+)
+
+export interface DimProps {
+	children: React.ReactNode
+	dim?: boolean
+	opacity?: number
+}
+
+export const Dim = ({ dim = true, opacity = 0.3, children }: DimProps) => (
+	<View style={{ opacity: dim ? opacity : 1 }}>{children}</View>
 )
 
 const styles = StyleSheet.create({

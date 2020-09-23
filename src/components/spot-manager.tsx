@@ -4,12 +4,11 @@ import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
 import { Spot } from 'lib/spots'
 import { useStore, IPlan } from 'models'
-import { formatDifference, formatTime } from 'lib/time'
+import { formatDifference } from 'lib/time'
 import { timeSpanEnd } from 'lib/spots/spot'
 import { TaskHeader } from './task'
 import { AddTask } from './task-list'
-import { useNavigation } from '@react-navigation/native'
-import { TextButton } from './touchable'
+import { ModalHeader } from './layout'
 
 export interface SpotManagerProps {
 	spot: Spot
@@ -68,22 +67,3 @@ const DashedSeparator = () => (
 		}}
 	/>
 )
-
-const ModalHeader = () => {
-	const navigation = useNavigation()
-	return (
-		<View
-			style={{
-				flexDirection: 'row',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-				height: 50,
-			}}
-		>
-			<TextButton onPress={navigation.goBack}>
-				<Text style={{ fontSize: 16 }}>Cancel</Text>
-			</TextButton>
-			<Text style={{ opacity: 0.4, fontSize: 16 }}>Done</Text>
-		</View>
-	)
-}

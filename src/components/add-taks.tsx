@@ -3,11 +3,13 @@ import { View, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { useStore } from 'models'
 import { useNavigation } from '@react-navigation/native'
+import { ModalHeader } from './layout'
 
 //TODO move react navigaiton dependencie outside
 export function AddTaskScreen() {
 	return (
 		<SafeView>
+			<ModalHeader />
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				style={{ flex: 1 }}
