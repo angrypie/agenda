@@ -3,9 +3,14 @@ import { View } from 'react-native'
 import { TextButton } from 'components/touchable'
 import { useNavigation } from '@react-navigation/native'
 
-interface ModalHeaderProps {}
+interface ModalHeaderProps {
+	done?: {
+		disabled: boolean
+		onPress: () => boolean
+	}
+}
 
-export const ModalHeader = ({}: ModalHeaderProps) => {
+export const ModalHeader = ({ done }: ModalHeaderProps) => {
 	const navigation = useNavigation()
 	const goBack = () => navigation.goBack()
 
@@ -19,9 +24,14 @@ export const ModalHeader = ({}: ModalHeaderProps) => {
 			}}
 		>
 			<TextButton onPress={goBack}>Cancel</TextButton>
-			<TextButton disabled onPress={goBack}>
-				Done
-			</TextButton>
+			{done === undefined ? null : (
+				<TextButton
+					disabled={done.disabled}
+					onPress={() => done.onPress() && goBack()}
+				>
+					Done
+				</TextButton>
+			)}
 		</View>
 	)
 }
