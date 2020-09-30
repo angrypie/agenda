@@ -1,4 +1,5 @@
 import React from 'react'
+import 'react-native-get-random-values'
 import { StatusBar } from 'expo-status-bar'
 import { Button } from 'react-native'
 import { StoreProvider, rootStore } from 'models'

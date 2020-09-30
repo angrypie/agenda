@@ -2,6 +2,7 @@ import { types, Instance } from 'mobx-state-tree'
 import { newSpots, Spot } from 'lib/spots'
 import { getDayStart } from 'lib/time'
 import { newMatcher } from 'lib/labels'
+import { v4 as uuidv4 } from 'uuid'
 
 export const Task = types.model({
 	id: types.identifier,
@@ -45,7 +46,7 @@ export const Schedule = types
 
 			//TODO Add Plan to plan backlog
 			addPlan(name: string) {
-				console.log('TODO: add-task -> add plan:', name)
+				self.plans.unshift({ name, id: uuidv4() })
 			},
 		}
 	})
