@@ -44,7 +44,6 @@ export const Schedule = types
 				return spots.next(time)
 			},
 
-			//TODO Add Plan to plan backlog
 			addPlan(name: string) {
 				self.plans.unshift({ name, id: uuidv4() })
 			},
