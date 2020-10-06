@@ -8,7 +8,7 @@ import { timeSpanEnd } from 'lib/spots/spot'
 import { TaskHeader } from './task'
 import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
-import { useObserver, useLocalStore } from 'mobx-react-lite'
+import { useLocalStore, Observer } from 'mobx-react-lite'
 import { Button } from './touchable'
 
 export interface SpotManagerProps {
@@ -23,7 +23,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 
 		select(plan: IPlan) {
 			const { id } = plan
-			if (this.isSelected(id)) {
+			if (store.isSelected(id)) {
 				store.selected.delete(id)
 			} else {
 				//TODO do not clean, display all selected
@@ -46,38 +46,42 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		},
 	}))
 
-	const renderPlans = ({ id, name }: IPlan) =>
-		useObserver(() => (
-			<Button onPress={() => store.select({ id, name })}>
-				<Header
-					style={{
-						opacity: store.isSelected(id) ? 1 : 0.8,
-						paddingVertical: 13,
-					}}
-					key={id}
-				>
-					{name}
-				</Header>
-			</Button>
-		))
+	const renderPlans = ({ id, name }: IPlan) => (
+		<Button key={id} onPress={() => store.select({ id, name })}>
+			<Header
+				style={{
+					opacity: store.isSelected(id) ? 1 : 0.8,
+					paddingVertical: 13,
+				}}
+				key={id}
+			>
+				{name}
+			</Header>
+		</Button>
+	)
 
-	const plansList = schedule.plans.map(renderPlans)
 	const spotEnd = timeSpanEnd(spot)
-	return useObserver(() => (
-		<SafeView>
-			<ModalHeader done={{ disabled: store.isEmpty, onPress: () => true }} />
-			<View style={{ opacity: 0.6 }}>
-				<TaskHeader name={store.currentName} time={spot.time} />
-				<DashedSeparator />
-				<TaskHeader name='' time={spotEnd} />
-			</View>
-			<Description />
+	return (
+		<Observer>
+			{() => (
+				<SafeView>
+					<ModalHeader
+						done={{ disabled: store.isEmpty, onPress: () => true }}
+					/>
+					<View style={{ opacity: 0.6 }}>
+						<TaskHeader name={store.currentName} time={spot.time} />
+						<DashedSeparator />
+						<TaskHeader name='' time={spotEnd} />
+					</View>
+					<Description />
 
-			<ScrollView>
-				<View>{plansList}</View>
-			</ScrollView>
-		</SafeView>
-	))
+					<ScrollView>
+						<View>{schedule.plans.map(renderPlans)}</View>
+					</ScrollView>
+				</SafeView>
+			)}
+		</Observer>
+	)
 }
 
 const DashedSeparator = () => <View style={styles.dashedSeparator} />
@@ -94,9 +98,6 @@ const Description = () => (
 const styles = StyleSheet.create({
 	dashedSeparator: {
 		height: 35,
-		borderBottomWidth: 1,
-		borderColor: 'white',
-		borderStyle: 'dashed',
 	},
 	description: {
 		flexDirection: 'row',

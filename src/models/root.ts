@@ -18,13 +18,13 @@ function d(hours: number): number {
 }
 
 export const stubTasks = [
-	{ id: '0', duration: d(8), name: 'Sleep', time: t(0) },
+	{ id: '0', duration: d(8), name: 'Sleep', time: t(1) },
 	{ id: '1', duration: d(1), name: 'Workout', time: t(9) },
 	{ id: '2', duration: d(4), name: 'Work Session', time: t(10) },
 	{ id: '3', duration: d(1), name: 'Clean Home', time: t(14) },
 	{ id: '5', duration: d(4), name: 'Work Session', time: t(16) },
 	{ id: '6', duration: d(2), name: 'Practice', time: t(20) },
-	{ id: '7', duration: d(8), name: 'Sleep', time: t(23) },
+	{ id: '7', duration: d(8), name: 'Sleep', time: t(25) },
 ]
 
 export const stubPlans = [
