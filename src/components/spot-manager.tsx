@@ -61,12 +61,14 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 	)
 
 	const spotEnd = timeSpanEnd(spot)
+	const doneButton = () =>
+		schedule.newTask({ ...spot, name: store.currentName })
 	return (
 		<Observer>
 			{() => (
 				<SafeView>
 					<ModalHeader
-						done={{ disabled: store.isEmpty, onPress: () => true }}
+						done={{ disabled: store.isEmpty, onPress: doneButton }}
 					/>
 					<View style={{ opacity: 0.6 }}>
 						<TaskHeader name={store.currentName} time={spot.time} />

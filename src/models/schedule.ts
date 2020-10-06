@@ -25,7 +25,7 @@ export const Schedule = types
 		plans: types.optional(types.array(Plan), []),
 	})
 	.actions(function (self) {
-		const spots = newSpots(self.tasks.slice())
+		let spots = newSpots(self.tasks.slice())
 		const matcher = newMatcher<ITask>()
 		return {
 			suggestByTime(time: number): ITask[] {
@@ -46,6 +46,12 @@ export const Schedule = types
 
 			addPlan(name: string) {
 				self.plans.unshift({ name, id: uuidv4() })
+			},
+
+			newTask(spot: Spot): boolean {
+				self.tasks.push({ ...spot, id: uuidv4() })
+				spots = newSpots(self.tasks.slice())
+				return true
 			},
 		}
 	})
