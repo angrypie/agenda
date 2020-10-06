@@ -1,7 +1,7 @@
 import { useContext, createContext } from 'react'
-import 'mobx-react-lite/batchingForReactNative'
 import { RootModel } from './root'
 import { Instance } from 'mobx-state-tree'
+
 export { rootStore } from './root'
 
 export type RootInstance = Instance<typeof RootModel>
