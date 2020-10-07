@@ -6,7 +6,7 @@ import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore } from 'models'
 import { formatTime } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
-import { BorderArea } from './touchable'
+import { BorderArea, Button } from './touchable'
 
 const subtasks = ['Some subtask', 'Another subtask']
 
@@ -25,15 +25,18 @@ export const Task = observer(({ task, hideSub = false }: TaskProps) => {
 
 	const isFree = isFreeSpot(task)
 
+	const navigation = useNavigation()
 	return (
-		<View style={[styles.task, style]}>
-			<TaskHeader name={name} time={displayTime} />
-			{hideSub ? null : isFree ? (
-				<FreeSpotSuggestion spot={task} />
-			) : (
-				<SubTasks tasks={subtasks} />
-			)}
-		</View>
+		<Button onPress={() => navigation.navigate('SpotManager', { spot: task })}>
+			<View style={[styles.task, style]}>
+				<TaskHeader name={name} time={displayTime} />
+				{hideSub ? null : isFree ? (
+					<FreeSpotSuggestion spot={task} />
+				) : (
+					<SubTasks tasks={subtasks} />
+				)}
+			</View>
+		</Button>
 	)
 })
 

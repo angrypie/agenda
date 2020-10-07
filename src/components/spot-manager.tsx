@@ -42,7 +42,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 
 		get currentName(): string {
 			const current = Array.from(store.selected.values()).pop()
-			return current === undefined ? '' : current.name
+			return current === undefined ? spot.name : current.name
 		},
 	}))
 
@@ -62,7 +62,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 
 	const spotEnd = timeSpanEnd(spot)
 	const doneButton = () =>
-		schedule.newTask({ ...spot, name: store.currentName })
+		schedule.updateTask({ ...spot, name: store.currentName })
 	return (
 		<Observer>
 			{() => (

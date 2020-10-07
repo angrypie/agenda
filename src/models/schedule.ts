@@ -48,8 +48,13 @@ export const Schedule = types
 				self.plans.unshift({ name, id: uuidv4() })
 			},
 
-			newTask(spot: Spot): boolean {
-				self.tasks.push({ ...spot, id: uuidv4() })
+			updateTask(spot: Spot): boolean {
+				const index = self.tasks.findIndex(({ id }) => id === spot.id)
+				if (index === -1) {
+					self.tasks.push({ ...spot, id: uuidv4() })
+				} else {
+					self.tasks[index].name = spot.name
+				}
 				spots = newSpots(self.tasks.slice())
 				return true
 			},
