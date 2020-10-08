@@ -1,4 +1,5 @@
 import { Spot, timeSpanEnd, gapsBetweenSpots } from './spot'
+import { head, last, NewNotEmptyArray } from 'lib/collections'
 
 interface Node {
 	spot: Spot
@@ -55,11 +56,3 @@ export const NewRootNode = (spots: Spot[] = []): Node =>
 		},
 		spots.map(spot => NewNode(spot))
 	)
-
-const NewNotEmptyArray = <T>(arr: T[]): Arr<T> | undefined =>
-	arr.length === 0 ? undefined : [arr[0], ...arr.slice(1)]
-
-const head = <T>(arr: Arr<T>): T => arr[0]
-const last = <T>(arr: Arr<T>): T => arr[arr.length - 1]
-
-type Arr<T> = [T, ...T[]]
