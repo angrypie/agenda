@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { View, FlatList, Dimensions } from 'react-native'
 import { useLocalStore, observer } from 'mobx-react-lite'
 import { Arr, head, last, NewNotEmptyArray } from 'lib/collections'
@@ -14,12 +14,15 @@ import { times } from 'rambda'
 // - shift screens without scrollToIndex
 // - add more screens on the fly and recycle them
 // - use linked list instead indexes to avoid int overflow?
+//
 
-const { width: contentWidth } = Dimensions.get('window')
+const genUpdateFlag = (): string => Math.random().toString()
+const getCenterIndex = (size: number) => Math.floor(size / 2)
+
 export const initSwiperScreens = (size: number): Arr<{ index: number }> => {
-	const half = Math.floor(size / 2)
+	const center = getCenterIndex(size)
 	const diffs = [...Array(size).keys()].map((_, i) =>
-		i < half ? -(half - i) : i - half
+		i < center ? -(center - i) : i - center
 	)
 	const result = NewNotEmptyArray(diffs.map(index => ({ index })))
 	if (result === undefined) {
@@ -32,79 +35,68 @@ interface SwiperProps {
 	renderItem: (index: number) => React.ReactElement
 }
 
+const { width: windowWidth } = Dimensions.get('window')
+
 export const Swiper = observer(({ renderItem }: SwiperProps) => {
 	//TODO decide how many screens needed and solve problem with
 	//multiple swipes lag when sreens buffer size is not enough
 	const size = 9
-	const half = Math.floor(size / 2)
-	const ref = useRef<FlatList>(null)
+	const centerIndex = getCenterIndex(size)
 	const store = useLocalStore(() => ({
 		screens: initSwiperScreens(size),
-		current: half,
-		setCurrent(index: number) {
-			console.log('index', index)
-			const { current, screens } = store
-			if (current === index) {
+		updateFlag: genUpdateFlag(),
+		updateScreens(visibleIndex: number) {
+			const { screens } = store
+			if (centerIndex === visibleIndex) {
 				return
 			}
-			const d = current - index
-			console.log('current', current, index, d)
-			const forward = d < 0
+			const d = visibleIndex - centerIndex
+			const forward = d > 0
+			console.log(screens.length, 'current', centerIndex, visibleIndex, d)
+
+			//addNewIndexes adding indexes to the start or tail of the screens list
+			const addNewIndexes = (edge: number, add: (index: number) => void) =>
+				times(i => add(edge + Math.sign(d) * (i + 1)), Math.abs(d))
 
 			if (forward) {
-				const end = last(screens).index + 1
-				times(i => screens.push({ index: end + i }), Math.abs(d))
-				store.current = index
-				console.log('forward')
+				addNewIndexes(last(screens).index, index => {
+					screens.push({ index })
+					screens.shift()
+				})
 			} else {
-				const start = head(screens).index - 1
-				times(i => {
-					console.log('unshift')
-					screens.unshift({
-						index: start - i,
-					})
+				addNewIndexes(head(screens).index, index => {
+					screens.unshift({ index })
 					screens.pop()
-				}, Math.abs(d))
-
-				console.log('backward')
-				//store.current = index + 1
+				})
 			}
+			store.updateFlag = genUpdateFlag()
 		},
 	}))
 
+	//TODO use own throtttle callback implementation
 	const shiftScreens = useThrottleCallback((index: number) => {
-		store.setCurrent(index)
-	}, 1)
+		store.updateScreens(index)
+	}, 5)
 
-	//console.log('update')
 	return (
 		<FlatList
-			extraData={store.screens[0].index}
-			maintainVisibleContentPosition={{
-				minIndexForVisible: 0,
-				//autoscrollToTopThreshold: ,
-			}}
-			ref={ref}
-			//onViewableItemsChanged={onChanged.current}
+			extraData={store.updateFlag}
+			maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
 			onScroll={event => {
 				const offset = event.nativeEvent.contentOffset.x
-				const index = Math.round(offset / contentWidth)
+				const index = Math.round(offset / windowWidth)
 				shiftScreens(index)
 			}}
-			scrollEventThrottle={5} //not working for onScroll
+			scrollEventThrottle={5} //TODO not working for onScroll
 			data={store.screens}
 			keyExtractor={item => item.index.toString()}
 			renderItem={({ index }) => (
 				<Screen renderItem={renderItem} store={store} index={index} />
 			)}
-			onScrollToIndexFailed={info => {
-				//TODO what to do with such situation?
-				console.log('failed', info.index)
-			}}
-			initialScrollIndex={half}
+			initialScrollIndex={centerIndex}
 			getItemLayout={(_, index) => ({
-				length: contentWidth,
-				offset: contentWidth * index,
+				length: windowWidth,
+				offset: windowWidth * index,
 				index,
 			})}
 			pagingEnabled
@@ -121,7 +113,7 @@ interface ScreenProps {
 
 const Screen = ({ index, renderItem, store }: ScreenProps) => {
 	return (
-		<View style={{ width: contentWidth }}>
+		<View style={{ width: windowWidth }}>
 			{renderItem(store.screens[index].index)}
 		</View>
 	)
