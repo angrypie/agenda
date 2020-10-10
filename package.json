@@ -36,6 +36,7 @@
 		"@types/jest": "^26.0.14",
 		"@types/react": "~16.9.50",
 		"@types/react-native": "~0.63.23",
+		"@types/uuid": "^8.3.0",
 		"@typescript-eslint/eslint-plugin": "^4.3.0",
 		"@typescript-eslint/parser": "^4.3.0",
 		"eslint": "^7.10.0",
