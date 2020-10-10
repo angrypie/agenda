@@ -18,26 +18,26 @@ function d(hours: number): number {
 }
 
 export const stubTasks = [
-	{ id: '0', duration: d(8), name: 'Sleep', time: t(0) },
-	{ id: '1', duration: d(1), name: 'Workout', time: t(9) },
-	{ id: '2', duration: d(4), name: 'Work Session', time: t(10) },
-	{ id: '3', duration: d(1), name: 'Clean Home', time: t(14) },
-	{ id: '5', duration: d(4), name: 'Work Session', time: t(16) },
-	{ id: '6', duration: d(2), name: 'Practice', time: t(20) },
-	{ id: '7', duration: d(8), name: 'Sleep', time: t(24) },
+	{ id: '0', plan: '15', duration: d(8), name: 'Sleep', time: t(0) },
+	{ id: '1', plan: '11', duration: d(1), name: 'Workout', time: t(9) },
+	{ id: '2', plan: '12', duration: d(4), name: 'Work Session', time: t(10) },
+	{ id: '3', plan: '13', duration: d(1), name: 'Clean Home', time: t(14) },
+	{ id: '5', plan: '12', duration: d(4), name: 'Work Session', time: t(16) },
+	{ id: '6', plan: '14', duration: d(2), name: 'Practice', time: t(20) },
+	{ id: '7', plan: '15', duration: d(8), name: 'Sleep', time: t(24) },
 ]
 
 export const stubPlans = [
-	{ id: '11', name: 'Clean Home' },
+	{ id: '11', name: 'Workout' },
 	{ id: '12', name: 'Work Session' },
-	{ id: '13', name: 'Grocery shoping' },
+	{ id: '13', name: 'Clean home' },
 	{ id: '14', name: 'Practice' },
-	{ id: '15', name: 'Workout' },
-	{ id: '16', name: 'Clean Home' },
-	{ id: '17', name: 'Work Session' },
-	{ id: '18', name: 'Grocery shoping' },
-	{ id: '19', name: 'Practice' },
-	{ id: '20', name: 'Workout' },
+	{ id: '15', name: 'Sleep' },
+	{ id: '16', name: 'Reed book' },
+	{ id: '17', name: 'Take a walk' },
+	{ id: '18', name: 'Ride bike' },
+	{ id: '19', name: 'Watch series' },
+	{ id: '20', name: 'Side project' },
 ]
 
 export const rootStore = RootModel.create(

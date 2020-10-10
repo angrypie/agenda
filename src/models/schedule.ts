@@ -4,16 +4,22 @@ import { getDayStart } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 
-export const Task = types.model({
-	id: types.identifier,
-	name: types.string,
-	time: types.number,
-	duration: types.number,
-})
+export const FreeSpotPlan = {
+	id: 'free-spot',
+	name: 'Free spot',
+}
 
 export const Plan = types.model({
 	id: types.identifier,
 	name: types.string,
+})
+
+export const Task = types.model({
+	id: types.identifier,
+	plan: types.reference(Plan),
+	name: types.string,
+	time: types.number,
+	duration: types.number,
 })
 
 export interface ITask extends Instance<typeof Task> {}
@@ -48,12 +54,14 @@ export const Schedule = types
 				self.plans.unshift({ name, id: uuidv4() })
 			},
 
-			updateTask(spot: Spot): boolean {
+			updateTask(spot: Spot, plan: IPlan): boolean {
 				const index = self.tasks.findIndex(({ id }) => id === spot.id)
+				const { id, name } = plan
 				if (index === -1) {
-					self.tasks.push({ ...spot, id: uuidv4() })
+					self.tasks.push({ ...spot, name, plan: id, id: uuidv4() })
 				} else {
-					self.tasks[index].name = spot.name
+					self.tasks[index].name = plan.name
+					self.tasks[index].plan = plan
 				}
 				spots = newSpots(self.tasks.slice())
 				return true

@@ -7,6 +7,7 @@ interface ModalHeaderProps {
 	done?: {
 		disabled: boolean
 		onPress: () => boolean
+		name?: string
 	}
 }
 
@@ -29,7 +30,7 @@ export const ModalHeader = ({ done }: ModalHeaderProps) => {
 					disabled={done.disabled}
 					onPress={() => done.onPress() && goBack()}
 				>
-					Done
+					{done.name || 'Done'}
 				</TextButton>
 			)}
 		</View>

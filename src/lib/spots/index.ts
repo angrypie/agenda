@@ -61,3 +61,7 @@ export const isActiveSpot = (now: number, spot: TimeSpan): boolean =>
 
 export const isCurrentSpot = (now: number, t: TimeSpan): boolean =>
 	now > t.time && now < timeSpanEnd(t)
+
+//TODO do not relay on ids but on tags maybe
+//isTaskSpot determines whether spot is real task or virtual one (gap, root, etc.)
+export const isTaskSpot = (spot: Spot): boolean => !spot.id.endsWith('+gap')
