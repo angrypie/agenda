@@ -18,7 +18,7 @@ export interface SpotManagerProps {
 
 export const SpotManager = ({ spot }: SpotManagerProps) => {
 	const { schedule } = useStore()
-	const task = schedule.tasks.find(task => task.id === spot.id)
+	const task = schedule.tasks.get(spot.id)
 	const store = useLocalStore(() => {
 		const selected: [string, IPlan][] = []
 		if (task !== undefined) {
@@ -93,7 +93,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 					<Description />
 
 					<ScrollView>
-						<View>{schedule.plans.map(renderPlans)}</View>
+						<View>{Array.from(schedule.plans.values()).map(renderPlans)}</View>
 					</ScrollView>
 				</SafeView>
 			)}

@@ -27,12 +27,15 @@ export interface IPlan extends Instance<typeof Plan> {}
 
 export const Schedule = types
 	.model({
-		tasks: types.optional(types.array(Task), []),
-		plans: types.optional(types.array(Plan), []),
+		tasks: types.optional(types.map(Task), {}),
+		plans: types.optional(types.map(Plan), {}),
 	})
 	.actions(function (self) {
-		let spots = newSpots(self.tasks.slice())
+		let spots = newSpots(Array.from(self.tasks.values()))
 		const matcher = newMatcher<ITask>()
+		if (!self.plans.has(FreeSpotPlan.id)) {
+			self.plans.put(FreeSpotPlan)
+		}
 		return {
 			suggestByTime(time: number): ITask[] {
 				return matcher.match(time)
@@ -51,19 +54,20 @@ export const Schedule = types
 			},
 
 			addPlan(name: string) {
-				self.plans.unshift({ name, id: uuidv4() })
+				const id = uuidv4()
+				self.plans.put({ name, id })
 			},
 
 			updateTask(spot: Spot, plan: IPlan): boolean {
-				const index = self.tasks.findIndex(({ id }) => id === spot.id)
+				const task = self.tasks.get(spot.id)
 				const { id, name } = plan
-				if (index === -1) {
-					self.tasks.push({ ...spot, name, plan: id, id: uuidv4() })
+				if (task === undefined) {
+					console.log('add')
+					self.tasks.put({ ...spot, name, plan: id, id: uuidv4() })
 				} else {
-					self.tasks[index].name = plan.name
-					self.tasks[index].plan = plan
+					self.tasks.put({ ...task, ...spot, name, plan: id })
 				}
-				spots = newSpots(self.tasks.slice())
+				spots = newSpots(Array.from(self.tasks.values()))
 				return true
 			},
 		}
