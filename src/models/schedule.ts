@@ -62,10 +62,13 @@ export const Schedule = types
 				const task = self.tasks.get(spot.id)
 				const { id, name } = plan
 				if (task === undefined) {
-					console.log('add')
 					self.tasks.put({ ...spot, name, plan: id, id: uuidv4() })
 				} else {
-					self.tasks.put({ ...task, ...spot, name, plan: id })
+					if (plan.id === FreeSpotPlan.id) {
+						self.tasks.delete(task.id)
+					} else {
+						self.tasks.put({ ...task, ...spot, name, plan: id })
+					}
 				}
 				spots = newSpots(Array.from(self.tasks.values()))
 				return true

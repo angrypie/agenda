@@ -52,7 +52,6 @@ export const Swiper = observer(({ renderItem }: SwiperProps) => {
 			}
 			const d = visibleIndex - centerIndex
 			const forward = d > 0
-			console.log(screens.length, 'current', centerIndex, visibleIndex, d)
 
 			//addNewIndexes adding indexes to the start or tail of the screens list
 			const addNewIndexes = (edge: number, add: (index: number) => void) =>
