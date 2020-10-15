@@ -1,7 +1,6 @@
 import React from 'react'
 import 'react-native-get-random-values'
-import { StatusBar } from 'expo-status-bar'
-import { Button } from 'react-native'
+import { Button, StatusBar } from 'react-native'
 import { StoreProvider, rootStore } from 'models'
 import { NavigationContainer, DarkTheme } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
@@ -22,7 +21,7 @@ export default function App() {
 			<NavigationContainer theme={DarkTheme}>
 				<StoreProvider value={rootStore}>
 					<RootStackScreen />
-					<StatusBar style='light' />
+					<StatusBar barStyle='light-content' />
 				</StoreProvider>
 			</NavigationContainer>
 		</SafeAreaProvider>
