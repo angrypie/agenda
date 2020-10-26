@@ -9,8 +9,9 @@ import { TaskHeader } from './task'
 import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
 import { useLocalStore, Observer } from 'mobx-react-lite'
-import { Button } from './touchable'
+import { ToggleHidden, Button } from './touchable'
 import { Styles } from 'lib/style'
+import DatePicker from 'react-native-date-picker'
 
 export interface SpotManagerProps {
 	spot: Spot
@@ -19,6 +20,8 @@ export interface SpotManagerProps {
 export const SpotManager = ({ spot }: SpotManagerProps) => {
 	const { schedule } = useStore()
 	const task = schedule.tasks.get(spot.id)
+	const spotEnd = timeSpanEnd(spot)
+
 	const store = useLocalStore(() => {
 		const selected: [string, IPlan][] = []
 		if (task !== undefined) {
@@ -26,7 +29,8 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		}
 		return {
 			selected: new Map<string, IPlan>(selected),
-
+			spotStart: spot.time,
+			spotEnd,
 			select(plan: IPlan) {
 				const { id } = plan
 				if (store.isSelected(id)) {
@@ -43,13 +47,20 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 			},
 
 			get current(): IPlan {
-				const current = Array.from(store.selected.values()).pop()
-				return current || FreeSpotPlan
+				return Array.from(store.selected.values()).pop() || FreeSpotPlan
+			},
+
+			get spot(): Spot {
+				const { spotStart, spotEnd } = store
+				return { ...spot, time: spotStart, duration: spotEnd - spotStart }
 			},
 
 			get isChanged() {
 				const current = Array.from(store.selected.values()).pop()
-				return current?.id !== task?.plan.id
+				const planChanged = current?.id !== task?.plan.id
+				const timeChanged =
+					spot.time !== store.spotStart || spotEnd !== store.spotEnd
+				return planChanged || timeChanged
 			},
 		}
 	})
@@ -72,8 +83,8 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		</Button>
 	)
 
-	const spotEnd = timeSpanEnd(spot)
-	const doneButton = () => schedule.updateTask(spot, store.current)
+	const doneButton = () => schedule.updateTask(store.spot, store.current)
+
 	return (
 		<Observer>
 			{() => (
@@ -85,14 +96,43 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 							name: 'Save',
 						}}
 					/>
+
 					<View style={{ opacity: 0.6 }}>
-						<TaskHeader name={store.current.name} time={spot.time} />
+						<ToggleHidden
+							visible={
+								<TaskHeader name={store.current.name} time={store.spotStart} />
+							}
+							hidden={
+								<DatePicker
+									date={new Date(store.spotStart)}
+									minimumDate={new Date(spot.time)}
+									maximumDate={new Date(store.spotEnd)}
+									onDateChange={time => (store.spotStart = time.valueOf())}
+									textColor='white'
+									minuteInterval={5}
+									mode='datetime'
+								/>
+							}
+						/>
 						<SpotsSeparator />
-						<TaskHeader name='' time={spotEnd} />
+						<ToggleHidden
+							visible={<TaskHeader name='' time={store.spotEnd} />}
+							hidden={
+								<DatePicker
+									date={new Date(store.spotEnd)}
+									minimumDate={new Date(store.spotStart)}
+									maximumDate={new Date(spotEnd)}
+									onDateChange={time => (store.spotEnd = time.valueOf())}
+									textColor='white'
+									minuteInterval={5}
+									mode='datetime'
+								/>
+							}
+						/>
 					</View>
 					<Description />
 
-					<ScrollView>
+					<ScrollView showsVerticalScrollIndicator={false}>
 						<View>{Array.from(schedule.plans.values()).map(renderPlans)}</View>
 					</ScrollView>
 				</SafeView>

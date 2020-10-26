@@ -45,7 +45,9 @@ export const TaskList = observer(({ day }: DayProps) => {
 	return (
 		<View style={{ flex: 1 }}>
 			<DayHeader day={day} />
-			<ScrollView>{renderTasks(tasks)}</ScrollView>
+			<ScrollView showsVerticalScrollIndicator={false}>
+				{renderTasks(tasks)}
+			</ScrollView>
 		</View>
 	)
 })

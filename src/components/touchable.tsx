@@ -61,6 +61,22 @@ export const Dim = ({ dim = true, opacity = 0.3, children }: DimProps) => (
 	<View style={{ opacity: dim ? opacity : 1 }}>{children}</View>
 )
 
+export const ToggleHidden = ({
+	visible,
+	hidden,
+}: {
+	visible: React.ReactNode
+	hidden: React.ReactNode
+}) => {
+	const [open, setOpen] = React.useState(false)
+	return (
+		<>
+			<Button onPress={() => setOpen(!open)}>{visible}</Button>
+			{open ? hidden : null}
+		</>
+	)
+}
+
 const styles = StyleSheet.create({
 	borderArea: {
 		justifyContent: 'center',

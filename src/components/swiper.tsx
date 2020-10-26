@@ -79,6 +79,7 @@ export const Swiper = observer(({ renderItem }: SwiperProps) => {
 
 	return (
 		<FlatList
+			showsHorizontalScrollIndicator={false}
 			extraData={store.updateFlag}
 			maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
 			onScroll={event => {

@@ -1,62 +1,60 @@
 {
-	"main": "node_modules/expo/AppEntry.js",
-	"scripts": {
-		"start": "expo start",
-		"android": "expo start --android",
-		"ios": "expo start --ios",
-		"web": "expo start --web",
-		"eject": "expo eject",
-		"test": "jest"
-	},
-	"dependencies": {
-		"@react-native-community/masked-view": "0.1.10",
-		"@react-navigation/native": "^5.7.5",
-		"@react-navigation/stack": "^5.9.2",
-		"babel-plugin-module-resolver": "^4.0.0",
-		"dayjs": "^1.9.1",
-		"expo": "^39.0.3",
-		"expo-status-bar": "~1.0.2",
-		"mobx": "^5",
-		"mobx-react-lite": "^2",
-		"mobx-state-tree": "^3.17.2",
-		"rambda": "^6.2.0",
-		"react": "16.13.1",
-		"react-dom": "16.13.1",
-		"react-native": "https://github.com/expo/react-native/archive/sdk-39.0.0.tar.gz",
-		"react-native-gesture-handler": "~1.7.0",
-		"react-native-get-random-values": "^1.5.0",
-		"react-native-reanimated": "~1.13.1",
-		"react-native-safe-area-context": "3.1.4",
-		"react-native-screens": "~2.10.1",
-		"react-native-web": "~0.13.14",
-		"uuid": "^8.3.1"
-	},
-	"devDependencies": {
-		"@babel/core": "^7.11.6",
-		"@types/jest": "^26.0.14",
-		"@types/react": "~16.9.50",
-		"@types/react-native": "~0.63.23",
-		"@types/uuid": "^8.3.0",
-		"@typescript-eslint/eslint-plugin": "^4.3.0",
-		"@typescript-eslint/parser": "^4.3.0",
-		"eslint": "^7.10.0",
-		"eslint-config-universe": "^5.0.0",
-		"husky": ">=4",
-		"jest-expo": "^39.0.0",
-		"lint-staged": ">=10",
-		"prettier": "^2.1.2",
-		"typescript": "~4.0.3"
-	},
-	"private": true,
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
-	"lint-staged": {
-		"*.{ts,tsx,css}": "prettier --write"
-	},
-	"jest": {
-		"preset": "jest-expo"
-	}
+  "name": "easyplan",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "dependencies": {
+    "@react-native-community/masked-view": "^0.1.10",
+    "@react-navigation/native": "^5.7.6",
+    "@react-navigation/stack": "^5.9.3",
+    "dayjs": "^1.9.3",
+    "mobx": "^5",
+    "mobx-react-lite": "^2",
+    "mobx-state-tree": "^3.17.2",
+    "rambda": "^6.2.0",
+    "react": "16.13.1",
+    "react-native": "0.63.3",
+    "react-native-date-picker": "^3.2.4",
+    "react-native-gesture-handler": "^1.8.0",
+    "react-native-get-random-values": "^1.5.0",
+    "react-native-reanimated": "^1.13.1",
+    "react-native-safe-area-context": "^3.1.8",
+    "react-native-screens": "^2.11.0",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/runtime": "^7.8.4",
+    "@react-native-community/eslint-config": "^1.1.0",
+    "@types/jest": "^25.2.3",
+    "@types/react-native": "^0.63.2",
+    "@types/react-test-renderer": "^16.9.2",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
+    "babel-jest": "^25.1.0",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "eslint": "^6.5.1",
+    "eslint-config-universe": "^5.0.0",
+    "jest": "^25.1.0",
+    "metro-react-native-babel-preset": "^0.59.0",
+    "react-test-renderer": "16.13.1",
+    "typescript": "^3.8.3"
+  },
+  "jest": {
+    "preset": "react-native",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
 }

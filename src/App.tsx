@@ -17,14 +17,16 @@ const RootStack = createStackNavigator<RootScreenParams>()
 
 export default function App() {
 	return (
-		<SafeAreaProvider>
-			<NavigationContainer theme={DarkTheme}>
-				<StoreProvider value={rootStore}>
-					<RootStackScreen />
-					<StatusBar barStyle='light-content' />
-				</StoreProvider>
-			</NavigationContainer>
-		</SafeAreaProvider>
+		<>
+			<StatusBar barStyle='light-content' />
+			<SafeAreaProvider>
+				<NavigationContainer theme={DarkTheme}>
+					<StoreProvider value={rootStore}>
+						<RootStackScreen />
+					</StoreProvider>
+				</NavigationContainer>
+			</SafeAreaProvider>
+		</>
 	)
 }
 
