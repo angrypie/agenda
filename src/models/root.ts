@@ -3,10 +3,14 @@ import { Schedule } from './schedule'
 import { Clock } from './clock'
 import dayjs from 'dayjs'
 import { createEnv } from './utils'
+import { persist } from './persist'
 
 export const RootModel = types.model({
 	schedule: Schedule,
-	clock: Clock,
+	clock: types.optional(Clock, {
+		now: dayjs().valueOf(),
+		today: t(0),
+	}),
 })
 
 function t(hours: number): number {
@@ -19,11 +23,7 @@ function d(hours: number): number {
 
 export const stubTasks = {
 	'0': { id: '0', plan: '15', duration: d(8), name: 'Sleep', time: t(0) },
-	'1': { id: '1', plan: '11', duration: d(1), name: 'Workout', time: t(9) },
 	'2': { id: '2', plan: '12', duration: d(4), name: 'Work', time: t(10) },
-	'3': { id: '3', plan: '13', duration: d(1), name: 'Clean Home', time: t(14) },
-	'5': { id: '5', plan: '12', duration: d(4), name: 'Work', time: t(16) },
-	'6': { id: '6', plan: '14', duration: d(2), name: 'Practice', time: t(20) },
 	'7': { id: '7', plan: '15', duration: d(8), name: 'Sleep', time: t(24) },
 }
 
@@ -42,7 +42,6 @@ export const stubPlans = {
 
 export const rootStore = RootModel.create(
 	{
-		clock: { now: t(1), today: t(1) },
 		schedule: {
 			tasks: stubTasks,
 			plans: stubPlans,
@@ -51,6 +50,10 @@ export const rootStore = RootModel.create(
 	//Use typesafe getEnv from 'models/utils.ts'
 	createEnv()
 )
+
+persist('rootStore', rootStore, {
+	blacklist: ['clock'],
+}).then(() => console.log('root store has been hydrated'))
 
 export const scheduler = CreateScheduler(rootStore)
 

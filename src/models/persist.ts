@@ -1,39 +1,23 @@
 import { onSnapshot, applySnapshot, IStateTreeNode } from 'mobx-state-tree'
+import { AsyncStorage } from 'react-native'
 
 export interface IArgs {
 	(name: string, store: IStateTreeNode, options?: IOptions): Promise<void>
 }
 export interface IOptions {
-	storage?: any
-	jsonify?: boolean
 	readonly whitelist?: string[]
 	readonly blacklist?: string[]
 }
-type StrToAnyMap = { [key: string]: any }
 
-export const persist: IArgs = (name, store, options = {}) => {
-	let { storage, jsonify = true, whitelist, blacklist } = options
-
-	// use AsyncLocalStorage by default (or if localStorage was passed in)
-	if (
-		typeof window !== 'undefined' &&
-		typeof window.localStorage !== 'undefined' &&
-		(!storage || storage === window.localStorage)
-	) {
-		storage = AsyncLocalStorage
-	}
-	if (!storage) {
-		return Promise.reject(
-			'localStorage (the default storage engine) is not ' +
-				'supported in this environment. Please configure a different storage ' +
-				'engine via the `storage:` option.'
-		)
-	}
+export const persist: IArgs = async (name, store, options = {}) => {
+	const { whitelist, blacklist } = options
+	//TODO why AsyncStorage is deprecated
+	const storage = AsyncStorage
 
 	const whitelistDict = arrToDict(whitelist)
 	const blacklistDict = arrToDict(blacklist)
 
-	onSnapshot(store, (_snapshot: StrToAnyMap) => {
+	onSnapshot(store, _snapshot => {
 		// need to shallow clone as otherwise properties are non-configurable (https://github.com/agilgur5/mst-persist/pull/21#discussion_r348105595)
 		const snapshot = { ..._snapshot }
 		Object.keys(snapshot).forEach(key => {
@@ -45,16 +29,17 @@ export const persist: IArgs = (name, store, options = {}) => {
 			}
 		})
 
-		const data = !jsonify ? snapshot : JSON.stringify(snapshot)
+		const data = JSON.stringify(snapshot)
 		storage.setItem(name, data)
 	})
 
-	return storage.getItem(name).then((data: object | string) => {
-		const snapshot = !isString(data) ? data : JSON.parse(data)
-		// don't apply falsey (which will error), leave store in initial state
-		if (!snapshot) {
+	return storage.getItem(name).then((data: string | null) => {
+		//don't apply falsey (which will error), leave store in initial state
+		if (data === null) {
 			return
 		}
+		const snapshot = JSON.parse(data)
+		console.log(snapshot)
 		applySnapshot(store, snapshot)
 	})
 }
@@ -70,9 +55,3 @@ function arrToDict(arr?: string[]): StrToBoolMap {
 		return dict
 	}, {})
 }
-
-function isString(value: any): value is string {
-	return typeof value === 'string'
-}
-
-export default persist
