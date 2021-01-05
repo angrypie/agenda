@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, FlatList, Dimensions } from 'react-native'
-import { useLocalStore, observer } from 'mobx-react-lite'
+import { useLocalObservable, observer } from 'mobx-react-lite'
 import { Arr, head, last, NewNotEmptyArray } from 'lib/collections'
 import { useThrottleCallback } from 'lib/hooks'
 import { times } from 'rambda'
@@ -42,7 +42,7 @@ export const Swiper = observer(({ renderItem }: SwiperProps) => {
 	//multiple swipes lag when sreens buffer size is not enough
 	const size = 9
 	const centerIndex = getCenterIndex(size)
-	const store = useLocalStore(() => ({
+	const store = useLocalObservable(() => ({
 		screens: initSwiperScreens(size),
 		updateFlag: genUpdateFlag(),
 		updateScreens(visibleIndex: number) {

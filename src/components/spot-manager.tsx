@@ -8,7 +8,7 @@ import { timeSpanEnd } from 'lib/spots/spot'
 import { TaskHeader } from './task'
 import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
-import { useLocalStore, Observer } from 'mobx-react-lite'
+import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { ToggleHidden, Button } from './touchable'
 import { Styles } from 'lib/style'
 import DatePicker from 'react-native-date-picker'
@@ -22,7 +22,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 	const task = schedule.tasks.get(spot.id)
 	const spotEnd = timeSpanEnd(spot)
 
-	const store = useLocalStore(() => {
+	const store = useLocalObservable(() => {
 		const selected: [string, IPlan][] = []
 		if (task !== undefined) {
 			selected.push([task.plan.id, task.plan])
