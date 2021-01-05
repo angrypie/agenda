@@ -38,9 +38,10 @@ export const TaskList = observer(({ day }: DayProps) => {
 	const renderTasks = (tasks: Spot[]) =>
 		tasks.map(task => <Task key={task.id} task={task} />)
 
-	const tasks = isToday(day)
-		? dayTasks.filter(task => isActiveSpot(clock.now, task))
-		: dayTasks
+	//const tasks = isToday(day)
+		//? dayTasks.filter(task => isActiveSpot(clock.now, task))
+		//: dayTasks
+	const tasks = dayTasks
 
 	return (
 		<View style={{ flex: 1 }}>

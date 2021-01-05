@@ -3,6 +3,7 @@ import { newSpots, Spot } from 'lib/spots'
 import { getDayStart } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
+import { observe } from 'mobx'
 
 export const FreeSpotPlan = {
 	id: 'free-spot',
@@ -32,6 +33,14 @@ export const Schedule = types
 	})
 	.actions(function (self) {
 		let spots = newSpots(Array.from(self.tasks.values()))
+		const updateSpots = () => {
+			spots = newSpots(Array.from(self.tasks.values()))
+		}
+		observe(self.tasks, change => {
+			console.log('TODO reduce spots update', change.name, change.type)
+			updateSpots()
+		})
+
 		const matcher = newMatcher<ITask>()
 		if (!self.plans.has(FreeSpotPlan.id)) {
 			self.plans.put(FreeSpotPlan)
@@ -70,7 +79,7 @@ export const Schedule = types
 						self.tasks.put({ ...task, ...spot, name, plan: id })
 					}
 				}
-				spots = newSpots(Array.from(self.tasks.values()))
+				updateSpots()
 				return true
 			},
 		}

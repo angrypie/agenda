@@ -50,7 +50,7 @@ export const NewRootNode = (spots: Spot[] = []): Node =>
 	NewNode(
 		{
 			id: 'root',
-			name: 'Root',
+			name: 'Free spot',
 			time: 0,
 			duration: Infinity,
 		},

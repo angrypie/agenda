@@ -22,9 +22,9 @@ function d(hours: number): number {
 }
 
 export const stubTasks = {
-	'0': { id: '0', plan: '15', duration: d(8), name: 'Sleep', time: t(0) },
-	'2': { id: '2', plan: '12', duration: d(4), name: 'Work', time: t(10) },
-	'7': { id: '7', plan: '15', duration: d(8), name: 'Sleep', time: t(24) },
+	//'0': { id: '0', plan: '15', duration: d(8), name: 'Sleep', time: t(0) },
+	//'2': { id: '2', plan: '12', duration: d(4), name: 'Work', time: t(10) },
+	//'7': { id: '7', plan: '15', duration: d(8), name: 'Sleep', time: t(24) },
 }
 
 export const stubPlans = {

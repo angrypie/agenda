@@ -39,7 +39,6 @@ export const persist: IArgs = async (name, store, options = {}) => {
 			return
 		}
 		const snapshot = JSON.parse(data)
-		console.log(snapshot)
 		applySnapshot(store, snapshot)
 	})
 }
