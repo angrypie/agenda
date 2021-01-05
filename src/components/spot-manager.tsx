@@ -42,6 +42,9 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 				}
 			},
 
+			setSpotStart: (time: number) => (store.spotStart = time),
+			setSpotEnd: (time: number) => (store.spotEnd = time),
+
 			isSelected(id: string): boolean {
 				return store.selected.has(id)
 			},
@@ -107,7 +110,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 									date={new Date(store.spotStart)}
 									minimumDate={new Date(spot.time)}
 									maximumDate={new Date(store.spotEnd)}
-									onDateChange={time => (store.spotStart = time.valueOf())}
+									onDateChange={time => store.setSpotStart(time.valueOf())}
 									textColor='white'
 									minuteInterval={5}
 									mode='datetime'
@@ -122,7 +125,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 									date={new Date(store.spotEnd)}
 									minimumDate={new Date(store.spotStart)}
 									maximumDate={new Date(spotEnd)}
-									onDateChange={time => (store.spotEnd = time.valueOf())}
+									onDateChange={time => store.setSpotEnd(time.valueOf())}
 									textColor='white'
 									minuteInterval={5}
 									mode='datetime'

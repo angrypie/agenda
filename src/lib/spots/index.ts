@@ -1,8 +1,8 @@
-import { curry, sort } from 'rambda'
+import { curry } from 'rambda'
 import { endOfDayTime } from 'lib/time'
 import { Spot, TimeSpan, timeSpanEnd } from './spot'
 import { NewRootNode, treeToSpots } from './tree'
-export { Spot }
+export type { Spot }
 
 export interface Spots {
 	todaySpots: (now: number) => Spot[]
@@ -18,6 +18,17 @@ export const newSpots = (tasks: Spot[]): Spots => {
 
 	const sliceByTime = (start: number, end: number): Spot[] => {
 		const spots = getSpots()
+		//Create RootDaySpot to avoid RootSpot with 0 to Infinity time span
+		if (spots.length === 1) {
+			return [
+				{
+					id: 'free-spot',
+					name: 'Free spot',
+					time: start,
+					duration: end - start,
+				},
+			]
+		}
 		return spots.slice(
 			firstNextSpot(start, spots),
 			firstNextSpot(end, spots) + 1
@@ -50,7 +61,7 @@ export const newSpots = (tasks: Spot[]): Spots => {
 }
 
 const sortSpots = (list: Spot[]): Spot[] =>
-	sort((a: Spot, b: Spot) => a.time - b.time, list)
+	list.sort((a: Spot, b: Spot) => a.time - b.time)
 
 const firstNextSpot = (time: number, spots: Spot[]): number =>
 	spots.findIndex(curry(isActiveSpot)(time))
