@@ -19,54 +19,7 @@ export interface SpotManagerProps {
 
 export const SpotManager = ({ spot }: SpotManagerProps) => {
 	const { schedule } = useStore()
-	const task = schedule.tasks.get(spot.id)
-	const spotEnd = timeSpanEnd(spot)
-
-	const store = useLocalObservable(() => {
-		const selected: [string, IPlan][] = []
-		if (task !== undefined) {
-			selected.push([task.plan.id, task.plan])
-		}
-		return {
-			selected: new Map<string, IPlan>(selected),
-			spotStart: spot.time,
-			spotEnd,
-			select(plan: IPlan) {
-				const { id } = plan
-				if (store.isSelected(id)) {
-					store.selected.delete(id)
-				} else {
-					//TODO do not clean, display all selected
-					store.selected.clear()
-					store.selected.set(id, plan)
-				}
-			},
-
-			setSpotStart: (time: number) => (store.spotStart = time),
-			setSpotEnd: (time: number) => (store.spotEnd = time),
-
-			isSelected(id: string): boolean {
-				return store.selected.has(id)
-			},
-
-			get current(): IPlan {
-				return Array.from(store.selected.values()).pop() || FreeSpotPlan
-			},
-
-			get spot(): Spot {
-				const { spotStart, spotEnd } = store
-				return { ...spot, time: spotStart, duration: spotEnd - spotStart }
-			},
-
-			get isChanged() {
-				const current = Array.from(store.selected.values()).pop()
-				const planChanged = current?.id !== task?.plan.id
-				const timeChanged =
-					spot.time !== store.spotStart || spotEnd !== store.spotEnd
-				return planChanged || timeChanged
-			},
-		}
-	})
+	const store = useSpotManager(spot)
 
 	const renderPlans = ({ id, name }: IPlan) => (
 		<Button key={id} onPress={() => store.select({ id, name })}>
@@ -103,12 +56,12 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 					<View style={{ opacity: 0.6 }}>
 						<ToggleHidden
 							visible={
-								<TaskHeader name={store.current.name} time={store.spotStart} />
+								<TaskHeader name={store.current.name} time={store.time} />
 							}
 							hidden={
 								<DatePicker
-									date={new Date(store.spotStart)}
-									minimumDate={new Date(spot.time)}
+									date={new Date(store.time)}
+									minimumDate={new Date(store.timespan.start)}
 									maximumDate={new Date(store.spotEnd)}
 									onDateChange={time => store.setSpotStart(time.valueOf())}
 									textColor='white'
@@ -123,8 +76,8 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 							hidden={
 								<DatePicker
 									date={new Date(store.spotEnd)}
-									minimumDate={new Date(store.spotStart)}
-									maximumDate={new Date(spotEnd)}
+									minimumDate={new Date(store.time)}
+									maximumDate={new Date(store.timespan.end)}
 									onDateChange={time => store.setSpotEnd(time.valueOf())}
 									textColor='white'
 									minuteInterval={5}
@@ -142,6 +95,72 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 			)}
 		</Observer>
 	)
+}
+
+const useSpotManager = (spot: Spot) => {
+	const { schedule } = useStore()
+	const task = schedule.tasks.get(spot.id)
+	const spotStart = spot.time
+	const spotEnd = timeSpanEnd(spot)
+
+	const store = useLocalObservable(() => {
+		const selected: [string, IPlan][] = []
+		if (task !== undefined) {
+			selected.push([task.plan.id, task.plan])
+		}
+		return {
+			selected: new Map<string, IPlan>(selected),
+			//Initil spot time span
+			timespan: { start: spotStart, end: spotEnd },
+			time: spotStart, // Spot sstart time
+			duration: spot.duration, //Spot duration
+			select(plan: IPlan) {
+				const { id } = plan
+				if (store.isSelected(id)) {
+					store.selected.delete(id)
+				} else {
+					//TODO do not clean, display all selected
+					store.selected.clear()
+					store.selected.set(id, plan)
+				}
+			},
+
+			get spotEnd(): number {
+				return store.time - store.duration
+			},
+
+			setSpotStart(time: number) {
+				return (store.time = time)
+			},
+
+			setSpotEnd(time: number) {
+				return (store.duration = time - store.time)
+			},
+
+			isSelected(id: string): boolean {
+				return store.selected.has(id)
+			},
+
+			get current(): IPlan {
+				return Array.from(store.selected.values()).pop() || FreeSpotPlan
+			},
+
+			get spot(): Spot {
+				const { time, duration } = store
+				return { ...spot, time, duration }
+			},
+
+			get isChanged() {
+				const current = Array.from(store.selected.values()).pop()
+				const planChanged = current?.id !== task?.plan.id
+				const timeChanged =
+					spot.time !== store.time || spotEnd !== store.spotEnd
+				return planChanged || timeChanged
+			},
+		}
+	})
+
+	return store
 }
 
 const SpotsSeparator = () => <View style={styles.spotsSeparator} />

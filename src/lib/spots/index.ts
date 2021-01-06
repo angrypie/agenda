@@ -18,17 +18,6 @@ export const newSpots = (tasks: Spot[]): Spots => {
 
 	const sliceByTime = (start: number, end: number): Spot[] => {
 		const spots = getSpots()
-		//Create RootDaySpot to avoid RootSpot with 0 to Infinity time span
-		if (spots.length === 1) {
-			return [
-				{
-					id: 'free-spot',
-					name: 'Free spot',
-					time: start,
-					duration: end - start,
-				},
-			]
-		}
 		return spots.slice(
 			firstNextSpot(start, spots),
 			firstNextSpot(end, spots) + 1
