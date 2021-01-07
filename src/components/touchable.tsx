@@ -47,7 +47,9 @@ export interface TextButtonProps extends ButtonProps {
 //TODO increase touchable area
 export const TextButton = ({ children, style, ...button }: TextButtonProps) => (
 	<Button {...button}>
-		<Text style={{ fontSize: 16, ...style }}>{children}</Text>
+		<Text style={{ fontSize: 16, ...style, paddingTop: 2, paddingBottom: 5 }}>
+			{children}
+		</Text>
 	</Button>
 )
 

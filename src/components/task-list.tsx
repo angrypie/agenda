@@ -78,12 +78,17 @@ export const AddTask = () => {
 	const onPress = () => navigation.navigate('AddTaskModal')
 
 	return (
-		<View style={{ alignItems: 'center' }}>
-			<TouchableOpacity onPress={onPress}>
-				<Text style={{ marginTop: -7, fontSize: 30, fontWeight: '200' }}>
-					+
-				</Text>
-			</TouchableOpacity>
-		</View>
+		<TouchableOpacity onPress={onPress}>
+			<Text
+				style={{
+					marginTop: -7,
+					fontSize: 33,
+					fontWeight: '200',
+					paddingLeft: 10,
+				}}
+			>
+				+
+			</Text>
+		</TouchableOpacity>
 	)
 }
