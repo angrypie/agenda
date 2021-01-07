@@ -1,5 +1,5 @@
 import { onSnapshot, applySnapshot, IStateTreeNode } from 'mobx-state-tree'
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export interface IArgs {
 	(name: string, store: IStateTreeNode, options?: IOptions): Promise<void>
