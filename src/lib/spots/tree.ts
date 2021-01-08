@@ -1,5 +1,5 @@
 import { Spot, timeSpanEnd, gapsBetweenSpots } from './spot'
-import { head, last, NewNotEmptyArray } from 'lib/collections'
+import { Arr, head, last, NewNotEmptyArray } from 'lib/collections'
 
 interface Node {
 	spot: Spot
@@ -11,7 +11,7 @@ export const NewNode = (spot: Spot, childs: Node[] = []): Node => ({
 	childs,
 })
 
-export const treeToSpots = ({ spot, childs }: Node): Spot[] => {
+export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 	const spots = NewNotEmptyArray(childs.flatMap(treeToSpots))
 	if (spots === undefined) {
 		return [spot]
@@ -25,7 +25,7 @@ export const treeToSpots = ({ spot, childs }: Node): Spot[] => {
 
 	const gaps = gapsBetweenSpots(spots)
 	const withGaps = spots.flatMap((spot, index) => {
-		const arr: Spot[] = [spot]
+		const arr = [spot]
 		const gap = gaps(index)
 		if (gap !== 0) {
 			arr.push({
@@ -50,7 +50,7 @@ export const NewRootNode = (spots: Spot[] = []): Node =>
 	NewNode(
 		{
 			id: 'root',
-			name: 'Free spot',
+			name: 'Free spot(root)',
 			time: 0,
 			duration: Infinity,
 		},

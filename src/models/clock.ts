@@ -1,5 +1,6 @@
 import { types } from 'mobx-state-tree'
 import { getDayStart } from 'lib/time'
+import dayjs from 'dayjs'
 
 export const Clock = types
 	.model({

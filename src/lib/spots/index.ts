@@ -14,24 +14,15 @@ export interface Spots {
 export const newSpots = (tasks: Spot[]): Spots => {
 	const tree = NewRootNode(sortSpots(tasks))
 
-	const getSpots = (): Spot[] => treeToSpots(tree)
-
-	const sliceByTime = (start: number, end: number): Spot[] => {
-		const spots = getSpots()
-		return spots.slice(
-			firstNextSpot(start, spots),
-			firstNextSpot(end, spots) + 1
-		)
-	}
+	//TODO do not call tereeToSpots every time?
+	const spots = treeToSpots(tree)
 
 	const current = (now: number): Spot => {
-		const spots = getSpots()
 		const index = spots.findIndex(spot => isCurrentSpot(now, spot))
 		//TODO make it type safe NotEmptyArray?
 		return index === -1 ? spots[0] : spots[index]
 	}
 	const next = (now: number): Spot => {
-		const spots = getSpots()
 		const index = spots.findIndex(spot => isCurrentSpot(now, spot))
 		if (index < spots.length - 1) {
 			//TODO make it type safe NotEmptyArray?
@@ -40,19 +31,36 @@ export const newSpots = (tasks: Spot[]): Spots => {
 		return spots[index]
 	}
 
+	//TODO replace string id 'root' to constant or enum
+	const todaySpots = (now: number): Spot[] =>
+		sliceByTime(spots, now, endOfDayTime(now)).map(spot =>
+			spot.id.startsWith('root')
+				? {
+						id: 'day-root',
+						name: 'Free spot(day)',
+						time: now,
+						duration: endOfDayTime(now) - now,
+				  }
+				: spot
+		)
+
 	return {
 		//todaySpots returns spots from now to end of the day
-		todaySpots: (now: number): Spot[] => sliceByTime(now, endOfDayTime(now)),
-		get: getSpots,
+		todaySpots,
+		get: () => spots,
 		next,
 		current,
 	}
 }
 
+const sliceByTime = (spots: Spot[], start: number, end: number): Spot[] =>
+	spots.slice(nextSpotIndex(start, spots), nextSpotIndex(end, spots) + 1)
+
 const sortSpots = (list: Spot[]): Spot[] =>
 	list.sort((a: Spot, b: Spot) => a.time - b.time)
 
-const firstNextSpot = (time: number, spots: Spot[]): number =>
+//nextSpotIndex finds first spot after time specified
+const nextSpotIndex = (time: number, spots: Spot[]): number =>
 	spots.findIndex(curry(isActiveSpot)(time))
 
 //isActiveSpot return true if spot is not end yet

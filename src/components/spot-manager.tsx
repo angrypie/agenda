@@ -12,6 +12,7 @@ import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { ToggleHidden, Button } from './touchable'
 import { Styles } from 'lib/style'
 import DatePicker from 'react-native-date-picker'
+import dayjs from 'dayjs'
 
 export interface SpotManagerProps {
 	spot: Spot
@@ -40,6 +41,9 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 	)
 
 	const doneButton = () => schedule.updateTask(store.spot, store.current)
+
+	console.log('start: ', dayjs(store.time).format('DD - HH:mm'))
+	console.log('end__: ', dayjs(store.spotEnd).format('DD - HH:mm'))
 
 	return (
 		<Observer>
@@ -126,15 +130,16 @@ const useSpotManager = (spot: Spot) => {
 			},
 
 			get spotEnd(): number {
-				return store.time - store.duration
+				return timeSpanEnd(store)
 			},
 
+			//TODO disallow start end time overlap
 			setSpotStart(time: number) {
-				return (store.time = time)
+				store.time = time
 			},
 
 			setSpotEnd(time: number) {
-				return (store.duration = time - store.time)
+				store.duration = time - store.time
 			},
 
 			isSelected(id: string): boolean {
