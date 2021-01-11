@@ -31,7 +31,7 @@ export const Schedule = types
 		tasks: types.optional(types.map(Task), {}),
 		plans: types.optional(types.map(Plan), {}),
 	})
-	.actions(function (self) {
+	.extend(function (self) {
 		let spots = newSpots(Array.from(self.tasks.values()))
 		const updateSpots = () => {
 			spots = newSpots(Array.from(self.tasks.values()))
@@ -46,41 +46,46 @@ export const Schedule = types
 			self.plans.put(FreeSpotPlan)
 		}
 		return {
-			suggestByTime(time: number): ITask[] {
-				return matcher.match(time)
-			},
-
-			getDayTask(time: number): Spot[] {
-				return spots.todaySpots(getDayStart(time))
-			},
-
-			getCurrentSpot(time: number): Spot {
-				return spots.current(time)
-			},
-
-			getNextTask(time: number): Spot {
-				return spots.next(time)
-			},
-
-			addPlan(name: string) {
-				const id = uuidv4()
-				self.plans.put({ name, id })
-			},
-
-			updateTask(spot: Spot, plan: IPlan): boolean {
-				const task = self.tasks.get(spot.id)
-				const { id, name } = plan
-				if (task === undefined) {
-					self.tasks.put({ ...spot, name, plan: id, id: uuidv4() })
-				} else {
-					if (plan.id === FreeSpotPlan.id) {
-						self.tasks.delete(task.id)
-					} else {
-						self.tasks.put({ ...task, ...spot, name, plan: id })
+			views: {
+				getDayTasks(time: number): Spot[] {
+					if (self.tasks.size === 0) {
+						return []
 					}
-				}
-				updateSpots()
-				return true
+					return spots.todaySpots(getDayStart(time))
+				},
+				getCurrentSpot(time: number): Spot {
+					return spots.current(time)
+				},
+
+				getNextTask(time: number): Spot {
+					return spots.next(time)
+				},
+			},
+			actions: {
+				suggestByTime(time: number): ITask[] {
+					return matcher.match(time)
+				},
+
+				addPlan(name: string) {
+					const id = uuidv4()
+					self.plans.put({ name, id })
+				},
+
+				updateTask(spot: Spot, plan: IPlan): boolean {
+					const task = self.tasks.get(spot.id)
+					const { id, name } = plan
+					if (task === undefined) {
+						self.tasks.put({ ...spot, name, plan: id, id: uuidv4() })
+					} else {
+						if (plan.id === FreeSpotPlan.id) {
+							self.tasks.delete(task.id)
+						} else {
+							self.tasks.put({ ...task, ...spot, name, plan: id })
+						}
+					}
+					updateSpots()
+					return true
+				},
 			},
 		}
 	})
