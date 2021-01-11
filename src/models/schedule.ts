@@ -32,9 +32,12 @@ export const Schedule = types
 		plans: types.optional(types.map(Plan), {}),
 	})
 	.extend(function (self) {
-		let spots = newSpots(Array.from(self.tasks.values()))
+		let spotsCache = newSpots(Array.from(self.tasks.values()))
+		//TODO find another way to triger spots views
+		const spots = () => (self.tasks.size === 0 ? spotsCache : spotsCache)
+
 		const updateSpots = () => {
-			spots = newSpots(Array.from(self.tasks.values()))
+			spotsCache = newSpots(Array.from(self.tasks.values()))
 		}
 		observe(self.tasks, change => {
 			console.log('TODO reduce spots update', change.name, change.type)
@@ -48,17 +51,14 @@ export const Schedule = types
 		return {
 			views: {
 				getDayTasks(time: number): Spot[] {
-					if (self.tasks.size === 0) {
-						return []
-					}
-					return spots.todaySpots(getDayStart(time))
+					return spots().todaySpots(getDayStart(time))
 				},
 				getCurrentSpot(time: number): Spot {
-					return spots.current(time)
+					return spots().current(time)
 				},
 
 				getNextTask(time: number): Spot {
-					return spots.next(time)
+					return spots().next(time)
 				},
 			},
 			actions: {
