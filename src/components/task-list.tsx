@@ -34,10 +34,15 @@ export const DaysSwiper = () => {
 //TODO add new tasks instantly, not depending on clock tick
 export const TaskList = observer(({ day }: DayProps) => {
 	const { schedule, clock } = useStore()
+	//const allTasks = schedule.tasks
 	const dayTasks = schedule.getDayTask(day)
 
 	const renderTasks = (tasks: Spot[]) =>
 		tasks.map(task => <Task key={task.id} task={task} />)
+
+	if (schedule.tasks.size === 0) {
+		return null
+	}
 
 	//If day is today then hide past tasks
 	const tasks = isToday(day)
