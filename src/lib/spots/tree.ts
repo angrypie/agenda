@@ -56,3 +56,6 @@ export const NewRootNode = (spots: Spot[] = []): Node =>
 		},
 		spots.map(spot => NewNode(spot))
 	)
+
+export const isRootSpot = (spot: Spot): boolean =>
+	spot.time === 0 || spot.duration === Infinity

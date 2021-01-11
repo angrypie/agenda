@@ -42,9 +42,6 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 
 	const doneButton = () => schedule.updateTask(store.spot, store.current)
 
-	console.log('start: ', dayjs(store.time).format('DD - HH:mm'))
-	console.log('end__: ', dayjs(store.spotEnd).format('DD - HH:mm'))
-
 	return (
 		<Observer>
 			{() => (
@@ -134,12 +131,14 @@ const useSpotManager = (spot: Spot) => {
 			},
 
 			//TODO disallow start end time overlap
-			setSpotStart(time: number) {
-				store.time = time
+			setSpotStart(startTime: number) {
+				const currentEnd = store.spotEnd
+				store.time = startTime
+				store.duration = currentEnd - startTime
 			},
 
-			setSpotEnd(time: number) {
-				store.duration = time - store.time
+			setSpotEnd(endTime: number) {
+				store.duration = endTime - store.time
 			},
 
 			isSelected(id: string): boolean {

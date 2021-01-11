@@ -1,7 +1,7 @@
 import { curry } from 'rambda'
 import { endOfDayTime } from 'lib/time'
 import { Spot, TimeSpan, timeSpanEnd } from './spot'
-import { NewRootNode, treeToSpots } from './tree'
+import { isRootSpot, NewRootNode, treeToSpots } from './tree'
 export type { Spot }
 
 export interface Spots {
@@ -9,6 +9,29 @@ export interface Spots {
 	get: () => Spot[]
 	current: (now: number) => Spot
 	next: (now: number) => Spot
+}
+
+const rootToDaySpot = (dayStart: number, spot: Spot) => {
+	if (!isRootSpot(spot)) {
+		return spot
+	}
+
+	const before =
+		spot.time === 0
+			? { duration: timeSpanEnd(spot) - dayStart, time: dayStart }
+			: spot
+
+	const after =
+		spot.duration === Infinity
+			? { ...before, duration: endOfDayTime(dayStart) - before.time }
+			: before
+
+	return {
+		id: spot.id,
+		name: 'Free spot',
+		time: after.time,
+		duration: after.duration,
+	}
 }
 
 export const newSpots = (tasks: Spot[]): Spots => {
@@ -32,16 +55,9 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	}
 
 	//TODO replace string id 'root' to constant or enum
-	const todaySpots = (now: number): Spot[] =>
-		sliceByTime(spots, now, endOfDayTime(now)).map(spot =>
-			spot.id.startsWith('root')
-				? {
-						id: 'day-root',
-						name: 'Free spot(day)',
-						time: now,
-						duration: endOfDayTime(now) - now,
-				  }
-				: spot
+	const todaySpots = (dayStart: number): Spot[] =>
+		sliceByTime(spots, dayStart, endOfDayTime(dayStart)).map(spot =>
+			rootToDaySpot(dayStart, spot)
 		)
 
 	return {
