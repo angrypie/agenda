@@ -1,18 +1,17 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import { Text, Header } from 'components/text'
+import { Header } from 'components/text'
 import { observer } from 'mobx-react-lite'
 import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore } from 'models'
 import { formatTime } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
-import { BorderArea, Button } from './touchable'
+import { Button } from './touchable'
 
-const subtasks = ['Some subtask', 'Another subtask']
+export const TaskFullHeight = 110
 
-export const TaskFullHeight = 200
-
-export const Task = observer(({ task, hideSub = false }: TaskProps) => {
+//TODO make free spot more different from regular task
+export const Task = observer(({ task }: TaskProps) => {
 	const { name, time } = task
 	const { clock } = useStore()
 	const isCurrent = isCurrentSpot(clock.now, task)
@@ -20,7 +19,7 @@ export const Task = observer(({ task, hideSub = false }: TaskProps) => {
 
 	const style = {
 		opacity: isCurrent ? 1 : 0.5,
-		height: hideSub ? 100 : TaskFullHeight,
+		height: TaskFullHeight,
 	}
 
 	const isFree = isFreeSpot(task)
@@ -29,27 +28,11 @@ export const Task = observer(({ task, hideSub = false }: TaskProps) => {
 	return (
 		<Button onPress={() => navigation.navigate('SpotManager', { spot: task })}>
 			<View style={[styles.task, style]}>
-				<TaskHeader name={name} time={displayTime} />
-				{hideSub ? null : isFree ? (
-					<FreeSpotSuggestion spot={task} />
-				) : (
-					<SubTasks tasks={subtasks} />
-				)}
+				<TaskHeader name={isFree ? 'free spot' : name} time={displayTime} />
 			</View>
 		</Button>
 	)
 })
-
-const FreeSpotSuggestion = ({ spot }: { spot: Spot }) => {
-	const navigation = useNavigation()
-	return (
-		<BorderArea
-			style={{ marginTop: 30 }}
-			text='Tap to schedule task'
-			onPress={() => navigation.navigate('SpotManager', { spot })}
-		/>
-	)
-}
 
 //TODO use category tag to figure out is it base free spot
 const isFreeSpot = (spot: Spot): boolean => {
@@ -65,18 +48,9 @@ export const TaskHeader = ({ name, time }: { name: string; time: number }) => {
 	)
 }
 
-const SubTasks = ({ tasks }: { tasks: string[] }) => (
-	<View style={styles.sub}>
-		{tasks.map((task, i) => (
-			<Text key={i}>{task}</Text>
-		))}
-	</View>
-)
-
 export const TaskTime = ({ time }: any) => <Header>{formatTime(time)}</Header>
 
 interface TaskProps {
-	hideSub?: boolean
 	task: Spot
 }
 const styles = StyleSheet.create({
@@ -89,11 +63,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-	},
-	sub: {
-		height: 40,
-		marginTop: 40,
-		justifyContent: 'space-around',
 	},
 	spotSuggestion: {
 		justifyContent: 'center',

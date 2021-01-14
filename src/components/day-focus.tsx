@@ -26,7 +26,7 @@ export const DayFocus = observer(() => {
 				<Task task={spot} />
 			</View>
 			<View style={{ opacity: 0.4 }}>
-				<Task task={nextTask} hideSub />
+				<Task task={nextTask} />
 			</View>
 		</View>
 	)
