@@ -2,7 +2,7 @@ import React from 'react'
 import { ScrollView, View, StyleSheet } from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
-import { Spot } from 'lib/spots'
+import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore, IPlan, FreeSpotPlan } from 'models'
 import { timeSpanEnd } from 'lib/spots/spot'
 import { TaskHeader } from './task'
@@ -12,33 +12,32 @@ import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { ToggleHidden, Button } from './touchable'
 import { Styles } from 'lib/style'
 import DatePicker from 'react-native-date-picker'
-import dayjs from 'dayjs'
 
 export interface SpotManagerProps {
 	spot: Spot
 }
 
+const PlanItem = ({ id, name }: IPlan, store: SpotManagerStore) => (
+	<Button key={id} onPress={() => store.select({ id, name })}>
+		<View
+			key={id}
+			style={[
+				{
+					opacity: store.isSelected(id) ? 1 : 0.8,
+					paddingVertical: 13,
+				},
+				Styles.rowBetween,
+			]}
+		>
+			<Header>{name}</Header>
+			{store.isSelected(id) ? <Text> [remove] </Text> : null}
+		</View>
+	</Button>
+)
+
 export const SpotManager = ({ spot }: SpotManagerProps) => {
 	const { schedule } = useStore()
 	const store = useSpotManager(spot)
-
-	const renderPlans = ({ id, name }: IPlan) => (
-		<Button key={id} onPress={() => store.select({ id, name })}>
-			<View
-				key={id}
-				style={[
-					{
-						opacity: store.isSelected(id) ? 1 : 0.8,
-						paddingVertical: 13,
-					},
-					Styles.rowBetween,
-				]}
-			>
-				<Header>{name}</Header>
-				{store.isSelected(id) ? <Text> [remove] </Text> : null}
-			</View>
-		</Button>
-	)
 
 	const doneButton = () => schedule.updateTask(store.spot, store.current)
 
@@ -90,7 +89,11 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 					<Description />
 
 					<ScrollView showsVerticalScrollIndicator={false}>
-						<View>{Array.from(schedule.plans.values()).map(renderPlans)}</View>
+						<View>
+							{Array.from(schedule.plans.values()).map(plan =>
+								PlanItem(plan, store)
+							)}
+						</View>
 					</ScrollView>
 				</SafeView>
 			)}
@@ -98,11 +101,15 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 	)
 }
 
+type SpotManagerStore = ReturnType<typeof useSpotManager>
+
 const useSpotManager = (spot: Spot) => {
-	const { schedule } = useStore()
+	const { schedule, clock } = useStore()
 	const task = schedule.tasks.get(spot.id)
 	const spotStart = spot.time
 	const spotEnd = timeSpanEnd(spot)
+
+	const currentTime = clock.getCurrentTime()
 
 	const store = useLocalObservable(() => {
 		const selected: [string, IPlan][] = []
@@ -113,7 +120,7 @@ const useSpotManager = (spot: Spot) => {
 			selected: new Map<string, IPlan>(selected),
 			//Initil spot time span
 			timespan: { start: spotStart, end: spotEnd },
-			time: spotStart, // Spot sstart time
+			time: isCurrentSpot(currentTime, spot) ? currentTime : spotStart, // Spot sstart time
 			duration: spot.duration, //Spot duration
 			select(plan: IPlan) {
 				const { id } = plan

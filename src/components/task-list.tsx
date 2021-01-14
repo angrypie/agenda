@@ -41,9 +41,10 @@ export const TaskList = observer(({ day }: DayProps) => {
 		tasks.map(task => <Task key={task.id} task={task} />)
 
 	//If day is today then hide past tasks
-	const tasks = isToday(day)
-		? dayTasks.filter(task => isActiveSpot(clock.now, task))
-		: dayTasks
+	//const tasks = isToday(day)
+	//? dayTasks.filter(task => isActiveSpot(clock.now, task))
+	//: dayTasks
+	const tasks = dayTasks
 
 	return (
 		<View style={{ flex: 1 }}>

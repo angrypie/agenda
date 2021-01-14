@@ -1,6 +1,5 @@
 import { types } from 'mobx-state-tree'
 import { getDayStart } from 'lib/time'
-import dayjs from 'dayjs'
 
 export const Clock = types
 	.model({
@@ -11,5 +10,8 @@ export const Clock = types
 		update(currentTime: number) {
 			self.now = currentTime
 			self.today = getDayStart(currentTime)
+		},
+		getCurrentTime(): number {
+			return self.now
 		},
 	}))
