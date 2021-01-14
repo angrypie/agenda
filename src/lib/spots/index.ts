@@ -16,14 +16,17 @@ const rootToDaySpot = (dayStart: number, spot: Spot) => {
 		return spot
 	}
 
+	const endOfDay = endOfDayTime(dayStart)
+
+	//TODO refactor this?
 	const before =
-		spot.time === 0
+		spot.time < dayStart
 			? { duration: timeSpanEnd(spot) - dayStart, time: dayStart }
 			: spot
 
 	const after =
-		spot.duration === Infinity
-			? { ...before, duration: endOfDayTime(dayStart) - before.time }
+		timeSpanEnd(before) > endOfDay
+			? { ...before, duration: endOfDay - before.time }
 			: before
 
 	return {
