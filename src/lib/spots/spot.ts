@@ -27,3 +27,30 @@ const spotsDistance = (before: Spot, after: Spot) =>
 	after.time - timeSpanEnd(before)
 
 export const timeSpanEnd = ({ time, duration }: TimeSpan) => time + duration
+
+interface timeSpan<T extends TimeSpan> {
+	setTime(time: number): timeSpan<T>
+	setDuration(duration: number): timeSpan<T>
+	time(): number
+	duration(): number
+	timeEnd(): number
+	get(): T
+	modify(cb: (initial: timeSpan<T>) => timeSpan<T>): timeSpan<T>
+}
+
+export const NewTimeSpan = <T extends TimeSpan>(span: T): timeSpan<T> => ({
+	modify: (cb: (initial: timeSpan<T>) => timeSpan<T>) => cb(NewTimeSpan(span)),
+
+	//Setters
+	setTime: (time: number) =>
+		NewTimeSpan({ ...span, time, duration: timeSpanEnd(span) - time }),
+	setDuration: (duration: number) => NewTimeSpan({ ...span, duration }),
+
+	//Getters
+	timeEnd: () => timeSpanEnd(span),
+	time: () => span.time,
+	duration: () => span.duration,
+
+	//Return original object
+	get: () => span,
+})

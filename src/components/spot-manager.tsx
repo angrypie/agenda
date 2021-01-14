@@ -120,8 +120,11 @@ const useSpotManager = (spot: Spot) => {
 			selected: new Map<string, IPlan>(selected),
 			//Initil spot time span
 			timespan: { start: spotStart, end: spotEnd },
+			//TODO: use NewTimeSpan
 			time: isCurrentSpot(currentTime, spot) ? currentTime : spotStart, // Spot sstart time
-			duration: spot.duration, //Spot duration
+			duration: isCurrentSpot(currentTime, spot)
+				? spotEnd - currentTime
+				: spot.duration, //Spot duration
 			select(plan: IPlan) {
 				const { id } = plan
 				if (store.isSelected(id)) {

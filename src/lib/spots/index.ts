@@ -1,6 +1,6 @@
 import { curry } from 'rambda'
 import { endOfDayTime } from 'lib/time'
-import { Spot, TimeSpan, timeSpanEnd } from './spot'
+import { NewTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
 import { isRootSpot, NewRootNode, treeToSpots } from './tree'
 export type { Spot }
 
@@ -16,18 +16,14 @@ const rootToDaySpot = (dayStart: number, spot: Spot) => {
 		return spot
 	}
 
-	const endOfDay = endOfDayTime(dayStart)
+	const dayEnd = endOfDayTime(dayStart)
 
-	//TODO refactor this?
-	const before =
-		spot.time < dayStart
-			? { duration: timeSpanEnd(spot) - dayStart, time: dayStart }
-			: spot
-
-	const after =
-		timeSpanEnd(before) > endOfDay
-			? { ...before, duration: endOfDay - before.time }
-			: before
+	const after = NewTimeSpan(spot)
+		.modify(span => (spot.time < dayStart ? span.setTime(dayStart) : span))
+		.modify(span =>
+			span.timeEnd() > dayEnd ? span.setDuration(dayEnd - span.time()) : span
+		)
+		.get()
 
 	return {
 		id: spot.id,
