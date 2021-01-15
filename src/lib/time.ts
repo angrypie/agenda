@@ -54,3 +54,24 @@ export const endOfDayTime = (time: number): number =>
 //TODO use RelativeTIme plugin for dayjs
 export const formatDifference = (start: number, end: number): number =>
 	dayjs(start).diff(end, 'hour')
+
+export const NewTime = (time: number) => {
+	const t = dayjs(time)
+	return {
+		add: nt(t.add.bind(t)),
+		subtract: nt(t.subtract.bind(t)),
+		dayEnd: nt(() => t.endOf('day')),
+		value: t.valueOf.bind(t),
+	}
+}
+
+interface ValueOf {
+	valueOf: () => number
+}
+
+//nt executes given function and calls NewTime  on valueOf method on result object
+function nt<T extends (...args: any) => ValueOf>(
+	fn: T
+): (...args: Parameters<T>) => ReturnType<typeof NewTime> {
+	return (...args: Parameters<T>[]) => NewTime(fn(...args).valueOf())
+}

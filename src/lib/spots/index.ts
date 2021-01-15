@@ -1,5 +1,5 @@
 import { curry } from 'rambda'
-import { endOfDayTime } from 'lib/time'
+import { endOfDayTime, NewTime } from 'lib/time'
 import { NewTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
 import { isRootSpot, NewRootNode, treeToSpots } from './tree'
 export type { Spot }
@@ -54,10 +54,13 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	}
 
 	//TODO replace string id 'root' to constant or enum
+	//TODO configure tomorow overlap time for today spots
 	const todaySpots = (dayStart: number): Spot[] =>
-		sliceByTime(spots, dayStart, endOfDayTime(dayStart)).map(spot =>
-			rootToDaySpot(dayStart, spot)
-		)
+		sliceByTime(
+			spots,
+			dayStart,
+			NewTime(dayStart).dayEnd().add(3, 'hours').value()
+		).map(spot => rootToDaySpot(dayStart, spot))
 
 	return {
 		//todaySpots returns spots from now to end of the day
