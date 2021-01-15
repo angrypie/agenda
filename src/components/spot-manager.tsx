@@ -164,9 +164,15 @@ const useSpotManager = (spot: Spot) => {
 				return { ...spot, time, duration }
 			},
 
-			get isChanged() {
+			//Time changed and plan choosen
+			get isChanged(): boolean {
 				const current = Array.from(store.selected.values()).pop()
+				//If plan not chosen and also current spot is free
+				if (task === undefined && current === undefined) {
+					return false
+				}
 				const planChanged = current?.id !== task?.plan.id
+				console.log(current?.id, task?.plan.id)
 				const timeChanged =
 					spot.time !== store.time || spotEnd !== store.spotEnd
 				return planChanged || timeChanged
