@@ -9,19 +9,17 @@ export function formatDate(ms: number): string {
 	return dayjs(ms).format('dddd, MMM D')
 }
 
+//TODO pass clock with today time as dependencies to
 export const isToday = (ms: number): boolean => dayjs().isSame(ms, 'day')
 
 export function formatTime(ms: number): string {
 	return dayjs(ms).format('HH:mm')
 }
 
-//TODO refactor this :)
 export const shiftDay = (time: number, diff: number): number =>
-	diff > 0
-		? dayjs(time).add(diff, 'day').valueOf()
-		: dayjs(time)
-				.subtract(diff * -1, 'day')
-				.valueOf()
+	(t => (diff > 0 ? t.add(diff, 'day') : t.subtract(diff * -1, 'day')))(
+		NewTime(time)
+	).value()
 
 interface TimeTags {
 	weekday: Enum7
