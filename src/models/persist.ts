@@ -11,7 +11,6 @@ export interface IOptions {
 
 export const persist: IArgs = async (name, store, options = {}) => {
 	const { whitelist, blacklist } = options
-	//TODO why AsyncStorage is deprecated
 	const storage = AsyncStorage
 
 	const whitelistDict = arrToDict(whitelist)

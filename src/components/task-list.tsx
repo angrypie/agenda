@@ -31,7 +31,6 @@ export const DaysSwiper = () => {
 	)
 }
 
-//TODO add new tasks instantly, not depending on clock tick
 export const TaskList = observer(({ day }: DayProps) => {
 	const { schedule, clock } = useStore()
 	//const allTasks = schedule.tasks
@@ -74,7 +73,6 @@ const DayHeader = ({ day }: DayProps) => {
 	)
 }
 
-//TODO use svg icon instead text, make touchaple area biger
 export const AddTask = () => {
 	const navigation = useNavigation()
 	const onPress = () => navigation.navigate('AddTaskModal')

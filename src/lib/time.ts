@@ -5,12 +5,10 @@ export function getUnixTimeMs(): number {
 	return dayjs().valueOf()
 }
 
-//TODO remove 'ss' after finding better way to debug
 export function formatDate(ms: number): string {
 	return dayjs(ms).format('dddd, MMM D')
 }
 
-//TODO pass clock with today time as dependencies to
 export const isToday = (ms: number): boolean => dayjs().isSame(ms, 'day')
 
 export function formatTime(ms: number): string {
