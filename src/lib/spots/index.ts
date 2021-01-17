@@ -1,7 +1,7 @@
-import { curry } from 'rambda'
 import { endOfDayTime, NewTime } from 'lib/time'
 import { NewTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
 import { isRootSpot, NewRootNode, treeToSpots } from './tree'
+import { head, curry } from 'lib/collections'
 export type { Spot }
 
 export interface Spots {
@@ -39,22 +39,17 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	//TODO do not call tereeToSpots every time?
 	const spots = treeToSpots(tree)
 
-	const current = (now: number): Spot => {
-		const index = spots.findIndex(spot => isCurrentSpot(now, spot))
-		//TODO make it type safe NotEmptyArray?
-		return index === -1 ? spots[0] : spots[index]
-	}
+	const current = (now: number): Spot =>
+		spots.find(isCurrentSpot(now)) || head(spots)
+
 	const next = (now: number): Spot => {
-		const index = spots.findIndex(spot => isCurrentSpot(now, spot))
-		if (index < spots.length - 1) {
-			//TODO make it type safe NotEmptyArray?
-			return spots[index + 1]
-		}
-		return spots[index]
+		const index = spots.findIndex(isCurrentSpot(now))
+		return index < spots.length - 1 ? spots[index + 1] : spots[index]
 	}
 
 	//TODO replace string id 'root' to constant or enum
 	//TODO configure tomorow overlap time for today spots
+	//TODO return spots as Spots type
 	const todaySpots = (dayStart: number): Spot[] =>
 		sliceByTime(
 			spots,
@@ -79,14 +74,16 @@ const sortSpots = (list: Spot[]): Spot[] =>
 
 //nextSpotIndex finds first spot after time specified
 const nextSpotIndex = (time: number, spots: Spot[]): number =>
-	spots.findIndex(curry(isActiveSpot)(time))
+	spots.findIndex(isActiveSpot(time))
 
 //isActiveSpot return true if spot is not end yet
-export const isActiveSpot = (now: number, spot: TimeSpan): boolean =>
-	now < timeSpanEnd(spot)
+export const isActiveSpot = curry(
+	(now: number, spot: TimeSpan): boolean => now < timeSpanEnd(spot)
+)
 
-export const isCurrentSpot = (now: number, t: TimeSpan): boolean =>
-	now > t.time && now < timeSpanEnd(t)
+export const isCurrentSpot = curry(
+	(now: number, t: TimeSpan): boolean => now > t.time && now < timeSpanEnd(t)
+)
 
 //TODO do not relay on ids but on tags maybe
 //isTaskSpot determines whether spot is real task or virtual one (gap, root, etc.)
