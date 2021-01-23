@@ -1,8 +1,8 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import { Header } from 'components/text'
+import { Header, Text } from 'components/text'
 import { observer } from 'mobx-react-lite'
-import { isCurrentSpot, Spot } from 'lib/spots'
+import { isActiveSpot, isCurrentSpot, Spot } from 'lib/spots'
 import { useStore } from 'models'
 import { formatTime } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
@@ -29,7 +29,7 @@ export const Task = observer(({ task }: TaskProps) => {
 	return (
 		<Button onPress={() => navigation.navigate('SpotManager', { spot: task })}>
 			<View style={[styles.task, style]}>
-				{isFree ? (
+				{isFree && isActiveSpot(clock.now, task) ? (
 					<FreeSpotHeader name={name} time={displayTime} />
 				) : (
 					<TaskHeader name={name} time={displayTime} />
@@ -57,10 +57,15 @@ export const TaskHeader = ({ name, time }: TaskHeaderProps) => (
 )
 
 export const FreeSpotHeader = ({ name, time }: TaskHeaderProps) => (
-	<Blinking style={styles.header}>
-		<Header>{name}</Header>
-		<TaskTime time={time} />
-	</Blinking>
+	<View>
+		<View style={[styles.header, { marginTop: 10 }]}>
+			<Header>{name}</Header>
+			<TaskTime time={time} />
+		</View>
+		<Blinking style={{ marginTop: 10 }}>
+			<Text>Tap to schedule task</Text>
+		</Blinking>
+	</View>
 )
 
 export const TaskTime = ({ time }: any) => <Header>{formatTime(time)}</Header>

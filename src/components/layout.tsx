@@ -45,11 +45,11 @@ export const ModalHeader = ({ done }: ModalHeaderProps) => {
 
 interface BlinkingProps {
 	children: React.ReactNode
-	style: ViewStyle
+	style?: ViewStyle
 }
 
 export const Blinking = ({ children, style }: BlinkingProps) => {
-	const opacity = useSharedValue(20)
+	const opacity = useSharedValue(40)
 
 	React.useEffect(() => {
 		opacity.value = withRepeat(withTiming(100, { duration: 2000 }), -1, true)
