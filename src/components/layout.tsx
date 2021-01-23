@@ -1,7 +1,13 @@
 import React from 'react'
-import { View } from 'react-native'
-import { TextButton } from 'components/touchable'
+import { View, ViewStyle } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import Animated, {
+	useAnimatedStyle,
+	useSharedValue,
+	withRepeat,
+	withTiming,
+} from 'react-native-reanimated'
+import { TextButton } from 'components/touchable'
 
 interface ModalHeaderProps {
 	done?: {
@@ -34,5 +40,28 @@ export const ModalHeader = ({ done }: ModalHeaderProps) => {
 				</TextButton>
 			)}
 		</View>
+	)
+}
+
+interface BlinkingProps {
+	children: React.ReactNode
+	style: ViewStyle
+}
+
+export const Blinking = ({ children, style }: BlinkingProps) => {
+	const opacity = useSharedValue(20)
+
+	React.useEffect(() => {
+		opacity.value = withRepeat(withTiming(100, { duration: 2000 }), -1, true)
+	}, [])
+
+	const animatedStyle = useAnimatedStyle(() => {
+		return {
+			opacity: opacity.value / 100,
+		}
+	})
+
+	return (
+		<Animated.View style={[style, animatedStyle]}>{children}</Animated.View>
 	)
 }

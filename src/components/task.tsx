@@ -7,6 +7,7 @@ import { useStore } from 'models'
 import { formatTime } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
 import { Button } from './touchable'
+import { Blinking } from './layout'
 
 export const TaskFullHeight = 110
 
@@ -28,7 +29,11 @@ export const Task = observer(({ task }: TaskProps) => {
 	return (
 		<Button onPress={() => navigation.navigate('SpotManager', { spot: task })}>
 			<View style={[styles.task, style]}>
-				<TaskHeader name={isFree ? 'free spot' : name} time={displayTime} />
+				{isFree ? (
+					<FreeSpotHeader name={name} time={displayTime} />
+				) : (
+					<TaskHeader name={name} time={displayTime} />
+				)}
 			</View>
 		</Button>
 	)
@@ -39,14 +44,24 @@ const isFreeSpot = (spot: Spot): boolean => {
 	return spot.name === 'Free spot'
 }
 
-export const TaskHeader = ({ name, time }: { name: string; time: number }) => {
-	return (
-		<View style={styles.header}>
-			<Header>{name}</Header>
-			<TaskTime time={time} />
-		</View>
-	)
+interface TaskHeaderProps {
+	name: string
+	time: number
 }
+
+export const TaskHeader = ({ name, time }: TaskHeaderProps) => (
+	<View style={styles.header}>
+		<Header>{name}</Header>
+		<TaskTime time={time} />
+	</View>
+)
+
+export const FreeSpotHeader = ({ name, time }: TaskHeaderProps) => (
+	<Blinking style={styles.header}>
+		<Header>{name}</Header>
+		<TaskTime time={time} />
+	</Blinking>
+)
 
 export const TaskTime = ({ time }: any) => <Header>{formatTime(time)}</Header>
 
