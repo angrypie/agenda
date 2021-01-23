@@ -27,7 +27,10 @@ export const Task = observer(({ task }: TaskProps) => {
 
 	const navigation = useNavigation()
 	return (
-		<Button onPress={() => navigation.navigate('SpotManager', { spot: task })}>
+		<Button
+			delayPressIn={300}
+			onPress={() => navigation.navigate('SpotManager', { spot: task })}
+		>
 			<View style={[styles.task, style]}>
 				{isFree && isActiveSpot(clock.now, task) ? (
 					<FreeSpotHeader name={name} time={displayTime} />

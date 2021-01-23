@@ -29,6 +29,7 @@ export interface ButtonProps {
 	onPress: (event: GestureResponderEvent) => void
 	children: React.ReactNode
 	disabled?: boolean
+	delayPressIn?: number
 }
 
 export const Button = ({ disabled = false, ...rest }: ButtonProps) => (
@@ -44,7 +45,6 @@ export interface TextButtonProps extends ButtonProps {
 	style?: TextStyle
 }
 
-//TODO increase touchable area
 export const TextButton = ({ children, style, ...button }: TextButtonProps) => (
 	<Button {...button}>
 		<Text style={{ fontSize: 16, ...style, paddingTop: 2, paddingBottom: 5 }}>
