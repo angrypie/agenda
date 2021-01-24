@@ -54,3 +54,8 @@ export const NewTimeSpan = <T extends TimeSpan>(span: T): timeSpan<T> => ({
 	//Return original object
 	get: () => span,
 })
+
+export const NewFreeSpot = (spot: Omit<Spot, 'name'>): Spot => ({
+	name: 'Free spot',
+	...spot,
+})

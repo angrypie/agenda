@@ -1,5 +1,7 @@
-import { Spot, timeSpanEnd, gapsBetweenSpots } from './spot'
+import { Spot, timeSpanEnd, gapsBetweenSpots, NewFreeSpot } from './spot'
 import { Arr, head, last, NewNotEmptyArray } from 'lib/collections'
+
+const rootNodeId = 'root.id.Aed1vahX'
 
 interface Node {
 	spot: Spot
@@ -28,12 +30,13 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 		const arr = [spot]
 		const gap = gaps(index)
 		if (gap !== 0) {
-			arr.push({
-				id: spot.id + '+gap',
-				name: 'Free spot',
-				duration: gap,
-				time: timeSpanEnd(spot),
-			})
+			arr.push(
+				NewFreeSpot({
+					id: spot.id + '+gap',
+					duration: gap,
+					time: timeSpanEnd(spot),
+				})
+			)
 		}
 		return arr
 	})
@@ -48,12 +51,11 @@ const splitSpot = (spot: Spot, start: number, end: number): [Spot, Spot] => [
 
 export const NewRootNode = (spots: Spot[] = []): Node =>
 	NewNode(
-		{
-			id: 'root',
-			name: 'Free spot(root)',
+		NewFreeSpot({
+			id: rootNodeId,
 			time: 0,
 			duration: Infinity,
-		},
+		}),
 		spots.map(spot => NewNode(spot))
 	)
 

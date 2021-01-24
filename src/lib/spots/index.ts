@@ -1,5 +1,5 @@
 import { endOfDayTime, NewTime } from 'lib/time'
-import { NewTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
+import { NewFreeSpot, NewTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
 import { isRootSpot, NewRootNode, treeToSpots } from './tree'
 import { head, curry } from 'lib/collections'
 export type { Spot }
@@ -25,12 +25,11 @@ const rootToDaySpot = (dayStart: number, spot: Spot) => {
 		)
 		.get()
 
-	return {
+	return NewFreeSpot({
 		id: spot.id,
-		name: 'Free spot',
 		time: after.time,
 		duration: after.duration,
-	}
+	})
 }
 
 export const newSpots = (tasks: Spot[]): Spots => {
@@ -47,7 +46,6 @@ export const newSpots = (tasks: Spot[]): Spots => {
 		return index < spots.length - 1 ? spots[index + 1] : spots[index]
 	}
 
-	//TODO replace string id 'root' to constant or enum
 	//TODO configure tomorow overlap time for today spots
 	//TODO return spots as Spots type
 	const todaySpots = (dayStart: number): Spot[] =>
@@ -84,7 +82,3 @@ export const isActiveSpot = curry(
 export const isCurrentSpot = curry(
 	(now: number, t: TimeSpan): boolean => now > t.time && now < timeSpanEnd(t)
 )
-
-//TODO do not relay on ids but on tags maybe
-//isTaskSpot determines whether spot is real task or virtual one (gap, root, etc.)
-export const isTaskSpot = (spot: Spot): boolean => !spot.id.endsWith('+gap')

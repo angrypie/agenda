@@ -9,30 +9,25 @@ import { useNavigation } from '@react-navigation/native'
 import { Button } from './touchable'
 import { Blinking } from './layout'
 
-export const TaskFullHeight = 110
-
-//TODO make free spot more different from regular task
 export const Task = observer(({ task }: TaskProps) => {
+	const navigation = useNavigation()
+	const { clock, schedule } = useStore()
 	const { name, time } = task
-	const { clock } = useStore()
+
 	const isCurrent = isCurrentSpot(clock.now, task)
 	const displayTime = isCurrent ? clock.now : time
+	const style = { opacity: isCurrent ? 1 : 0.5 }
 
-	const style = {
-		opacity: isCurrent ? 1 : 0.5,
-		height: TaskFullHeight,
-	}
+	const showFreeSpot =
+		!schedule.tasks.has(task.id) && isActiveSpot(clock.now, task)
 
-	const isFree = isFreeSpot(task)
-
-	const navigation = useNavigation()
 	return (
 		<Button
 			delayPressIn={300}
 			onPress={() => navigation.navigate('SpotManager', { spot: task })}
 		>
 			<View style={[styles.task, style]}>
-				{isFree && isActiveSpot(clock.now, task) ? (
+				{showFreeSpot ? (
 					<FreeSpotHeader name={name} time={displayTime} />
 				) : (
 					<TaskHeader name={name} time={displayTime} />
@@ -41,11 +36,6 @@ export const Task = observer(({ task }: TaskProps) => {
 		</Button>
 	)
 })
-
-//TODO use category tag to figure out is it base free spot
-const isFreeSpot = (spot: Spot): boolean => {
-	return spot.name === 'Free spot'
-}
 
 interface TaskHeaderProps {
 	name: string
@@ -80,24 +70,12 @@ const styles = StyleSheet.create({
 	task: {
 		flexDirection: 'column',
 		justifyContent: 'center',
+		height: 110,
 		opacity: 1,
 	},
 	header: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-	},
-	spotSuggestion: {
-		justifyContent: 'center',
-		alignItems: 'center',
-		//opacity: 0.6,
-		borderWidth: 2,
-		borderRadius: 5,
-		borderStyle: 'dashed',
-		//marginVertical: 30,
-		height: 50,
-		marginTop: 30,
-		marginHorizontal: 5,
-		borderColor: 'white',
 	},
 })
