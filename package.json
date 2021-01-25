@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@ptomasroos/react-native-multi-slider": "^2.2.2",
     "@react-native-async-storage/async-storage": "^1.13.2",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-navigation/native": "^5.8.10",
@@ -21,7 +22,6 @@
     "rambda": "^6.4.0",
     "react": "16.13.1",
     "react-native": "0.63.4",
-    "react-native-date-picker": "^3.2.7",
     "react-native-gesture-handler": "^1.9.0",
     "react-native-get-random-values": "^1.5.0",
     "react-native-reanimated": "^2.0.0-rc.2",

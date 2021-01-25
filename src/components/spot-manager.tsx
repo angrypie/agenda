@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ScrollView, View, StyleSheet } from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
@@ -9,37 +9,26 @@ import { TaskHeader } from './task'
 import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
 import { useLocalObservable, Observer } from 'mobx-react-lite'
-import { ToggleHidden, Button } from './touchable'
+import { Button } from './touchable'
 import { Styles } from 'lib/style'
-import DatePicker from 'react-native-date-picker'
+import MultiSlider from '@ptomasroos/react-native-multi-slider'
 
 export interface SpotManagerProps {
 	spot: Spot
 }
-
-const PlanItem = ({ id, name }: IPlan, store: SpotManagerStore) => (
-	<Button key={id} onPress={() => store.select({ id, name })}>
-		<View
-			key={id}
-			style={[
-				{
-					opacity: store.isSelected(id) ? 1 : 0.8,
-					paddingVertical: 13,
-				},
-				Styles.rowBetween,
-			]}
-		>
-			<Header>{name}</Header>
-			{store.isSelected(id) ? <Text> [remove] </Text> : null}
-		</View>
-	</Button>
-)
 
 export const SpotManager = ({ spot }: SpotManagerProps) => {
 	const { schedule } = useStore()
 	const store = useSpotManager(spot)
 
 	const doneButton = () => schedule.updateTask(store.spot, store.current)
+
+	const [layoutWidth, setLayoutWidth] = useState(300)
+
+	const onSliderChange = ([start, end]: number[]) => {
+		store.setSpotStart(start)
+		store.setSpotEnd(end)
+	}
 
 	return (
 		<Observer>
@@ -53,38 +42,26 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 						}}
 					/>
 
-					<View style={{ opacity: 0.6 }}>
-						<ToggleHidden
-							visible={
-								<TaskHeader name={store.current.name} time={store.time} />
-							}
-							hidden={
-								<DatePicker
-									date={new Date(store.time)}
-									minimumDate={new Date(store.timespan.start)}
-									maximumDate={new Date(store.spotEnd)}
-									onDateChange={time => store.setSpotStart(time.valueOf())}
-									textColor='white'
-									minuteInterval={5}
-									mode='datetime'
-								/>
-							}
-						/>
+					<View
+						onLayout={event => setLayoutWidth(event.nativeEvent.layout.width)}
+						style={{ opacity: 0.6 }}
+					>
+						<TaskHeader name={store.current.name} time={store.time} />
 						<SpotsSeparator />
-						<ToggleHidden
-							visible={<TaskHeader name='' time={store.spotEnd} />}
-							hidden={
-								<DatePicker
-									date={new Date(store.spotEnd)}
-									minimumDate={new Date(store.time)}
-									maximumDate={new Date(store.timespan.end)}
-									onDateChange={time => store.setSpotEnd(time.valueOf())}
-									textColor='white'
-									minuteInterval={5}
-									mode='datetime'
-								/>
-							}
-						/>
+						<TaskHeader name='' time={store.spotEnd} />
+						<View style={{ marginLeft: 10 }}>
+							<MultiSlider
+								values={[store.time, store.spotEnd]}
+								sliderLength={layoutWidth - 20}
+								onValuesChange={onSliderChange}
+								min={store.timespan.start}
+								max={store.timespan.end}
+								step={300000}
+								allowOverlap={false}
+								snapped
+								minMarkerOverlapDistance={40}
+							/>
+						</View>
 					</View>
 					<Description />
 
@@ -192,6 +169,24 @@ const Description = () => (
 		</Text>
 		<AddTask />
 	</View>
+)
+
+const PlanItem = ({ id, name }: IPlan, store: SpotManagerStore) => (
+	<Button key={id} onPress={() => store.select({ id, name })}>
+		<View
+			key={id}
+			style={[
+				{
+					opacity: store.isSelected(id) ? 1 : 0.8,
+					paddingVertical: 13,
+				},
+				Styles.rowBetween,
+			]}
+		>
+			<Header>{name}</Header>
+			{store.isSelected(id) ? <Text> [remove] </Text> : null}
+		</View>
+	</Button>
 )
 
 const styles = StyleSheet.create({
