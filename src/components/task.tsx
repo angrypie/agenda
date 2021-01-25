@@ -15,11 +15,11 @@ export const Task = observer(({ task }: TaskProps) => {
 	const { name, time } = task
 
 	const isCurrent = isCurrentSpot(clock.now, task)
+	const isActive = isActiveSpot(clock.now, task)
 	const displayTime = isCurrent ? clock.now : time
 	const style = { opacity: isCurrent ? 1 : 0.5 }
 
-	const showFreeSpot =
-		!schedule.tasks.has(task.id) && isActiveSpot(clock.now, task)
+	const showFreeSpot = !schedule.tasks.has(task.id) && isActive
 
 	return (
 		<Button
@@ -27,11 +27,12 @@ export const Task = observer(({ task }: TaskProps) => {
 			onPress={() => navigation.navigate('SpotManager', { spot: task })}
 		>
 			<View style={[styles.task, style]}>
-				{showFreeSpot ? (
-					<FreeSpotHeader name={name} time={displayTime} />
-				) : (
-					<TaskHeader name={name} time={displayTime} />
-				)}
+				<TaskHeader
+					name={name}
+					time={displayTime}
+					isFreeSpot={showFreeSpot}
+					isActive={isActive}
+				/>
 			</View>
 		</Button>
 	)
@@ -40,24 +41,28 @@ export const Task = observer(({ task }: TaskProps) => {
 interface TaskHeaderProps {
 	name: string
 	time: number
+	isActive?: boolean
+	isFreeSpot?: boolean
 }
 
-export const TaskHeader = ({ name, time }: TaskHeaderProps) => (
-	<View style={styles.header}>
-		<Header>{name}</Header>
-		<TaskTime time={time} />
-	</View>
-)
-
-export const FreeSpotHeader = ({ name, time }: TaskHeaderProps) => (
+export const TaskHeader = ({
+	name,
+	time,
+	isActive = true,
+	isFreeSpot = false,
+}: TaskHeaderProps) => (
 	<View>
-		<View style={[styles.header, { marginTop: 10 }]}>
-			<Header>{name}</Header>
+		<View style={[styles.header, { marginTop: isFreeSpot ? 10 : 0 }]}>
+			<Header
+				style={{ textDecorationLine: isActive ? 'none' : 'line-through' }}
+			>{`${name}\xa0\xa0`}</Header>
 			<TaskTime time={time} />
 		</View>
-		<Blinking style={{ marginTop: 10 }}>
-			<Text>Tap to schedule task</Text>
-		</Blinking>
+		{isFreeSpot ? (
+			<Blinking style={{ marginTop: 10 }}>
+				<Text>Tap to schedule task</Text>
+			</Blinking>
+		) : null}
 	</View>
 )
 
@@ -70,7 +75,7 @@ const styles = StyleSheet.create({
 	task: {
 		flexDirection: 'column',
 		justifyContent: 'center',
-		height: 110,
+		height: 100,
 		opacity: 1,
 	},
 	header: {
