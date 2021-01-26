@@ -4,7 +4,7 @@ import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
 import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore, IPlan, FreeSpotPlan } from 'models'
-import { timeSpanEnd } from 'lib/spots/spot'
+import { NewTimeSpan, TimeSpan, timeSpanEnd } from 'lib/spots/spot'
 import { TaskHeader } from './task'
 import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
@@ -56,7 +56,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 								onValuesChange={onSliderChange}
 								min={store.timespan.start}
 								max={store.timespan.end}
-								step={300000}
+								step={300000} //5 minutes step
 								allowOverlap={false}
 								snapped
 								minMarkerOverlapDistance={40}
@@ -88,6 +88,8 @@ const useSpotManager = (spot: Spot) => {
 
 	const currentTime = clock.getCurrentTime()
 
+	const { time, duration } = remainingTimeSpan(currentTime, spot)
+
 	const store = useLocalObservable(() => {
 		const selected: [string, IPlan][] = []
 		if (task !== undefined) {
@@ -97,17 +99,13 @@ const useSpotManager = (spot: Spot) => {
 			selected: new Map<string, IPlan>(selected),
 			//Initil spot time span
 			timespan: { start: spotStart, end: spotEnd },
-			//TODO: use NewTimeSpan
-			time: isCurrentSpot(currentTime, spot) ? currentTime : spotStart, // Spot sstart time
-			duration: isCurrentSpot(currentTime, spot)
-				? spotEnd - currentTime
-				: spot.duration, //Spot duration
+			time,
+			duration,
 			select(plan: IPlan) {
 				const { id } = plan
 				if (store.isSelected(id)) {
 					store.selected.delete(id)
 				} else {
-					//TODO do not clean, display all selected
 					store.selected.clear()
 					store.selected.set(id, plan)
 				}
@@ -117,11 +115,9 @@ const useSpotManager = (spot: Spot) => {
 				return timeSpanEnd(store)
 			},
 
-			//TODO disallow start end time overlap
 			setSpotStart(startTime: number) {
-				const currentEnd = store.spotEnd
+				store.duration = store.spotEnd - startTime
 				store.time = startTime
-				store.duration = currentEnd - startTime
 			},
 
 			setSpotEnd(endTime: number) {
@@ -159,6 +155,9 @@ const useSpotManager = (spot: Spot) => {
 
 	return store
 }
+
+const remainingTimeSpan = (now: number, span: TimeSpan): TimeSpan =>
+	isCurrentSpot(now, span) ? NewTimeSpan(span).setTime(now).get() : span
 
 const SpotsSeparator = () => <View style={styles.spotsSeparator} />
 
