@@ -86,8 +86,12 @@ const useSpotManager = (spot: Spot) => {
 	const spotStart = spot.time
 	const spotEnd = timeSpanEnd(spot)
 
-	const currentTime = clock.getCurrentTime()
+	const [maxStart, maxEnd] =
+		task === undefined
+			? [spotStart, timeSpanEnd(spot)]
+			: schedule.getTaskGaps(task)
 
+	const currentTime = clock.getCurrentTime()
 	const { time, duration } = remainingTimeSpan(currentTime, spot)
 
 	const store = useLocalObservable(() => {
@@ -98,7 +102,7 @@ const useSpotManager = (spot: Spot) => {
 		return {
 			selected: new Map<string, IPlan>(selected),
 			//Initil spot time span
-			timespan: { start: spotStart, end: spotEnd },
+			timespan: { start: maxStart, end: maxEnd },
 			time,
 			duration,
 			select(plan: IPlan) {
@@ -145,9 +149,8 @@ const useSpotManager = (spot: Spot) => {
 					return false
 				}
 				const planChanged = current?.id !== task?.plan.id
-				console.log(current?.id, task?.plan.id)
 				const timeChanged =
-					spot.time !== store.time || spotEnd !== store.spotEnd
+					spotStart !== store.time || spotEnd !== store.spotEnd
 				return planChanged || timeChanged
 			},
 		}

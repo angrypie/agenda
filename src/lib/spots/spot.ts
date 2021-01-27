@@ -23,7 +23,7 @@ export const gapsBetweenSpots = (spots: Spot[]): ((i: number) => number) => {
 	return (index: number) => gaps.get(index) || 0
 }
 
-const spotsDistance = (before: Spot, after: Spot) =>
+export const spotsDistance = (before: Spot, after: Spot) =>
 	after.time - timeSpanEnd(before)
 
 export const timeSpanEnd = ({ time, duration }: TimeSpan) => time + duration

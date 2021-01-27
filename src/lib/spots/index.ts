@@ -1,6 +1,12 @@
 import { endOfDayTime, NewTime } from 'lib/time'
 import { NewFreeSpot, NewTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
-import { isRootSpot, NewRootNode, treeToSpots } from './tree'
+import {
+	findNodeDeep,
+	availableTimeSpan,
+	isRootSpot,
+	NewRootNode,
+	treeToSpots,
+} from './tree'
 import { head, curry } from 'lib/collections'
 export type { Spot }
 
@@ -9,6 +15,7 @@ export interface Spots {
 	get: () => Spot[]
 	current: (now: number) => Spot
 	next: (now: number) => Spot
+	getGaps: (spot: Spot) => [number, number]
 }
 
 const rootToDaySpot = (dayStart: number, spot: Spot) => {
@@ -55,12 +62,16 @@ export const newSpots = (tasks: Spot[]): Spots => {
 			NewTime(dayStart).dayEnd().add(3, 'hours').value()
 		).map(spot => rootToDaySpot(dayStart, spot))
 
+	const getGaps = (spot: Spot): [number, number] =>
+		availableTimeSpan(findNodeDeep(tree, spot.id))
+
 	return {
 		//todaySpots returns spots from now to end of the day
 		todaySpots,
 		get: () => spots,
 		next,
 		current,
+		getGaps,
 	}
 }
 
