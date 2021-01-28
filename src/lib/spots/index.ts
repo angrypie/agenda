@@ -1,11 +1,19 @@
-import { endOfDayTime, NewTime } from 'lib/time'
-import { NewFreeSpot, NewTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
+import { endOfDayTime } from 'lib/time'
+import {
+	CreateTimeSpan,
+	NewFreeSpot,
+	NewTimeSpan,
+	Spot,
+	TimeSpan,
+	timeSpanEnd,
+} from './spot'
 import {
 	findNodeDeep,
 	availableTimeSpan,
 	isRootSpot,
 	NewRootNode,
 	treeToSpots,
+	sliceTreeByTime,
 } from './tree'
 import { head, curry } from 'lib/collections'
 export type { Spot }
@@ -55,12 +63,12 @@ export const newSpots = (tasks: Spot[]): Spots => {
 
 	//TODO configure tomorow overlap time for today spots
 	//TODO return spots as Spots type
-	const todaySpots = (dayStart: number): Spot[] =>
-		sliceByTime(
-			spots,
-			dayStart,
-			NewTime(dayStart).dayEnd().add(3, 'hours').value()
+	const todaySpots = (dayStart: number): Spot[] => {
+		console.log(createDayTimeSpan(dayStart).get())
+		return treeToSpots(
+			sliceTreeByTime(tree, createDayTimeSpan(dayStart).get())
 		).map(spot => rootToDaySpot(dayStart, spot))
+	}
 
 	const getGaps = (spot: Spot): [number, number] =>
 		availableTimeSpan(findNodeDeep(tree, spot.id))
@@ -75,15 +83,8 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	}
 }
 
-const sliceByTime = (spots: Spot[], start: number, end: number): Spot[] =>
-	spots.slice(nextSpotIndex(start, spots), nextSpotIndex(end, spots) + 1)
-
 const sortSpots = (list: Spot[]): Spot[] =>
 	list.sort((a: Spot, b: Spot) => a.time - b.time)
-
-//nextSpotIndex finds first spot after time specified
-const nextSpotIndex = (time: number, spots: Spot[]): number =>
-	spots.findIndex(isActiveSpot(time))
 
 //isActiveSpot return true if spot is not end yet
 export const isActiveSpot = curry(
@@ -93,3 +94,7 @@ export const isActiveSpot = curry(
 export const isCurrentSpot = curry(
 	(now: number, t: TimeSpan): boolean => now > t.time && now < timeSpanEnd(t)
 )
+
+//createDayTimeSpan creates TimeSpan from start to the end of the day
+const createDayTimeSpan = (dayStart: number) =>
+	CreateTimeSpan(dayStart, endOfDayTime(dayStart))

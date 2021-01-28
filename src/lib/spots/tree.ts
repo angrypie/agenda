@@ -1,4 +1,10 @@
-import { Spot, timeSpanEnd, gapsBetweenSpots, NewFreeSpot } from './spot'
+import {
+	Spot,
+	timeSpanEnd,
+	gapsBetweenSpots,
+	NewFreeSpot,
+	TimeSpan,
+} from './spot'
 import { Arr, head, last, NewNotEmptyArray } from 'lib/collections'
 
 const rootNodeId = 'root.id.Aed1vahX'
@@ -100,3 +106,14 @@ export const NewRootNode = (spots: Spot[] = []): Node =>
 
 export const isRootSpot = (spot: Spot): boolean =>
 	spot.time === 0 || spot.duration === Infinity
+
+//sliceTreeByTime returns root with childrens related to given timespan
+export const sliceTreeByTime = (root: Node, timespan: TimeSpan): Node => ({
+	...root,
+	spot: NewFreeSpot({ id: rootNodeId, ...timespan }),
+	childs: root.childs.filter(node => timeSpanItersection(node.spot, timespan)),
+})
+
+//timeSpanIntersection checks intersection of two time intervals
+export const timeSpanItersection = (a: TimeSpan, b: TimeSpan) =>
+	a.time < timeSpanEnd(b) && b.time < timeSpanEnd(a)

@@ -38,6 +38,9 @@ interface timeSpan<T extends TimeSpan> {
 	modify(cb: (initial: timeSpan<T>) => timeSpan<T>): timeSpan<T>
 }
 
+export const CreateTimeSpan = (start: number, end: number) =>
+	NewTimeSpan({ time: start, duration: end - start })
+
 export const NewTimeSpan = <T extends TimeSpan>(span: T): timeSpan<T> => ({
 	modify: (cb: (initial: timeSpan<T>) => timeSpan<T>) => cb(NewTimeSpan(span)),
 
