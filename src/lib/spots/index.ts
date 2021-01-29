@@ -64,10 +64,9 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	//TODO configure tomorow overlap time for today spots
 	//TODO return spots as Spots type
 	const todaySpots = (dayStart: number): Spot[] => {
-		console.log(createDayTimeSpan(dayStart).get())
-		return treeToSpots(
-			sliceTreeByTime(tree, createDayTimeSpan(dayStart).get())
-		).map(spot => rootToDaySpot(dayStart, spot))
+		console.log(treeToSpots(sliceTreeByTime(tree, createDayTimeSpan(dayStart).get())))
+		console.log(sliceTreeByTime(tree, createDayTimeSpan(dayStart).get()))
+		return treeToSpots(sliceTreeByTime(tree, createDayTimeSpan(dayStart).get()))
 	}
 
 	const getGaps = (spot: Spot): [number, number] =>

@@ -75,8 +75,13 @@ export const availableTimeSpan = (node: Node): [number, number] => {
 }
 
 const splitSpot = (spot: Spot, start: number, end: number): [Spot, Spot] => [
-	{ ...spot, id: `${spot.id}+before`, duration: start },
-	{ ...spot, id: `${spot.id}+after`, time: end },
+	{ ...spot, id: `${spot.id}+before`, duration: start - spot.time },
+	{
+		...spot,
+		id: `${spot.id}+after`,
+		time: end,
+		duration: timeSpanEnd(spot) - end,
+	},
 ]
 
 //findNodeDeep try to find node with given id in whole tree.
