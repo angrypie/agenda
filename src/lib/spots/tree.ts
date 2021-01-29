@@ -4,6 +4,7 @@ import {
 	gapsBetweenSpots,
 	NewFreeSpot,
 	TimeSpan,
+	NewTimeSpan,
 } from './spot'
 import { Arr, head, last, NewNotEmptyArray } from 'lib/collections'
 
@@ -69,19 +70,14 @@ export const availableTimeSpan = (node: Node): [number, number] => {
 	const right = nodes[index + 1]
 
 	return [
-		left === undefined ? 0 : timeSpanEnd(left.spot),
-		right === undefined ? 0 : right.spot.time,
+		left === undefined ? parent().spot.time : timeSpanEnd(left.spot),
+		right === undefined ? timeSpanEnd(parent().spot) : right.spot.time,
 	]
 }
 
 const splitSpot = (spot: Spot, start: number, end: number): [Spot, Spot] => [
-	{ ...spot, id: `${spot.id}+before`, duration: start - spot.time },
-	{
-		...spot,
-		id: `${spot.id}+after`,
-		time: end,
-		duration: timeSpanEnd(spot) - end,
-	},
+	{ ...NewTimeSpan(spot).setEnd(start).get(), id: `${spot.id}+before` },
+	{ ...NewTimeSpan(spot).setTime(end).get(), id: `${spot.id}+after` },
 ]
 
 //findNodeDeep try to find node with given id in whole tree.
@@ -109,15 +105,14 @@ export const NewRootNode = (spots: Spot[] = []): Node =>
 		spots.map(spot => NewNode(spot))
 	)
 
-export const isRootSpot = (spot: Spot): boolean =>
-	spot.time === 0 || spot.duration === Infinity
-
 //sliceTreeByTime returns root with childrens related to given timespan
-export const sliceTreeByTime = (root: Node, timespan: TimeSpan): Node => ({
-	...root,
-	spot: NewFreeSpot({ id: rootNodeId, ...timespan }),
-	childs: root.childs.filter(node => timeSpanItersection(node.spot, timespan)),
-})
+export const sliceTreeByTime = (root: Node, timespan: TimeSpan): Node =>
+	NewNode(
+		NewFreeSpot({ id: rootNodeId, ...timespan }),
+		root.childs
+			.filter(node => timeSpanItersection(node.spot, timespan))
+			.map(({ spot }) => NewNode(spot))
+	)
 
 //timeSpanIntersection checks intersection of two time intervals
 export const timeSpanItersection = (a: TimeSpan, b: TimeSpan) =>

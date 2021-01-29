@@ -1,16 +1,8 @@
-import { endOfDayTime } from 'lib/time'
-import {
-	CreateTimeSpan,
-	NewFreeSpot,
-	NewTimeSpan,
-	Spot,
-	TimeSpan,
-	timeSpanEnd,
-} from './spot'
+import { endOfDayTime, getDayStart } from 'lib/time'
+import { CreateTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
 import {
 	findNodeDeep,
 	availableTimeSpan,
-	isRootSpot,
 	NewRootNode,
 	treeToSpots,
 	sliceTreeByTime,
@@ -23,28 +15,7 @@ export interface Spots {
 	get: () => Spot[]
 	current: (now: number) => Spot
 	next: (now: number) => Spot
-	getGaps: (spot: Spot) => [number, number]
-}
-
-const rootToDaySpot = (dayStart: number, spot: Spot) => {
-	if (!isRootSpot(spot)) {
-		return spot
-	}
-
-	const dayEnd = endOfDayTime(dayStart)
-
-	const after = NewTimeSpan(spot)
-		.modify(span => (spot.time < dayStart ? span.setTime(dayStart) : span))
-		.modify(span =>
-			span.timeEnd() > dayEnd ? span.setDuration(dayEnd - span.time()) : span
-		)
-		.get()
-
-	return NewFreeSpot({
-		id: spot.id,
-		time: after.time,
-		duration: after.duration,
-	})
+	daySpotGaps: (spot: Spot, dayStart: number) => [number, number]
 }
 
 export const newSpots = (tasks: Spot[]): Spots => {
@@ -61,16 +32,16 @@ export const newSpots = (tasks: Spot[]): Spots => {
 		return index < spots.length - 1 ? spots[index + 1] : spots[index]
 	}
 
+	const getDayTree = (dayStart: number) =>
+		sliceTreeByTime(tree, createDayTimeSpan(dayStart).get())
+
 	//TODO configure tomorow overlap time for today spots
 	//TODO return spots as Spots type
-	const todaySpots = (dayStart: number): Spot[] => {
-		console.log(treeToSpots(sliceTreeByTime(tree, createDayTimeSpan(dayStart).get())))
-		console.log(sliceTreeByTime(tree, createDayTimeSpan(dayStart).get()))
-		return treeToSpots(sliceTreeByTime(tree, createDayTimeSpan(dayStart).get()))
-	}
+	const todaySpots = (dayStart: number): Spot[] =>
+		treeToSpots(getDayTree(dayStart))
 
-	const getGaps = (spot: Spot): [number, number] =>
-		availableTimeSpan(findNodeDeep(tree, spot.id))
+	const daySpotGaps = (spot: Spot, dayStart: number): [number, number] =>
+		availableTimeSpan(findNodeDeep(getDayTree(getDayStart(dayStart)), spot.id))
 
 	return {
 		//todaySpots returns spots from now to end of the day
@@ -78,7 +49,7 @@ export const newSpots = (tasks: Spot[]): Spots => {
 		get: () => spots,
 		next,
 		current,
-		getGaps,
+		daySpotGaps,
 	}
 }
 
