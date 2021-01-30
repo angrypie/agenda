@@ -20,7 +20,7 @@ export const Task = types.model({
 	plan: types.reference(Plan),
 	name: types.string,
 	time: types.number,
-	duration: types.number,
+	end: types.number,
 })
 
 export interface ITask extends Instance<typeof Task> {}

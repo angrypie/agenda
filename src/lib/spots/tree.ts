@@ -1,6 +1,6 @@
 import {
 	Spot,
-	timeSpanEnd,
+	NewTimeSpanDuration,
 	gapsBetweenSpots,
 	NewFreeSpot,
 	TimeSpan,
@@ -31,11 +31,7 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 		return [spot]
 	}
 
-	const [before, after] = splitSpot(
-		spot,
-		head(spots).time,
-		timeSpanEnd(last(spots))
-	)
+	const [before, after] = splitSpot(spot, head(spots).time, last(spots).end)
 
 	const gaps = gapsBetweenSpots(spots)
 	const withGaps = spots.flatMap((spot, index) => {
@@ -45,8 +41,7 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 			arr.push(
 				NewFreeSpot({
 					id: spot.id + '+gap',
-					duration: gap,
-					time: timeSpanEnd(spot),
+					...NewTimeSpanDuration(spot.end, gap).get(),
 				})
 			)
 		}
@@ -70,8 +65,8 @@ export const availableTimeSpan = (node: Node): [number, number] => {
 	const right = nodes[index + 1]
 
 	return [
-		left === undefined ? parent().spot.time : timeSpanEnd(left.spot),
-		right === undefined ? timeSpanEnd(parent().spot) : right.spot.time,
+		left === undefined ? parent().spot.time : left.spot.end,
+		right === undefined ? parent().spot.end : right.spot.time,
 	]
 }
 
@@ -100,7 +95,7 @@ export const NewRootNode = (spots: Spot[] = []): Node =>
 		NewFreeSpot({
 			id: rootNodeId,
 			time: 0,
-			duration: Infinity,
+			end: Infinity,
 		}),
 		spots.map(spot => NewNode(spot))
 	)
@@ -116,4 +111,4 @@ export const sliceTreeByTime = (root: Node, timespan: TimeSpan): Node =>
 
 //timeSpanIntersection checks intersection of two time intervals
 export const timeSpanItersection = (a: TimeSpan, b: TimeSpan) =>
-	a.time < timeSpanEnd(b) && b.time < timeSpanEnd(a)
+	a.time < b.end && b.time < a.end

@@ -6,7 +6,7 @@ export interface Spot extends TimeSpan {
 //isCurrentSpot return true if spot belong to current time
 export interface TimeSpan {
 	time: number
-	duration: number
+	end: number
 }
 
 export const gapsBetweenSpots = (spots: Spot[]): ((i: number) => number) => {
@@ -24,9 +24,7 @@ export const gapsBetweenSpots = (spots: Spot[]): ((i: number) => number) => {
 }
 
 export const spotsDistance = (before: Spot, after: Spot) =>
-	after.time - timeSpanEnd(before)
-
-export const timeSpanEnd = ({ time, duration }: TimeSpan) => time + duration
+	after.time - before.end
 
 interface timeSpan<T extends TimeSpan> {
 	setTime(time: number): timeSpan<T>
@@ -39,22 +37,22 @@ interface timeSpan<T extends TimeSpan> {
 	modify(cb: (initial: timeSpan<T>) => timeSpan<T>): timeSpan<T>
 }
 
-export const CreateTimeSpan = (start: number, end: number) =>
-	NewTimeSpan({ time: start, duration: end - start })
+export const NewTimeSpanDuration = (start: number, duration: number) =>
+	NewTimeSpan({ time: start, end: 0 }).setDuration(duration)
 
 export const NewTimeSpan = <T extends TimeSpan>(span: T): timeSpan<T> => ({
 	modify: (cb: (initial: timeSpan<T>) => timeSpan<T>) => cb(NewTimeSpan(span)),
 
 	//Setters
-	setTime: (time: number) =>
-		NewTimeSpan({ ...span, time, duration: timeSpanEnd(span) - time }),
-	setDuration: (duration: number) => NewTimeSpan({ ...span, duration }),
-	setEnd: (end: number) => NewTimeSpan({ ...span, duration: end - span.time }),
+	setTime: (time: number) => NewTimeSpan({ ...span, time }),
+	setDuration: (duration: number) =>
+		NewTimeSpan({ ...span, end: span.time + duration }),
+	setEnd: (end: number) => NewTimeSpan({ ...span, end }),
 
 	//Getters
-	timeEnd: () => timeSpanEnd(span),
+	timeEnd: () => span.end,
 	time: () => span.time,
-	duration: () => span.duration,
+	duration: () => span.end - span.time,
 	//Return original object
 	get: () => span,
 })

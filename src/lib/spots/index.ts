@@ -1,5 +1,5 @@
 import { endOfDayTime, getDayStart } from 'lib/time'
-import { CreateTimeSpan, Spot, TimeSpan, timeSpanEnd } from './spot'
+import { Spot, TimeSpan } from './spot'
 import {
 	findNodeDeep,
 	availableTimeSpan,
@@ -33,7 +33,7 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	}
 
 	const getDayTree = (dayStart: number) =>
-		sliceTreeByTime(tree, createDayTimeSpan(dayStart).get())
+		sliceTreeByTime(tree, createDayTimeSpan(dayStart))
 
 	//TODO configure tomorow overlap time for today spots
 	//TODO return spots as Spots type
@@ -58,13 +58,15 @@ const sortSpots = (list: Spot[]): Spot[] =>
 
 //isActiveSpot return true if spot is not end yet
 export const isActiveSpot = curry(
-	(now: number, spot: TimeSpan): boolean => now < timeSpanEnd(spot)
+	(now: number, spot: TimeSpan): boolean => now < spot.end
 )
 
 export const isCurrentSpot = curry(
-	(now: number, t: TimeSpan): boolean => now > t.time && now < timeSpanEnd(t)
+	(now: number, t: TimeSpan): boolean => now > t.time && now < t.end
 )
 
 //createDayTimeSpan creates TimeSpan from start to the end of the day
-const createDayTimeSpan = (dayStart: number) =>
-	CreateTimeSpan(dayStart, endOfDayTime(dayStart))
+const createDayTimeSpan = (dayStart: number) => ({
+	time: dayStart,
+	end: endOfDayTime(dayStart),
+})

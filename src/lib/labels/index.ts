@@ -3,7 +3,7 @@ import { Features, timeToFeatures } from './tags'
 export interface Task {
 	id: string
 	time: number
-	duration: number
+	end: number
 }
 
 export function newMatcher<T extends Task>() {

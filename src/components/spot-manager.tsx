@@ -4,7 +4,7 @@ import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
 import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore, IPlan, FreeSpotPlan } from 'models'
-import { NewTimeSpan, TimeSpan, timeSpanEnd } from 'lib/spots/spot'
+import { NewTimeSpan, TimeSpan } from 'lib/spots/spot'
 import { TaskHeader } from './task'
 import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
@@ -84,15 +84,15 @@ const useSpotManager = (spot: Spot) => {
 	const { schedule, clock } = useStore()
 	const task = schedule.tasks.get(spot.id)
 	const spotStart = spot.time
-	const spotEnd = timeSpanEnd(spot)
+	const spotEnd = spot.end
 
 	const [maxStart, maxEnd] =
 		task === undefined
-			? [spotStart, timeSpanEnd(spot)]
+			? [spotStart, spot.end]
 			: schedule.getTaskGaps(task, clock.today)
 
 	const currentTime = clock.getCurrentTime()
-	const { time, duration } = remainingTimeSpan(currentTime, spot)
+	const { time, end } = remainingTimeSpan(currentTime, spot)
 
 	const store = useLocalObservable(() => {
 		const selected: [string, IPlan][] = []
@@ -104,7 +104,7 @@ const useSpotManager = (spot: Spot) => {
 			//Initil spot time span
 			timespan: { start: maxStart, end: maxEnd },
 			time,
-			duration,
+			end,
 			select(plan: IPlan) {
 				const { id } = plan
 				if (store.isSelected(id)) {
@@ -116,16 +116,15 @@ const useSpotManager = (spot: Spot) => {
 			},
 
 			get spotEnd(): number {
-				return timeSpanEnd(store)
+				return store.end
 			},
 
 			setSpotStart(startTime: number) {
-				store.duration = store.spotEnd - startTime
 				store.time = startTime
 			},
 
 			setSpotEnd(endTime: number) {
-				store.duration = endTime - store.time
+				store.end = endTime
 			},
 
 			isSelected(id: string): boolean {
@@ -137,8 +136,8 @@ const useSpotManager = (spot: Spot) => {
 			},
 
 			get spot(): Spot {
-				const { time, duration } = store
-				return { ...spot, time, duration }
+				const { time, end } = store
+				return { ...spot, time, end }
 			},
 
 			//Time changed and plan choosen

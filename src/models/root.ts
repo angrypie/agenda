@@ -17,14 +17,10 @@ function t(hours: number): number {
 	return dayjs().startOf('day').add(hours, 'hour').valueOf()
 }
 
-function d(hours: number): number {
-	return hours * 3600000
-}
-
 export const stubTasks = {
-	'0': { id: '0', plan: '15', duration: d(8), name: 'Sleep', time: t(0) },
-	'2': { id: '2', plan: '12', duration: d(4), name: 'Work', time: t(10) },
-	'7': { id: '7', plan: '15', duration: d(8), name: 'Sleep', time: t(24) },
+	'0': { id: '0', plan: '15', end: t(8), name: 'Sleep', time: t(0) },
+	'2': { id: '2', plan: '12', end: t(14), name: 'Work', time: t(10) },
+	'7': { id: '7', plan: '15', end: t(32), name: 'Sleep', time: t(24) },
 }
 
 export const stubPlans = {
