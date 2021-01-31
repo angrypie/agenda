@@ -57,8 +57,8 @@ export const Schedule = types
 					return spots().current(time)
 				},
 
-				getTaskGaps(task: ITask, dayStart: number): [number, number] {
-					return spots().daySpotGaps(task, dayStart)
+				getTaskGaps(task: ITask): [number, number] {
+					return spots().daySpotGaps(task)
 				},
 
 				getNextTask(time: number): Spot {

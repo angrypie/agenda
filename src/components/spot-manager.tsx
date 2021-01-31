@@ -87,13 +87,10 @@ const useSpotManager = (spot: Spot) => {
 	const spotEnd = spot.end
 
 	const [maxStart, maxEnd] =
-		task === undefined
-			? [spotStart, spot.end]
-			: schedule.getTaskGaps(task, clock.today)
+		task === undefined ? [spotStart, spot.end] : schedule.getTaskGaps(task)
 
-	const currentTime = clock.getCurrentTime()
 	const { time, end } =
-		task === undefined ? remainingTimeSpan(currentTime, spot) : spot
+		task === undefined ? remainingTimeSpan(clock.getCurrentTime(), spot) : spot
 
 	const store = useLocalObservable(() => {
 		const selected: [string, IPlan][] = []

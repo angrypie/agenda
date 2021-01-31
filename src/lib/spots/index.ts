@@ -15,7 +15,7 @@ export interface Spots {
 	get: () => Spot[]
 	current: (now: number) => Spot
 	next: (now: number) => Spot
-	daySpotGaps: (spot: Spot, dayStart: number) => [number, number]
+	daySpotGaps: (spot: Spot) => [number, number]
 }
 
 export const newSpots = (tasks: Spot[]): Spots => {
@@ -40,8 +40,9 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	const todaySpots = (dayStart: number): Spot[] =>
 		treeToSpots(getDayTree(dayStart))
 
-	const daySpotGaps = (spot: Spot, dayStart: number): [number, number] =>
-		availableTimeSpan(findNodeDeep(getDayTree(getDayStart(dayStart)), spot.id))
+	//TODO look wider around the spot (spot may start yesterday and end tomorow)
+	const daySpotGaps = (spot: Spot): [number, number] =>
+		availableTimeSpan(findNodeDeep(getDayTree(getDayStart(spot.time)), spot.id))
 
 	return {
 		//todaySpots returns spots from now to end of the day
