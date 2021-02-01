@@ -2,7 +2,6 @@ import React from 'react'
 import { View, FlatList, Dimensions } from 'react-native'
 import { useLocalObservable, observer } from 'mobx-react-lite'
 import { Arr, head, last, NewNotEmptyArray } from 'lib/collections'
-import { useThrottleCallback } from 'lib/hooks'
 import { times } from 'rambda'
 
 //TODO BUGS:
@@ -72,11 +71,6 @@ export const Swiper = observer(({ renderItem }: SwiperProps) => {
 		},
 	}))
 
-	//TODO use own throtttle callback implementation
-	const shiftScreens = useThrottleCallback((index: number) => {
-		store.updateScreens(index)
-	}, 5)
-
 	return (
 		<FlatList
 			showsHorizontalScrollIndicator={false}
@@ -85,9 +79,10 @@ export const Swiper = observer(({ renderItem }: SwiperProps) => {
 			onScroll={event => {
 				const offset = event.nativeEvent.contentOffset.x
 				const index = Math.round(offset / windowWidth)
-				shiftScreens(index)
+				console.log(offset)
+				store.updateScreens(index)
 			}}
-			scrollEventThrottle={5} //TODO not working for onScroll
+			scrollEventThrottle={200} //TODO not working for android? (reanimated?)
 			data={store.screens}
 			keyExtractor={item => item.index.toString()}
 			renderItem={({ index }) => (
