@@ -79,7 +79,6 @@ export const Swiper = observer(({ renderItem }: SwiperProps) => {
 			onScroll={event => {
 				const offset = event.nativeEvent.contentOffset.x
 				const index = Math.round(offset / windowWidth)
-				console.log(offset)
 				store.updateScreens(index)
 			}}
 			scrollEventThrottle={200} //TODO not working for android? (reanimated?)

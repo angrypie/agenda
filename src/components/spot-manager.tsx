@@ -27,7 +27,9 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 
 	const onSliderChange = ([start, end]: number[]) => {
 		store.setSpotStart(start)
-		store.setSpotEnd(end)
+		const maxEnd = store.timespan.end
+		//TODO setup slider to not allow such things
+		store.setSpotEnd(end > store.timespan.end ? maxEnd : end)
 	}
 
 	return (
