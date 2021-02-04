@@ -31,8 +31,6 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 		return [spot]
 	}
 
-	const [before, after] = splitSpot(spot, head(spots).time, last(spots).end)
-
 	const gaps = gapsBetweenSpots(spots)
 	const withGaps = spots.flatMap((spot, index) => {
 		const arr = [spot]
@@ -46,9 +44,10 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 			)
 		}
 		return arr
-	})
+	}) as Arr<Spot>
 
-	return [before, ...withGaps, after]
+	const [before, after] = splitSpot(spot, head(spots).time, last(spots).end)
+	return [...before, ...withGaps, ...after]
 }
 
 export const availableTimeSpan = (node: Node): [number, number] => {
@@ -70,9 +69,17 @@ export const availableTimeSpan = (node: Node): [number, number] => {
 	]
 }
 
-const splitSpot = (spot: Spot, start: number, end: number): [Spot, Spot] => [
-	{ ...NewTimeSpan(spot).setEnd(start).get(), id: `${spot.id}+before` },
-	{ ...NewTimeSpan(spot).setTime(end).get(), id: `${spot.id}+after` },
+const splitSpot = (
+	spot: Spot,
+	start: number,
+	end: number
+): [[Spot] | [], [Spot] | []] => [
+	spot.time !== start
+		? [{ ...NewTimeSpan(spot).setEnd(start).get(), id: `${spot.id}+before` }]
+		: [],
+	spot.end !== end
+		? [{ ...NewTimeSpan(spot).setTime(end).get(), id: `${spot.id}+after` }]
+		: [],
 ]
 
 //findNodeDeep try to find node with given id in whole tree.

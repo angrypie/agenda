@@ -32,10 +32,10 @@ export const newSpots = (tasks: Spot[]): Spots => {
 		return index < spots.length - 1 ? spots[index + 1] : spots[index]
 	}
 
+	//TODO configure tomorow overlap time for today spots
 	const getDayTree = (dayStart: number) =>
 		sliceTreeByTime(tree, createDayTimeSpan(dayStart))
 
-	//TODO configure tomorow overlap time for today spots
 	//TODO return spots as Spots type
 	const todaySpots = (dayStart: number): Spot[] =>
 		treeToSpots(getDayTree(dayStart))
