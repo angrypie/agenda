@@ -28,3 +28,14 @@ export function curry<A extends any[], R>(
 			? fn(...(args as any))
 			: curry((fn as any).bind(undefined, ...args))
 }
+
+export const flatMap = <R extends any>(
+	create: (n: R) => Arr<R>,
+	fn: (n: Arr<R>, i: number) => Arr<R>,
+	list: Arr<R>
+): Arr<R> => {
+	const [first, ...rest] = list
+	const r = fn(create(first), 0)
+	rest.forEach((n, i) => r.push(...fn(create(n), i + 1)))
+	return r
+}

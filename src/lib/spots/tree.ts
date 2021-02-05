@@ -6,7 +6,7 @@ import {
 	TimeSpan,
 	NewTimeSpan,
 } from './spot'
-import { Arr, head, last, NewNotEmptyArray } from 'lib/collections'
+import { Arr, flatMap, head, last, NewNotEmptyArray } from 'lib/collections'
 
 const rootNodeId = 'root.id.Aed1vahX'
 
@@ -32,22 +32,27 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 	}
 
 	const gaps = gapsBetweenSpots(spots)
-	const withGaps = spots.flatMap((spot, index) => {
-		const arr = [spot]
-		const gap = gaps(index)
-		if (gap !== 0) {
-			arr.push(
-				NewFreeSpot({
-					id: spot.id + '+gap',
-					...NewTimeSpanDuration(spot.end, gap).get(),
-				})
-			)
-		}
-		return arr
-	}) as Arr<Spot>
+	const withGaps = flatMap(
+		spot => [spot],
+		(arr, index) => {
+			const gap = gaps(index)
+			if (gap !== 0) {
+				arr.push(
+					NewFreeSpot({
+						id: spot.id + '+gap',
+						...NewTimeSpanDuration(spot.end, gap).get(),
+					})
+				)
+			}
+			return arr
+		},
+		spots
+	)
 
 	const [before, after] = splitSpot(spot, head(spots).time, last(spots).end)
-	return [...before, ...withGaps, ...after]
+	withGaps.unshift(...before)
+	withGaps.push(...after)
+	return withGaps
 }
 
 export const availableTimeSpan = (node: Node): [number, number] => {
