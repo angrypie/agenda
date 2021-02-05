@@ -3,8 +3,8 @@ import { ScrollView, View, StyleSheet } from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
 import { isCurrentSpot, Spot } from 'lib/spots'
-import { useStore, IPlan, FreeSpotPlan } from 'models'
-import { NewTimeSpan, TimeSpan } from 'lib/spots/spot'
+import { useStore, IPlan } from 'models'
+import { FreeSpotPlan, NewTimeSpan, TimeSpan } from 'lib/spots/spot'
 import { TaskHeader } from './task'
 import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
@@ -175,7 +175,6 @@ const Description = () => (
 const PlanItem = ({ id, name }: IPlan, store: SpotManagerStore) => (
 	<Button key={id} onPress={() => store.select({ id, name })}>
 		<View
-			key={id}
 			style={[
 				{
 					opacity: store.isSelected(id) ? 1 : 0.8,

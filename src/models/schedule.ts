@@ -4,11 +4,7 @@ import { getDayStart } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 import { observe } from 'mobx'
-
-export const FreeSpotPlan = {
-	id: 'free-spot',
-	name: 'Free spot',
-}
+import { FreeSpotPlan } from 'lib/spots/spot'
 
 export const Plan = types.model({
 	id: types.identifier,
@@ -32,13 +28,19 @@ export const Schedule = types
 		plans: types.optional(types.map(Plan), {}),
 	})
 	.extend(function (self) {
-		let spotsCache = newSpots(Array.from(self.tasks.values()))
+		const recreateSpots = () =>
+			newSpots(
+				Array.from(self.tasks.values()).map(spot => ({
+					...spot,
+					plan: spot.plan.id,
+				}))
+			)
+		let spotsCache = recreateSpots()
+		const updateSpots = () => (spotsCache = recreateSpots())
+
 		//TODO find another way to triger spots views
 		const spots = () => (self.tasks.size === 0 ? spotsCache : spotsCache)
 
-		const updateSpots = () => {
-			spotsCache = newSpots(Array.from(self.tasks.values()))
-		}
 		observe(self.tasks, change => {
 			console.log('TODO reduce spots update', change.name, change.type)
 			updateSpots()
@@ -58,7 +60,7 @@ export const Schedule = types
 				},
 
 				getTaskGaps(task: ITask): [number, number] {
-					return spots().daySpotGaps(task)
+					return spots().daySpotGaps({ ...task, plan: task.plan.id })
 				},
 
 				getNextTask(time: number): Spot {

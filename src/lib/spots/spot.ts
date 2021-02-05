@@ -1,6 +1,8 @@
 export interface Spot extends TimeSpan {
 	id: string
+	//TODO remeve spot name
 	name: string
+	plan: string
 }
 //
 //isCurrentSpot return true if spot belong to current time
@@ -57,7 +59,13 @@ export const NewTimeSpan = <T extends TimeSpan>(span: T): timeSpan<T> => ({
 	get: () => span,
 })
 
-export const NewFreeSpot = (spot: Omit<Spot, 'name'>): Spot => ({
+export const NewFreeSpot = (spot: Omit<Spot, 'name' | 'plan'>): Spot => ({
 	name: 'Free spot',
+	plan: FreeSpotPlan.id,
 	...spot,
 })
+
+export const FreeSpotPlan = {
+	id: 'free-spot',
+	name: 'Free spot',
+}

@@ -39,7 +39,8 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 			if (gap !== 0) {
 				arr.push(
 					NewFreeSpot({
-						id: spot.id + '+gap',
+						//TODO should it be meaningfull ids?
+						id: `${spot.id}+gap+${index}`,
 						...NewTimeSpanDuration(spot.end, gap).get(),
 					})
 				)
