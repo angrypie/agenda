@@ -3,7 +3,6 @@ import { newSpots, Spot } from 'lib/spots'
 import { getDayStart } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
-import { observe } from 'mobx'
 import { FreeSpotPlan } from 'lib/spots/spot'
 
 export const Plan = types.model({
@@ -28,23 +27,14 @@ export const Schedule = types
 		plans: types.optional(types.map(Plan), {}),
 	})
 	.extend(function (self) {
-		const recreateSpots = () =>
+		//TODO [perfomance] do not create spots each time or is mobx may cache it?
+		const spots = () =>
 			newSpots(
 				Array.from(self.tasks.values()).map(spot => ({
 					...spot,
 					plan: spot.plan.id,
 				}))
 			)
-		let spotsCache = recreateSpots()
-		const updateSpots = () => (spotsCache = recreateSpots())
-
-		//TODO find another way to triger spots views
-		const spots = () => (self.tasks.size === 0 ? spotsCache : spotsCache)
-
-		observe(self.tasks, change => {
-			console.log('TODO reduce spots update', change.name, change.type)
-			updateSpots()
-		})
 
 		const matcher = newMatcher<ITask>()
 		if (!self.plans.has(FreeSpotPlan.id)) {
@@ -89,7 +79,6 @@ export const Schedule = types
 							self.tasks.put({ ...task, ...spot, name, plan: id })
 						}
 					}
-					updateSpots()
 					return true
 				},
 			},

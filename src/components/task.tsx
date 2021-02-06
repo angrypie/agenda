@@ -9,9 +9,11 @@ import { useNavigation } from '@react-navigation/native'
 import { Button } from './touchable'
 import { Blinking } from './layout'
 
-export const Task = observer(({ task }: TaskProps) => {
+export const Task = observer(({ task: spot }: TaskProps) => {
 	const navigation = useNavigation()
 	const { clock, schedule } = useStore()
+
+	const task = schedule.tasks.get(spot.id) || spot
 	const { name, time } = task
 
 	const isCurrent = isCurrentSpot(clock.now, task)
