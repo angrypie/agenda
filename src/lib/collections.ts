@@ -30,12 +30,13 @@ export function curry<A extends any[], R>(
 }
 
 export const flatMap = <R extends any>(
-	create: (n: R) => Arr<R>,
 	fn: (n: Arr<R>, i: number) => Arr<R>,
 	list: Arr<R>
 ): Arr<R> => {
 	const [first, ...rest] = list
-	const r = fn(create(first), 0)
-	rest.forEach((n, i) => r.push(...fn(create(n), i + 1)))
+	const r = fn([first], 0)
+	rest.forEach((n, i) => r.push(...fn([n], i + 1)))
 	return r
 }
+
+export const concat = <T extends any[]>(a: T, b: T | []): T => a.concat(b) as T

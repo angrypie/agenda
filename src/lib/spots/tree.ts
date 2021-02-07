@@ -6,11 +6,18 @@ import {
 	TimeSpan,
 	NewTimeSpan,
 } from './spot'
-import { Arr, flatMap, head, last, NewNotEmptyArray } from 'lib/collections'
+import {
+	Arr,
+	concat,
+	flatMap,
+	head,
+	last,
+	NewNotEmptyArray,
+} from 'lib/collections'
 
 const rootNodeId = 'root.id.Aed1vahX'
 
-interface Node {
+export interface Node {
 	spot: Spot
 	parent: (() => Node) | undefined
 	childs: Node[]
@@ -33,20 +40,7 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 
 	const gaps = gapsBetweenSpots(spots)
 	const withGaps = flatMap(
-		spot => [spot],
-		(arr, index) => {
-			const gap = gaps(index)
-			if (gap !== 0) {
-				arr.push(
-					NewFreeSpot({
-						//TODO should it be meaningfull ids?
-						id: `${spot.id}+gap+${index}`,
-						...NewTimeSpanDuration(spot.end, gap).get(),
-					})
-				)
-			}
-			return arr
-		},
+		(arr, index) => concat(arr, createFreeSpotGap(head(arr), gaps(index))),
 		spots
 	)
 
@@ -55,6 +49,16 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 	withGaps.push(...after)
 	return withGaps
 }
+
+const createFreeSpotGap = (child: Spot, gap: number): [] | [Spot] =>
+	gap === 0
+		? []
+		: [
+				NewFreeSpot({
+					id: `${child.id}+gap`,
+					...NewTimeSpanDuration(child.end, gap).get(),
+				}),
+		  ]
 
 export const availableTimeSpan = (node: Node): [number, number] => {
 	const { parent } = node

@@ -5,6 +5,8 @@ import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 import { FreeSpotPlan } from 'lib/spots/spot'
 
+const SleepSpotPlan = { id: 'sleep-spot', name: 'Sleep_s' }
+
 export const Plan = types.model({
 	id: types.identifier,
 	name: types.string,
@@ -28,22 +30,26 @@ export const Schedule = types
 	})
 	.extend(function (self) {
 		//TODO [perfomance] do not create spots each time or is mobx may cache it?
-		const spots = () =>
+		const spots = (inject: Spot[] = []) =>
 			newSpots(
-				Array.from(self.tasks.values()).map(spot => ({
-					...spot,
-					plan: spot.plan.id,
-				}))
+				Array.from(self.tasks.values())
+					.map(spot => ({
+						...spot,
+						plan: spot.plan.id,
+					}))
+					.concat(inject)
 			)
 
 		const matcher = newMatcher<ITask>()
-		if (!self.plans.has(FreeSpotPlan.id)) {
-			self.plans.put(FreeSpotPlan)
-		}
+		self.plans.put(FreeSpotPlan)
+		self.plans.put(SleepSpotPlan)
 		return {
 			views: {
 				getDayTasks(time: number): Spot[] {
-					return spots().todaySpots(getDayStart(time))
+					const dayStart = getDayStart(time)
+					return spots(
+						createSuggestedTasks(spots().todaySpots(dayStart))
+					).todaySpots(dayStart)
 				},
 				getCurrentSpot(time: number): Spot {
 					return spots().current(time)
@@ -84,3 +90,21 @@ export const Schedule = types
 			},
 		}
 	})
+
+const createSuggestedTasks = (spots: Spot[]): Spot[] => {
+	const sleepDuration = 216e5
+	const spot = spots.find(
+		s => s.plan === FreeSpotPlan.id && s.end - s.time >= sleepDuration
+	)
+	if (spot === undefined) {
+		return []
+	}
+	const sleepSpot = {
+		...spot,
+		id: uuidv4(),
+		end: spot.time + sleepDuration,
+		name: SleepSpotPlan.name,
+		plan: SleepSpotPlan.id,
+	}
+	return [sleepSpot]
+}
