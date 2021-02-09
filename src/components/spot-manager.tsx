@@ -32,10 +32,6 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		store.setSpotEnd(end > store.timespan.end ? maxEnd : end)
 	}
 
-	console.log(spot)
-	console.log(JSON.stringify(store, undefined, 2))
-	//return null
-
 	return (
 		<Observer>
 			{() => (
@@ -92,10 +88,8 @@ const useSpotManager = (spot: Spot) => {
 	const spotStart = spot.time
 	const spotEnd = spot.end
 
-	const [maxStart, maxEnd] = (([before, after]) => [
-		spotStart - before,
-		spotEnd + after,
-	])(task === undefined ? [0, 0] : schedule.getTaskGaps(task))
+	const [maxStart, maxEnd] =
+		task === undefined ? [spotStart, spotEnd] : schedule.getTaskGaps(task)
 
 	const { time, end } =
 		task === undefined ? remainingTimeSpan(clock.getCurrentTime(), spot) : spot

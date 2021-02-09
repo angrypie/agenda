@@ -5,7 +5,7 @@ import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 import { FreeSpotPlan } from 'lib/spots/spot'
 
-const SleepSpotPlan = { id: 'sleep-spot', name: 'Sleep_s' }
+const SleepSpotPlan = { id: 'sleep-spot', name: 'Sleep' }
 
 export const Plan = types.model({
 	id: types.identifier,
@@ -92,19 +92,24 @@ export const Schedule = types
 	})
 
 const createSuggestedTasks = (spots: Spot[]): Spot[] => {
-	const sleepDuration = 216e5
-	const spot = spots.find(
-		s => s.plan === FreeSpotPlan.id && s.end - s.time >= sleepDuration
-	)
-	if (spot === undefined) {
-		return []
+	const sleepDuration = 288e5
+	for (const s of spots) {
+		//Exit if sleep task already exist
+		if (s.plan === SleepSpotPlan.id) {
+			return []
+		}
+		//Add sleep task to first free spot that fits 8h time span
+		if (s.plan === FreeSpotPlan.id && s.end - s.time >= sleepDuration) {
+			return [
+				{
+					...s,
+					id: uuidv4(),
+					end: s.time + sleepDuration,
+					name: SleepSpotPlan.name,
+					plan: SleepSpotPlan.id,
+				},
+			]
+		}
 	}
-	const sleepSpot = {
-		...spot,
-		id: uuidv4(),
-		end: spot.time + sleepDuration,
-		name: SleepSpotPlan.name,
-		plan: SleepSpotPlan.id,
-	}
-	return [sleepSpot]
+	return []
 }

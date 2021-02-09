@@ -17,18 +17,12 @@ function t(hours: number): number {
 	return dayjs().startOf('day').add(hours, 'hour').valueOf()
 }
 
-export const stubTasks = {
-	'0': { id: '0', plan: '15', end: t(8), name: 'Sleep', time: t(0) },
-	'2': { id: '2', plan: '12', end: t(14), name: 'Work', time: t(10) },
-	'7': { id: '7', plan: '15', end: t(32), name: 'Sleep', time: t(24) },
-}
-
 export const stubPlans = {
 	'11': { id: '11', name: 'Workout' },
 	'12': { id: '12', name: 'Work' },
 	'13': { id: '13', name: 'Clean home' },
 	'14': { id: '14', name: 'Practice' },
-	'15': { id: '15', name: 'Sleep' },
+	'15': { id: 'sleep-spot', name: 'Sleep' },
 	'16': { id: '16', name: 'Reed book' },
 	'17': { id: '17', name: 'Take a walk' },
 	'18': { id: '18', name: 'Ride bike' },
@@ -39,7 +33,6 @@ export const stubPlans = {
 export const rootStore = RootModel.create(
 	{
 		schedule: {
-			tasks: stubTasks,
 			plans: stubPlans,
 		},
 	},
