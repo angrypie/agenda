@@ -31,7 +31,6 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		//TODO setup slider to not allow such things
 		store.setSpotEnd(end > store.timespan.end ? maxEnd : end)
 	}
-
 	return (
 		<Observer>
 			{() => (
@@ -85,26 +84,27 @@ type SpotManagerStore = ReturnType<typeof useSpotManager>
 const useSpotManager = (spot: Spot) => {
 	const { schedule, clock } = useStore()
 	const task = schedule.tasks.get(spot.id)
+	const spotPlan = schedule.plans.get(spot.plan)
 	const spotStart = spot.time
 	const spotEnd = spot.end
 
 	const [maxStart, maxEnd] =
 		task === undefined ? [spotStart, spotEnd] : schedule.getTaskGaps(task)
 
-	const { time, end } =
+	const remainingTime =
 		task === undefined ? remainingTimeSpan(clock.getCurrentTime(), spot) : spot
 
 	const store = useLocalObservable(() => {
 		const selected: [string, IPlan][] = []
-		if (task !== undefined) {
-			selected.push([task.plan.id, task.plan])
+		if (spotPlan !== undefined) {
+			selected.push([spot.plan, spotPlan])
 		}
 		return {
 			selected: new Map<string, IPlan>(selected),
 			//Initil spot time span
 			timespan: { start: maxStart, end: maxEnd },
-			time,
-			end,
+			time: remainingTime.time,
+			end: remainingTime.end,
 			select(plan: IPlan) {
 				const { id } = plan
 				if (store.isSelected(id)) {

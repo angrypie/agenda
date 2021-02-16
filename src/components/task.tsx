@@ -26,7 +26,7 @@ export const Task = observer(({ task: spot }: TaskProps) => {
 	return (
 		<Button
 			delayPressIn={300}
-			onPress={() => navigation.navigate('SpotManager', { spot: task })}
+			onPress={() => navigation.navigate('SpotManager', { spot })}
 		>
 			<View style={[styles.task, style]}>
 				<TaskHeader

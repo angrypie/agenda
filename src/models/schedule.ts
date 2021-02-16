@@ -3,9 +3,7 @@ import { newSpots, Spot } from 'lib/spots'
 import { getDayStart } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
-import { FreeSpotPlan } from 'lib/spots/spot'
-
-const SleepSpotPlan = { id: 'sleep-spot', name: 'Sleep' }
+import { FreeSpotPlan, SleepSpotPlan } from 'lib/spots/spot'
 
 export const Plan = types.model({
 	id: types.identifier,
@@ -41,7 +39,6 @@ export const Schedule = types
 			)
 
 		const matcher = newMatcher<ITask>()
-		self.plans.put(FreeSpotPlan)
 		self.plans.put(SleepSpotPlan)
 		return {
 			views: {
@@ -61,6 +58,10 @@ export const Schedule = types
 
 				getNextTask(time: number): Spot {
 					return spots().next(time)
+				},
+
+				getPlan(id: string): IPlan | undefined {
+					return self.plans.get(id)
 				},
 			},
 			actions: {

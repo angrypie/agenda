@@ -65,7 +65,5 @@ export const NewFreeSpot = (spot: Omit<Spot, 'name' | 'plan'>): Spot => ({
 	...spot,
 })
 
-export const FreeSpotPlan = {
-	id: 'free-spot',
-	name: 'Free spot',
-}
+export const FreeSpotPlan = { id: 'free-spot', name: 'Free spot' }
+export const SleepSpotPlan = { id: 'sleep-spot', name: 'Sleep' }

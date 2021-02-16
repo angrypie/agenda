@@ -4,6 +4,7 @@ import { Clock } from './clock'
 import dayjs from 'dayjs'
 import { createEnv } from './utils'
 import { persist } from './persist'
+import { SleepSpotPlan } from 'lib/spots/spot'
 
 export const RootModel = types.model({
 	schedule: Schedule,
@@ -22,12 +23,12 @@ export const stubPlans = {
 	'12': { id: '12', name: 'Work' },
 	'13': { id: '13', name: 'Clean home' },
 	'14': { id: '14', name: 'Practice' },
-	'15': { id: 'sleep-spot', name: 'Sleep' },
 	'16': { id: '16', name: 'Reed book' },
 	'17': { id: '17', name: 'Take a walk' },
 	'18': { id: '18', name: 'Ride bike' },
 	'19': { id: '19', name: 'Watch series' },
 	'20': { id: '20', name: 'Side project' },
+	[SleepSpotPlan.id]: SleepSpotPlan,
 }
 
 export const rootStore = RootModel.create(
