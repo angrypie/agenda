@@ -8,6 +8,7 @@ import { formatTime } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
 import { Button } from './touchable'
 import { Blinking } from './layout'
+import { SleepSpotPlan } from 'lib/spots/spot'
 
 export const Task = observer(({ task: spot }: TaskProps) => {
 	const navigation = useNavigation()
@@ -23,11 +24,23 @@ export const Task = observer(({ task: spot }: TaskProps) => {
 
 	const showFreeSpot = !schedule.tasks.has(task.id) && isActive
 
-	return (
-		<Button
-			delayPressIn={300}
-			onPress={() => navigation.navigate('SpotManager', { spot })}
-		>
+	const taskBody =
+		spot.plan === SleepSpotPlan.id ? (
+			<View style={[styles.task, style, { height: 30 }]}>
+				<View
+					style={{
+						flexDirection: 'row',
+						justifyContent: 'center',
+					}}
+				>
+					<Header style={{ fontSize: 18 }}>
+						{isCurrent
+							? `😴\xa0 Sleep now\xa0 ${formatTime(displayTime)}`
+							: `🌞\xa0 Wake up at\xa0 ${formatTime(spot.end)}`}
+					</Header>
+				</View>
+			</View>
+		) : (
 			<View style={[styles.task, style]}>
 				<TaskHeader
 					name={name}
@@ -36,6 +49,13 @@ export const Task = observer(({ task: spot }: TaskProps) => {
 					isActive={isActive}
 				/>
 			</View>
+		)
+	return (
+		<Button
+			delayPressIn={300}
+			onPress={() => navigation.navigate('SpotManager', { spot })}
+		>
+			{taskBody}
 		</Button>
 	)
 })
