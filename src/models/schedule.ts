@@ -1,9 +1,10 @@
 import { types, Instance } from 'mobx-state-tree'
 import { newSpots, Spot } from 'lib/spots'
-import { getDayStart } from 'lib/time'
+import { formatDate, formatTime, getDayStart, NewTime } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
-import { FreeSpotPlan, SleepSpotPlan } from 'lib/spots/spot'
+import { FreeSpotPlan, SleepSpotPlan, TimeSpan } from 'lib/spots/spot'
+import { Arr, head, last } from 'lib/collections'
 
 export const Plan = types.model({
 	id: types.identifier,
@@ -45,7 +46,12 @@ export const Schedule = types
 				getDayTasks(time: number): Spot[] {
 					const dayStart = getDayStart(time)
 					return spots(
-						createSuggestedTasks(spots().todaySpots(dayStart))
+						createSuggestedTasks(
+							spots().slice({
+								time: NewTime(dayStart).subtract(1, 'day').dayStart().value(),
+								end: NewTime(dayStart).add(1, 'day').dayEnd().value(),
+							})
+						)
 					).todaySpots(dayStart)
 				},
 				getCurrentSpot(time: number): Spot {
@@ -92,25 +98,44 @@ export const Schedule = types
 		}
 	})
 
-const createSuggestedTasks = (spots: Spot[]): Spot[] => {
+const createSuggestedTasks = (spots: Arr<Spot>): Spot[] => {
+	const wholeTimeSpan = {
+		time: head(spots).time,
+		end: last(spots).end,
+	}
 	const sleepDuration = 288e5
+	const fitsForSleep = ({ time, end }: TimeSpan) => end - time >= sleepDuration
+	const inject: Spot[] = []
+
 	for (const s of spots) {
-		//Exit if sleep task already exist
-		if (s.plan === SleepSpotPlan.id) {
-			return []
-		}
 		//Add sleep task to first free spot that fits 8h time span
-		if (s.plan === FreeSpotPlan.id && s.end - s.time >= sleepDuration) {
-			return [
-				{
-					...s,
+		if (s.plan === FreeSpotPlan.id && fitsForSleep(s)) {
+			const sleepSpan = {
+				time: NewTime(s.time).dayStart().add(23, 'hours').value(),
+				end: NewTime(s.time)
+					.dayStart()
+					.add(23 + 8, 'hours')
+					.value(),
+			}
+			if (s.time <= sleepSpan.time && s.end >= sleepSpan.end) {
+				const sleepSpot = {
+					...sleepSpan,
 					id: uuidv4(),
-					end: s.time + sleepDuration,
 					name: SleepSpotPlan.name,
 					plan: SleepSpotPlan.id,
-				},
-			]
+				}
+				inject.push(
+					...createSuggestedTasks(
+						newSpots([
+							...spots.filter(spot => spot.plan !== FreeSpotPlan.id),
+							sleepSpot,
+						]).slice(wholeTimeSpan)
+					)
+				)
+				inject.push(sleepSpot)
+			}
 		}
 	}
-	return []
+
+	return inject
 }

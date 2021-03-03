@@ -10,6 +10,10 @@ export interface TimeSpan {
 	time: number
 	end: number
 }
+//
+//timeSpanIntersection checks intersection of two time intervals
+export const timeSpanIntersection = (a: TimeSpan, b: TimeSpan) =>
+	a.time < b.end && b.time < a.end
 
 export const gapsBetweenSpots = (spots: Spot[]): ((i: number) => number) => {
 	const gaps = new Map<number, number>()

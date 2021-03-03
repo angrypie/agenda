@@ -7,11 +7,12 @@ import {
 	treeToSpots,
 	sliceTreeByTime,
 } from './tree'
-import { head, curry } from 'lib/collections'
+import { head, curry, Arr } from 'lib/collections'
 export type { Spot }
 
 export interface Spots {
 	todaySpots: (now: number) => Spot[]
+	slice: (span: TimeSpan) => Arr<Spot>
 	get: () => Spot[]
 	current: (now: number) => Spot
 	next: (now: number) => Spot
@@ -44,6 +45,9 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	const daySpotGaps = (spot: Spot): [number, number] =>
 		availableTimeSpan(findNodeDeep(getDayTree(getDayStart(spot.time)), spot.id))
 
+	const slice = (span: TimeSpan): Arr<Spot> =>
+		treeToSpots(sliceTreeByTime(tree, span))
+
 	return {
 		//todaySpots returns spots from now to end of the day
 		todaySpots,
@@ -51,6 +55,7 @@ export const newSpots = (tasks: Spot[]): Spots => {
 		next,
 		current,
 		daySpotGaps,
+		slice,
 	}
 }
 

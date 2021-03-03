@@ -5,6 +5,7 @@ import {
 	NewFreeSpot,
 	TimeSpan,
 	NewTimeSpan,
+	timeSpanIntersection,
 } from './spot'
 import {
 	Arr,
@@ -14,6 +15,7 @@ import {
 	last,
 	NewNotEmptyArray,
 } from 'lib/collections'
+import { formatTime } from 'lib/time'
 
 const rootNodeId = 'root.id.Aed1vahX'
 
@@ -47,6 +49,7 @@ export const treeToSpots = ({ spot, childs }: Node): Arr<Spot> => {
 	const [before, after] = splitSpot(spot, head(spots).time, last(spots).end)
 	withGaps.unshift(...before)
 	withGaps.push(...after)
+
 	return withGaps
 }
 
@@ -118,14 +121,26 @@ export const NewRootNode = (spots: Spot[] = []): Node =>
 	)
 
 //sliceTreeByTime returns root with childrens related to given timespan
-export const sliceTreeByTime = (root: Node, timespan: TimeSpan): Node =>
-	NewNode(
-		NewFreeSpot({ id: rootNodeId, ...timespan }),
-		root.childs
-			.filter(node => timeSpanItersection(node.spot, timespan))
-			.map(({ spot }) => NewNode(spot))
-	)
+export const sliceTreeByTime = (root: Node, timespan: TimeSpan): Node => {
+	const childs = root.childs
+		.filter(node => timeSpanIntersection(node.spot, timespan))
+		.map(({ spot }) => NewNode(spot))
 
-//timeSpanIntersection checks intersection of two time intervals
-export const timeSpanItersection = (a: TimeSpan, b: TimeSpan) =>
-	a.time < b.end && b.time < a.end
+	//Expand root timespan if childs out of provider range
+	const tt = NewTimeSpan(timespan).modify(ts => {
+		if (childs.length !== 0) {
+			const childsStart = childs[0].spot.time
+			const childsEnd = childs[childs.length - 1].spot.end
+
+			return ts
+				.setTime(firstIfTrue(childsStart, ts.time(), (a, b) => a < b))
+				.setEnd(firstIfTrue(childsEnd, ts.timeEnd(), (a, b) => a > b))
+		}
+		return ts
+	})
+
+	return NewNode(NewFreeSpot({ id: rootNodeId, ...tt.get() }), childs)
+}
+
+const firstIfTrue = <T>(a: T, b: T, compare: (x: T, y: T) => boolean): T =>
+	compare(a, b) ? a : b
