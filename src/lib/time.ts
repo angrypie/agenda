@@ -13,7 +13,7 @@ export function formatDate(ms: number): string {
 export const isToday = (ms: number): boolean => dayjs().isSame(ms, 'day')
 
 export function formatTime(ms: number): string {
-	return dayjs(ms).format('HH:mm D')
+	return dayjs(ms).format('HH:mm')
 }
 
 export const shiftDay = (time: number, diff: number): number =>

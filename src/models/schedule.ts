@@ -1,6 +1,6 @@
 import { types, Instance } from 'mobx-state-tree'
 import { newSpots, Spot } from 'lib/spots'
-import { formatDate, formatTime, getDayStart, NewTime } from 'lib/time'
+import { getDayStart, NewTime } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 import { FreeSpotPlan, SleepSpotPlan, TimeSpan } from 'lib/spots/spot'

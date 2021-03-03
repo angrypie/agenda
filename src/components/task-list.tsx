@@ -7,9 +7,10 @@ import { formatDate, shiftDay, isToday } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeView } from 'components/safe-area'
-import { Task } from 'components/task'
+import { SleepTask, Task } from 'components/task'
 import { isActiveSpot, Spot } from 'lib/spots'
 import { Swiper } from './swiper'
+import { SleepSpotPlan } from 'lib/spots/spot'
 
 interface DayProps {
 	//unix time start of the day
@@ -37,7 +38,17 @@ export const TaskList = observer(({ day }: DayProps) => {
 	const dayTasks = schedule.getDayTasks(day)
 
 	const renderTasks = (tasks: Spot[]) =>
-		tasks.map(task => <Task key={task.id} task={task} />)
+		tasks.map((task, index) =>
+			task.plan === SleepSpotPlan.id ? (
+				<SleepTask
+					key={task.id}
+					type={index === 0 ? 'wakeup' : 'bedtime'}
+					task={task}
+				/>
+			) : (
+				<Task key={task.id} task={task} />
+			)
+		)
 
 	//If day is today then hide past tasks
 	//const tasks = isToday(day)

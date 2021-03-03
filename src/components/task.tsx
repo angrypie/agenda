@@ -10,8 +10,64 @@ import { Button } from './touchable'
 import { Blinking } from './layout'
 import { SleepSpotPlan } from 'lib/spots/spot'
 
-export const Task = observer(({ task: spot }: TaskProps) => {
+interface TaskBaseProps {
+	spot: Spot
+	body: React.ReactNode
+}
+
+export const TaskBase = observer(({ spot, body }: TaskBaseProps) => {
 	const navigation = useNavigation()
+	const { clock, schedule } = useStore()
+
+	const task = schedule.tasks.get(spot.id) || spot
+
+	const isCurrent = isCurrentSpot(clock.now, task)
+	const style = { opacity: isCurrent ? 1 : 0.5 }
+
+	return (
+		<Button
+			delayPressIn={300}
+			onPress={() => navigation.navigate('SpotManager', { spot })}
+		>
+			<View style={[styles.task, style]}>{body}</View>
+		</Button>
+	)
+})
+
+interface SleepTaskProps {
+	task: Spot
+	type: 'wakeup' | 'bedtime'
+}
+
+export const SleepTask = observer(({ task: spot, type }: SleepTaskProps) => {
+	const { clock, schedule } = useStore()
+
+	const task = schedule.tasks.get(spot.id) || spot
+	const { time } = task
+
+	const isCurrent = isCurrentSpot(clock.now, task)
+	const displayTime = isCurrent ? clock.now : time
+
+	const taskBody = (
+		<View
+			style={{
+				flexDirection: 'row',
+				justifyContent: 'center',
+			}}
+		>
+			<Header style={{ fontSize: 18 }}>
+				{isCurrent
+					? `😴\xa0 Sleep now\xa0 ${formatTime(displayTime)}`
+					: type === 'wakeup'
+					? `🌞\xa0 Wake up at\xa0 ${formatTime(spot.end)}`
+					: `🌚\xa0 Bedtime at\xa0 ${formatTime(spot.time)}`}
+			</Header>
+		</View>
+	)
+	return <TaskBase spot={spot} body={taskBody} />
+})
+
+export const Task = observer(({ task: spot }: TaskProps) => {
 	const { clock, schedule } = useStore()
 
 	const task = schedule.tasks.get(spot.id) || spot
@@ -20,44 +76,18 @@ export const Task = observer(({ task: spot }: TaskProps) => {
 	const isCurrent = isCurrentSpot(clock.now, task)
 	const isActive = isActiveSpot(clock.now, task)
 	const displayTime = isCurrent ? clock.now : time
-	const style = { opacity: isCurrent ? 1 : 0.5 }
 
 	const showFreeSpot = !schedule.tasks.has(task.id) && isActive
 
-	const taskBody =
-		spot.plan === SleepSpotPlan.id ? (
-			<View style={[styles.task, style, { height: 30 }]}>
-				<View
-					style={{
-						flexDirection: 'row',
-						justifyContent: 'center',
-					}}
-				>
-					<Header style={{ fontSize: 18 }}>
-						{isCurrent
-							? `😴\xa0 Sleep now\xa0 ${formatTime(displayTime)}`
-							: `🌞\xa0 Wake up at\xa0 ${formatTime(spot.end)}`}
-					</Header>
-				</View>
-			</View>
-		) : (
-			<View style={[styles.task, style]}>
-				<TaskHeader
-					name={name}
-					time={displayTime}
-					isFreeSpot={showFreeSpot}
-					isActive={isActive}
-				/>
-			</View>
-		)
-	return (
-		<Button
-			delayPressIn={300}
-			onPress={() => navigation.navigate('SpotManager', { spot })}
-		>
-			{taskBody}
-		</Button>
+	const taskBody = (
+		<TaskHeader
+			name={name}
+			time={displayTime}
+			isFreeSpot={showFreeSpot}
+			isActive={isActive}
+		/>
 	)
+	return <TaskBase spot={spot} body={taskBody} />
 })
 
 interface TaskHeaderProps {
