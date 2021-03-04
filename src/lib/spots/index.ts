@@ -11,7 +11,7 @@ import { head, curry, Arr } from 'lib/collections'
 export type { Spot }
 
 export interface Spots {
-	todaySpots: (now: number) => Spot[]
+	todaySpots: (now: number) => Arr<Spot>
 	slice: (span: TimeSpan) => Arr<Spot>
 	get: () => Spot[]
 	current: (now: number) => Spot
@@ -38,7 +38,7 @@ export const newSpots = (tasks: Spot[]): Spots => {
 		sliceTreeByTime(tree, createDayTimeSpan(dayStart))
 
 	//TODO return spots as Spots type
-	const todaySpots = (dayStart: number): Spot[] =>
+	const todaySpots = (dayStart: number): Arr<Spot> =>
 		treeToSpots(getDayTree(dayStart))
 
 	//TODO look wider around the spot (spot may start yesterday and end tomorow)

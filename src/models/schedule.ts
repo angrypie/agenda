@@ -3,8 +3,15 @@ import { newSpots, Spot } from 'lib/spots'
 import { getDayStart, NewTime } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
-import { FreeSpotPlan, SleepSpotPlan, TimeSpan } from 'lib/spots/spot'
+import {
+	FreeSpotPlan,
+	NewSleepSpot,
+	SleepSpotPlan,
+	TimeSpan,
+	timeSpanInclusion,
+} from 'lib/spots/spot'
 import { Arr, head, last } from 'lib/collections'
+import { logSpotsList } from 'lib/logger'
 
 export const Plan = types.model({
 	id: types.identifier,
@@ -105,37 +112,35 @@ const createSuggestedTasks = (spots: Arr<Spot>): Spot[] => {
 	}
 	const sleepDuration = 288e5
 	const fitsForSleep = ({ time, end }: TimeSpan) => end - time >= sleepDuration
-	const inject: Spot[] = []
 
 	for (const s of spots) {
 		//Add sleep task to first free spot that fits 8h time span
-		if (s.plan === FreeSpotPlan.id && fitsForSleep(s)) {
-			const sleepSpan = {
-				time: NewTime(s.time).dayStart().add(23, 'hours').value(),
-				end: NewTime(s.time)
-					.dayStart()
-					.add(23 + 8, 'hours')
-					.value(),
-			}
-			if (s.time <= sleepSpan.time && s.end >= sleepSpan.end) {
-				const sleepSpot = {
-					...sleepSpan,
-					id: uuidv4(),
-					name: SleepSpotPlan.name,
-					plan: SleepSpotPlan.id,
-				}
-				inject.push(
-					...createSuggestedTasks(
-						newSpots([
-							...spots.filter(spot => spot.plan !== FreeSpotPlan.id),
-							sleepSpot,
-						]).slice(wholeTimeSpan)
-					)
-				)
-				inject.push(sleepSpot)
-			}
+		if (s.plan !== FreeSpotPlan.id || !fitsForSleep(s)) {
+			continue
 		}
+
+		//TODO suggest sleep span by smart suggsetion engine
+		const t = NewTime(s.time).dayStart().add(23, 'hours')
+		const sleepSpan = {
+			time: t.value(),
+			end: t.add(8, 'hours').value(),
+		}
+		//If sleep span not suite for selected spot
+		if (!timeSpanInclusion(sleepSpan, s)) {
+			continue
+		}
+
+		const sleepSpot = NewSleepSpot({ ...sleepSpan, id: uuidv4() })
+		return [
+			...createSuggestedTasks(
+				newSpots([
+					...spots.filter(spot => spot.plan !== FreeSpotPlan.id),
+					sleepSpot,
+				]).slice(wholeTimeSpan)
+			),
+			sleepSpot,
+		]
 	}
 
-	return inject
+	return []
 }

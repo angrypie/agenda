@@ -13,7 +13,11 @@ export interface TimeSpan {
 //
 //timeSpanIntersection checks intersection of two time intervals
 export const timeSpanIntersection = (a: TimeSpan, b: TimeSpan) =>
-	a.time < b.end && b.time < a.end
+	a.time <= b.end && b.time <= a.end
+//
+//timeSpanInclusion checks that sub interval includeed in sup
+export const timeSpanInclusion = (sub: TimeSpan, sup: TimeSpan) =>
+	sup.time <= sub.time && sup.end >= sub.end
 
 export const gapsBetweenSpots = (spots: Spot[]): ((i: number) => number) => {
 	const gaps = new Map<number, number>()
@@ -66,6 +70,12 @@ export const NewTimeSpan = <T extends TimeSpan>(span: T): timeSpan<T> => ({
 export const NewFreeSpot = (spot: Omit<Spot, 'name' | 'plan'>): Spot => ({
 	name: 'Free spot',
 	plan: FreeSpotPlan.id,
+	...spot,
+})
+
+export const NewSleepSpot = (spot: Omit<Spot, 'name' | 'plan'>): Spot => ({
+	name: SleepSpotPlan.name,
+	plan: SleepSpotPlan.id,
 	...spot,
 })
 
