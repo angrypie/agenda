@@ -11,7 +11,6 @@ import {
 	timeSpanInclusion,
 } from 'lib/spots/spot'
 import { Arr, head, last } from 'lib/collections'
-import { logSpotsList } from 'lib/logger'
 
 export const Plan = types.model({
 	id: types.identifier,
