@@ -68,9 +68,9 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 
 					<ScrollView showsVerticalScrollIndicator={false}>
 						<View>
-							{Array.from(schedule.plans.values()).map(plan =>
-								PlanItem(plan, store)
-							)}
+							{Array.from(schedule.plans.values())
+								.sort(p => (p.id === spot.plan ? -1 : 1)) //current plan on top
+								.map(plan => PlanItem(plan, store))}
 						</View>
 					</ScrollView>
 				</SafeView>
