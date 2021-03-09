@@ -1,11 +1,14 @@
 import { Spot } from './spots'
-import { formatTime } from './time'
+import { formatTimeDebug } from './time'
 
 export const logSpotsList = (spots: Spot[]) =>
 	console.log(
 		['Log Spots List']
 			.concat(
-				spots.map(s => `${formatTime(s.time)} - ${formatTime(s.end)} ${s.name}`)
+				spots.map(
+					s =>
+						`${formatTimeDebug(s.time)} - ${formatTimeDebug(s.end)} ${s.name}`
+				)
 			)
 			.join(`\n`)
 	)
