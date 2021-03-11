@@ -11,6 +11,7 @@ import {
 	timeSpanInclusion,
 } from 'lib/spots/spot'
 import { Arr, head, last } from 'lib/collections'
+import { pipe } from 'rambda'
 
 export const Plan = types.model({
 	id: types.identifier,
@@ -49,17 +50,25 @@ export const Schedule = types
 		self.plans.put(SleepSpotPlan)
 		return {
 			views: {
+				//TODO decide how to slice day spots based on sleep spots around day-start/end
 				getDayTasks(time: number): Spot[] {
-					const dayStart = getDayStart(time)
-					return spots(
-						createSuggestedTasks(
-							spots().slice({
-								time: NewTime(dayStart).subtract(1, 'day').dayStart().value(),
-								end: NewTime(dayStart).add(1, 'day').dayEnd().value(),
-							})
-						)
-					).todaySpots(dayStart)
+					return pipe(
+						siblingDaysSpan,
+						spots().slice,
+						buff => buff.concat(createSuggestedTasks(buff)),
+						newSpots,
+						s => {
+							const buff = s.get()
+							const sleeps: number[] = buff.reduce(
+								(acc, spot, i) =>
+									spot.plan === SleepSpotPlan.id ? acc.concat([i]) : acc,
+								[] as number[]
+							)
+							return s.get().slice(sleeps[0], sleeps[1] + 1)
+						}
+					)(time)
 				},
+
 				getCurrentSpot(time: number): Spot {
 					return spots().current(time)
 				},
@@ -132,10 +141,7 @@ const createSuggestedTasks = (spots: Arr<Spot>): Spot[] => {
 		const sleepSpot = NewSleepSpot({ ...sleepSpan, id: uuidv4() })
 		return [
 			...createSuggestedTasks(
-				newSpots([
-					...spots.filter(spot => spot.plan !== FreeSpotPlan.id),
-					sleepSpot,
-				]).slice(wholeTimeSpan)
+				newSpots([...spots, sleepSpot]).slice(wholeTimeSpan)
 			),
 			sleepSpot,
 		]
@@ -143,3 +149,9 @@ const createSuggestedTasks = (spots: Arr<Spot>): Spot[] => {
 
 	return []
 }
+
+const siblingDaysSpan = (todayTime: number, n: number = 1): TimeSpan =>
+	pipe(NewTime, t => ({
+		time: t.subtract(n, 'day').dayStart().value(),
+		end: t.add(n, 'day').dayEnd().value(),
+	}))(todayTime)

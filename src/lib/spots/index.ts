@@ -1,5 +1,5 @@
 import { endOfDayTime, getDayStart } from 'lib/time'
-import { Spot, TimeSpan } from './spot'
+import { FreeSpotPlan, Spot, TimeSpan } from './spot'
 import {
 	findNodeDeep,
 	availableTimeSpan,
@@ -19,7 +19,8 @@ export interface Spots {
 	daySpotGaps: (spot: Spot) => [number, number]
 }
 
-export const newSpots = (tasks: Spot[]): Spots => {
+export const newSpots = (unfiltered: Spot[]): Spots => {
+	const tasks: Spot[] = unfiltered.filter(spot => spot.plan !== FreeSpotPlan.id)
 	const tree = NewRootNode(sortSpots(tasks))
 
 	//TODO do not call tereeToSpots every time?
@@ -34,8 +35,9 @@ export const newSpots = (tasks: Spot[]): Spots => {
 	}
 
 	//TODO configure tomorow overlap time for today spots
-	const getDayTree = (dayStart: number) =>
-		sliceTreeByTime(tree, createDayTimeSpan(dayStart))
+	const getDayTree = (dayStart: number) => {
+		return sliceTreeByTime(tree, createDayTimeSpan(dayStart))
+	}
 
 	//TODO return spots as Spots type
 	const todaySpots = (dayStart: number): Arr<Spot> =>

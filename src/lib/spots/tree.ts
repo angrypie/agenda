@@ -15,7 +15,6 @@ import {
 	last,
 	NewNotEmptyArray,
 } from 'lib/collections'
-import { formatTime } from 'lib/time'
 
 const rootNodeId = 'root.id.Aed1vahX'
 
