@@ -50,8 +50,9 @@ export const Schedule = types
 		self.plans.put(SleepSpotPlan)
 		return {
 			views: {
-				//TODO decide how to slice day spots based on sleep spots around day-start/end
 				getDayTasks(time: number): Spot[] {
+					const day = siblingDaysSpan(time, 0)
+					const siblingDays = siblingDaysSpan(time)
 					return pipe(
 						siblingDaysSpan,
 						spots().slice,
@@ -59,12 +60,21 @@ export const Schedule = types
 						newSpots,
 						s => {
 							const buff = s.get()
-							const sleeps: number[] = buff.reduce(
-								(acc, spot, i) =>
-									spot.plan === SleepSpotPlan.id ? acc.concat([i]) : acc,
-								[] as number[]
+							const wake = buff.find(
+								({ end, plan }) =>
+									end >= day.time && end <= day.end && plan === SleepSpotPlan.id
 							)
-							return s.get().slice(sleeps[0], sleeps[1] + 1)
+							const bedtime = buff.find(
+								({ end, plan }) =>
+									end >= day.end &&
+									end <= siblingDays.end &&
+									plan === SleepSpotPlan.id
+							)
+
+							return s.slice({
+								time: wake === undefined ? day.time : wake.end,
+								end: bedtime === undefined ? day.end : bedtime.time,
+							})
 						}
 					)(time)
 				},
