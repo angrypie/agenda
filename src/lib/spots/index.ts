@@ -1,7 +1,6 @@
-import { endOfDayTime, getDayStart } from 'lib/time'
 import { FreeSpotPlan, Spot, TimeSpan } from './spot'
 import {
-	findNodeDeep,
+	findNodeByTime,
 	availableTimeSpan,
 	NewRootNode,
 	treeToSpots,
@@ -11,7 +10,6 @@ import { head, curry, Arr } from 'lib/collections'
 export type { Spot }
 
 export interface Spots {
-	todaySpots: (now: number) => Arr<Spot>
 	slice: (span: TimeSpan) => Arr<Spot>
 	get: () => Spot[]
 	current: (now: number) => Spot
@@ -34,25 +32,15 @@ export const newSpots = (unfiltered: Spot[]): Spots => {
 		return index < spots.length - 1 ? spots[index + 1] : spots[index]
 	}
 
-	//TODO configure tomorow overlap time for today spots
-	const getDayTree = (dayStart: number) => {
-		return sliceTreeByTime(tree, createDayTimeSpan(dayStart))
-	}
-
-	//TODO return spots as Spots type
-	const todaySpots = (dayStart: number): Arr<Spot> =>
-		treeToSpots(getDayTree(dayStart))
-
-	//TODO look wider around the spot (spot may start yesterday and end tomorow)
 	const daySpotGaps = (spot: Spot): [number, number] =>
-		availableTimeSpan(findNodeDeep(getDayTree(getDayStart(spot.time)), spot.id))
+		spot.plan === FreeSpotPlan.id
+			? [spot.time, spot.end]
+			: availableTimeSpan(findNodeByTime(tree, spot))
 
 	const slice = (span: TimeSpan): Arr<Spot> =>
 		treeToSpots(sliceTreeByTime(tree, span))
 
 	return {
-		//todaySpots returns spots from now to end of the day
-		todaySpots,
 		get: () => spots,
 		next,
 		current,
@@ -72,9 +60,3 @@ export const isActiveSpot = curry(
 export const isCurrentSpot = curry(
 	(now: number, t: TimeSpan): boolean => now > t.time && now < t.end
 )
-
-//createDayTimeSpan creates TimeSpan from start to the end of the day
-const createDayTimeSpan = (dayStart: number) => ({
-	time: dayStart,
-	end: endOfDayTime(dayStart),
-})

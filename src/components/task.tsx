@@ -8,7 +8,6 @@ import { formatTime } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
 import { Button } from './touchable'
 import { Blinking } from './layout'
-import { SleepSpotPlan } from 'lib/spots/spot'
 
 interface TaskBaseProps {
 	spot: Spot

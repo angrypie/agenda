@@ -1,6 +1,6 @@
 import { types, Instance } from 'mobx-state-tree'
 import { newSpots, Spot } from 'lib/spots'
-import { getDayStart, NewTime } from 'lib/time'
+import { NewTime } from 'lib/time'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 import {
@@ -54,7 +54,6 @@ export const Schedule = types
 					const day = siblingDaysSpan(time, 0)
 					const siblingDays = siblingDaysSpan(time)
 					return pipe(
-						siblingDaysSpan,
 						spots().slice,
 						buff => buff.concat(createSuggestedTasks(buff)),
 						newSpots,
@@ -76,15 +75,20 @@ export const Schedule = types
 								end: bedtime === undefined ? day.end : bedtime.time,
 							})
 						}
-					)(time)
+					)(siblingDays)
 				},
 
 				getCurrentSpot(time: number): Spot {
 					return spots().current(time)
 				},
 
-				getTaskGaps(task: ITask): [number, number] {
-					return spots().daySpotGaps({ ...task, plan: task.plan.id })
+				getTaskGaps(spot: Spot): [number, number] {
+					return pipe(
+						siblingDaysSpan,
+						spots().slice,
+						buff => buff.concat(createSuggestedTasks(buff)),
+						newSpots
+					)(spot.time).daySpotGaps(spot)
 				},
 
 				getNextTask(time: number): Spot {

@@ -88,8 +88,7 @@ const useSpotManager = (spot: Spot) => {
 	const spotStart = spot.time
 	const spotEnd = spot.end
 
-	const [maxStart, maxEnd] =
-		task === undefined ? [spotStart, spotEnd] : schedule.getTaskGaps(task)
+	const [maxStart, maxEnd] = schedule.getTaskGaps(spot)
 
 	const remainingTime =
 		task === undefined ? remainingTimeSpan(clock.getCurrentTime(), spot) : spot

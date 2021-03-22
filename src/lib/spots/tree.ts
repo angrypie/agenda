@@ -6,6 +6,7 @@ import {
 	TimeSpan,
 	NewTimeSpan,
 	timeSpanIntersection,
+	timeSpanInclusion,
 } from './spot'
 import {
 	Arr,
@@ -63,8 +64,10 @@ const createFreeSpotGap = (child: Spot, gap: number): [] | [Spot] =>
 		  ]
 
 export const availableTimeSpan = (node: Node): [number, number] => {
+	console.log('available node', node)
 	const { parent } = node
 	if (parent === undefined) {
+		console.warn('availableTimeSpan: parent is undefined')
 		return [0, 0]
 	}
 	const nodes = parent().childs
@@ -96,13 +99,25 @@ const splitSpot = (
 
 //findNodeDeep try to find node with given id in whole tree.
 //If node is not found returns root node
-export const findNodeDeep = (root: Node, id: string): Node => {
-	if (root.spot.id === id) {
+export const findNodeById = (root: Node, id: string): Node => {
+	return findNode(root, spot => spot.id === id)
+}
+//
+//findNodeDeep try to find node with given timespan in whole tree.
+//If node is not found returns root node
+export const findNodeByTime = (root: Node, timespan: TimeSpan): Node => {
+	return findNode(root, spot => timeSpanInclusion(spot, timespan))
+}
+//
+//findNode try to find node in whole tree using test callback.
+//If node is not found returns root node
+export const findNode = (root: Node, test: (spot: Spot) => boolean): Node => {
+	if (test(root.spot)) {
 		return root
 	}
 	for (const child of root.childs) {
-		const node = findNodeDeep(child, id)
-		if (node.spot.id === id) {
+		const node = findNode(child, test)
+		if (test(node.spot)) {
 			return node
 		}
 	}
