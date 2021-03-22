@@ -12,26 +12,29 @@ import { Blinking } from './layout'
 interface TaskBaseProps {
 	spot: Spot
 	body: React.ReactNode
+	height?: number
 }
 
-export const TaskBase = observer(({ spot, body }: TaskBaseProps) => {
-	const navigation = useNavigation()
-	const { clock, schedule } = useStore()
+export const TaskBase = observer(
+	({ height = 100, spot, body }: TaskBaseProps) => {
+		const navigation = useNavigation()
+		const { clock, schedule } = useStore()
 
-	const task = schedule.tasks.get(spot.id) || spot
+		const task = schedule.tasks.get(spot.id) || spot
 
-	const isCurrent = isCurrentSpot(clock.now, task)
-	const style = { opacity: isCurrent ? 1 : 0.5 }
+		const isCurrent = isCurrentSpot(clock.now, task)
+		const style = { opacity: isCurrent ? 1 : 0.5, height }
 
-	return (
-		<Button
-			delayPressIn={300}
-			onPress={() => navigation.navigate('SpotManager', { spot })}
-		>
-			<View style={[styles.task, style]}>{body}</View>
-		</Button>
-	)
-})
+		return (
+			<Button
+				delayPressIn={300}
+				onPress={() => navigation.navigate('SpotManager', { spot })}
+			>
+				<View style={[styles.task, style]}>{body}</View>
+			</Button>
+		)
+	}
+)
 
 interface SleepTaskProps {
 	task: Spot
@@ -47,6 +50,8 @@ export const SleepTask = observer(({ task: spot, type }: SleepTaskProps) => {
 	const isCurrent = isCurrentSpot(clock.now, task)
 	const displayTime = isCurrent ? clock.now : time
 
+	const isWakeup = type === 'wakeup'
+
 	const taskBody = (
 		<View
 			style={{
@@ -57,13 +62,13 @@ export const SleepTask = observer(({ task: spot, type }: SleepTaskProps) => {
 			<Header style={{ fontSize: 18 }}>
 				{isCurrent
 					? `😴\xa0 Sleep now\xa0 ${formatTime(displayTime)}`
-					: type === 'wakeup'
+					: isWakeup
 					? `🌞\xa0 Wake up at\xa0 ${formatTime(spot.end)}`
 					: `🌚\xa0 Bedtime at\xa0 ${formatTime(spot.time)}`}
 			</Header>
 		</View>
 	)
-	return <TaskBase spot={spot} body={taskBody} />
+	return <TaskBase height={isWakeup ? 40 : 80} spot={spot} body={taskBody} />
 })
 
 export const Task = observer(({ task: spot }: TaskProps) => {

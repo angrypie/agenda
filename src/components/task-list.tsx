@@ -3,12 +3,12 @@ import { View, ScrollView } from 'react-native'
 import { Text } from 'components/text'
 import { useStore } from 'models'
 import { observer } from 'mobx-react-lite'
-import { formatDate, shiftDay, isToday } from 'lib/time'
+import { formatDate, shiftDay } from 'lib/time'
 import { useNavigation } from '@react-navigation/native'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { SafeView } from 'components/safe-area'
 import { SleepTask, Task } from 'components/task'
-import { isActiveSpot, Spot } from 'lib/spots'
+import { Spot } from 'lib/spots'
 import { Swiper } from './swiper'
 import { SleepSpotPlan } from 'lib/spots/spot'
 
@@ -33,7 +33,7 @@ export const DaysSwiper = () => {
 }
 
 export const TaskList = observer(({ day }: DayProps) => {
-	const { schedule, clock } = useStore()
+	const { schedule } = useStore()
 	//const allTasks = schedule.tasks
 	const dayTasks = schedule.getDayTasks(day)
 
@@ -75,7 +75,7 @@ const DayHeader = ({ day }: DayProps) => {
 				flexDirection: 'row',
 				justifyContent: 'space-between',
 				alignItems: 'center',
-				height: 50,
+				height: 60,
 			}}
 		>
 			<Text style={{ opacity: 0.6, fontSize: 14 }}>{dateStr}</Text>

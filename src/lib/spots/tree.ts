@@ -64,10 +64,8 @@ const createFreeSpotGap = (child: Spot, gap: number): [] | [Spot] =>
 		  ]
 
 export const availableTimeSpan = (node: Node): [number, number] => {
-	console.log('available node', node)
 	const { parent } = node
 	if (parent === undefined) {
-		console.warn('availableTimeSpan: parent is undefined')
 		return [0, 0]
 	}
 	const nodes = parent().childs
