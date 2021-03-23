@@ -76,10 +76,12 @@ export const availableTimeSpan = (node: Node): [number, number] => {
 	const left = nodes[index - 1]
 	const right = nodes[index + 1]
 
-	return [
+	const ret: [number, number] = [
 		left === undefined ? parent().spot.time : left.spot.end,
 		right === undefined ? parent().spot.end : right.spot.time,
 	]
+	console.log(ret)
+	return ret
 }
 
 const splitSpot = (

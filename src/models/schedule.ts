@@ -52,7 +52,7 @@ export const Schedule = types
 			views: {
 				getDayTasks(time: number): Spot[] {
 					const day = siblingDaysSpan(time, 0)
-					const siblingDays = siblingDaysSpan(time)
+					const siblingDays = minSufficientSiblingDays(time)
 					return pipe(
 						spots().slice,
 						buff => buff.concat(createSuggestedTasks(buff)),
@@ -84,7 +84,7 @@ export const Schedule = types
 
 				getTaskGaps(spot: Spot): [number, number] {
 					return pipe(
-						siblingDaysSpan,
+						minSufficientSiblingDays,
 						spots().slice,
 						buff => buff.concat(createSuggestedTasks(buff)),
 						newSpots
@@ -164,7 +164,10 @@ const createSuggestedTasks = (spots: Arr<Spot>): Spot[] => {
 	return []
 }
 
-const siblingDaysSpan = (todayTime: number, n: number = 1): TimeSpan =>
+const minSufficientSiblingDays = (todayTime: number): TimeSpan =>
+	siblingDaysSpan(todayTime, 2)
+
+const siblingDaysSpan = (todayTime: number, n: number): TimeSpan =>
 	pipe(NewTime, t => ({
 		time: t.subtract(n, 'day').dayStart().value(),
 		end: t.add(n, 'day').dayEnd().value(),
