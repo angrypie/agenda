@@ -1,16 +1,9 @@
 import { types, Instance } from 'mobx-state-tree'
 import { newSpots, Spot } from 'lib/spots'
 import { NewTime } from 'lib/time'
-import { newMatcher } from 'lib/labels'
+import { createSuggestedTasks, newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
-import {
-	FreeSpotPlan,
-	NewSleepSpot,
-	SleepSpotPlan,
-	TimeSpan,
-	timeSpanInclusion,
-} from 'lib/spots/spot'
-import { Arr, head, last } from 'lib/collections'
+import { FreeSpotPlan, SleepSpotPlan, TimeSpan } from 'lib/spots/spot'
 import { pipe } from 'rambda'
 
 export const Plan = types.model({
@@ -126,43 +119,6 @@ export const Schedule = types
 			},
 		}
 	})
-
-const createSuggestedTasks = (spots: Arr<Spot>): Spot[] => {
-	const wholeTimeSpan = {
-		time: head(spots).time,
-		end: last(spots).end,
-	}
-	const sleepDuration = 288e5
-	const fitsForSleep = ({ time, end }: TimeSpan) => end - time >= sleepDuration
-
-	for (const s of spots) {
-		//Add sleep task to first free spot that fits 8h time span
-		if (s.plan !== FreeSpotPlan.id || !fitsForSleep(s)) {
-			continue
-		}
-
-		//TODO suggest sleep span by smart suggsetion engine
-		const t = NewTime(s.time).dayStart().add(23, 'hours')
-		const sleepSpan = {
-			time: t.value(),
-			end: t.add(8, 'hours').value(),
-		}
-		//If sleep span not suite for selected spot
-		if (!timeSpanInclusion(sleepSpan, s)) {
-			continue
-		}
-
-		const sleepSpot = NewSleepSpot({ ...sleepSpan, id: uuidv4() })
-		return [
-			...createSuggestedTasks(
-				newSpots([...spots, sleepSpot]).slice(wholeTimeSpan)
-			),
-			sleepSpot,
-		]
-	}
-
-	return []
-}
 
 const minSufficientSiblingDays = (todayTime: number): TimeSpan =>
 	siblingDaysSpan(todayTime, 2)

@@ -45,6 +45,7 @@ persist('rootStore', rootStore, {
 	blacklist: ['clock'],
 }).then(() => console.log('root store has been hydrated'))
 
+//TODO ensule that scheduler created only once
 export const scheduler = CreateScheduler(rootStore)
 
 export function CreateScheduler(root: Instance<typeof rootStore>) {
