@@ -39,10 +39,12 @@ export function newMatcher<T extends Task>() {
 			const features = timeToFeatures(time)
 			return matchByFeatures(features)
 		},
+
+		createSuggestedTasks,
 	}
 }
 
-export const createSuggestedTasks = (spots: Arr<Spot>): Spot[] => {
+const createSuggestedTasks = (spots: Arr<Spot>): Arr<Spot> => {
 	const wholeTimeSpan = {
 		time: head(spots).time,
 		end: last(spots).end,
@@ -68,13 +70,11 @@ export const createSuggestedTasks = (spots: Arr<Spot>): Spot[] => {
 		}
 
 		const sleepSpot = NewSleepSpot({ ...sleepSpan, id: uuidv4() })
-		return [
-			...createSuggestedTasks(
-				newSpots([...spots, sleepSpot]).slice(wholeTimeSpan)
-			),
-			sleepSpot,
-		]
+		return createSuggestedTasks(
+			//newSpots needs here to create new free spots around new sleep spot
+			newSpots([...spots, sleepSpot]).slice(wholeTimeSpan)
+		)
 	}
 
-	return []
+	return spots
 }

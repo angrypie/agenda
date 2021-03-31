@@ -1,7 +1,7 @@
 import { types, Instance } from 'mobx-state-tree'
 import { newSpots, Spot } from 'lib/spots'
 import { NewTime } from 'lib/time'
-import { createSuggestedTasks, newMatcher } from 'lib/labels'
+import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 import { FreeSpotPlan, SleepSpotPlan, TimeSpan } from 'lib/spots/spot'
 import { pipe } from 'rambda'
@@ -28,18 +28,17 @@ export const Schedule = types
 		plans: types.optional(types.map(Plan), {}),
 	})
 	.extend(function (self) {
+		const fullTasksArray = () =>
+			Array.from(self.tasks.values()).map(spot => ({
+				...spot,
+				plan: spot.plan.id,
+			}))
 		//TODO [perfomance] do not create spots each time or is mobx may cache it?
 		const spots = (inject: Spot[] = []) =>
-			newSpots(
-				Array.from(self.tasks.values())
-					.map(spot => ({
-						...spot,
-						plan: spot.plan.id,
-					}))
-					.concat(inject)
-			)
+			newSpots(fullTasksArray().concat(inject))
 
-		const matcher = newMatcher<ITask>()
+		//TODO request historic data from Storage Repository
+		const matcher = newMatcher<Spot>()
 		self.plans.put(SleepSpotPlan)
 		return {
 			views: {
@@ -48,7 +47,7 @@ export const Schedule = types
 					const siblingDays = minSufficientSiblingDays(time)
 					return pipe(
 						spots().slice,
-						buff => buff.concat(createSuggestedTasks(buff)),
+						matcher.createSuggestedTasks,
 						newSpots,
 						s => {
 							const buff = s.get()
@@ -79,7 +78,7 @@ export const Schedule = types
 					return pipe(
 						minSufficientSiblingDays,
 						spots().slice,
-						buff => buff.concat(createSuggestedTasks(buff)),
+						matcher.createSuggestedTasks,
 						newSpots
 					)(spot.time).daySpotGaps(spot)
 				},
@@ -93,7 +92,7 @@ export const Schedule = types
 				},
 			},
 			actions: {
-				suggestByTime(time: number): ITask[] {
+				suggestByTime(time: number): Spot[] {
 					return matcher.match(time)
 				},
 
