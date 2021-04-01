@@ -5,6 +5,7 @@ import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 import { FreeSpotPlan, SleepSpotPlan, TimeSpan } from 'lib/spots/spot'
 import { pipe } from 'rambda'
+import { newSpotsRepository } from 'lib/repository'
 
 export const Plan = types.model({
 	id: types.identifier,
@@ -37,8 +38,9 @@ export const Schedule = types
 		const spots = (inject: Spot[] = []) =>
 			newSpots(fullTasksArray().concat(inject))
 
+		const spotsRepository = newSpotsRepository(fullTasksArray)
 		//TODO request historic data from Storage Repository
-		const matcher = newMatcher<Spot>()
+		const matcher = newMatcher<Spot>(spotsRepository)
 		self.plans.put(SleepSpotPlan)
 		return {
 			views: {

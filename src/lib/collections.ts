@@ -39,4 +39,5 @@ export const flatMap = <R extends any>(
 	return r
 }
 
-export const concat = <T extends any[]>(a: T, b: T | []): T => a.concat(b) as T
+export const concat = <T extends R[], R extends any>(a: T, b: T | R[]): T =>
+	a.concat(b) as T
