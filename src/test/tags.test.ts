@@ -1,6 +1,6 @@
-import { Month, Weekday } from 'lib/labels/tags'
+import { Month, Weekday } from 'lib/matcher/tags'
 import { Enum7, Enum12 } from 'lib/types/enumerate'
-import { newMatcher } from 'lib/labels'
+import { newMatcher } from 'lib/matcher'
 import { stubTasks } from 'models/root'
 
 test('create new month tags', () => {

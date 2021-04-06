@@ -48,7 +48,7 @@ interface timeSpan<T extends TimeSpan> {
 	setEnd(time: number): timeSpan<T>
 	time(): number
 	duration(): number
-	timeEnd(): number
+	end(): number
 	get(): T
 	modify(cb: (initial: timeSpan<T>) => timeSpan<T>): timeSpan<T>
 }
@@ -66,7 +66,7 @@ export const NewTimeSpan = <T extends TimeSpan>(span: T): timeSpan<T> => ({
 	setEnd: (end: number) => NewTimeSpan({ ...span, end }),
 
 	//Getters
-	timeEnd: () => span.end,
+	end: () => span.end,
 	time: () => span.time,
 	duration: () => span.end - span.time,
 	//Return original object

@@ -146,7 +146,7 @@ export const sliceTreeByTime = (root: Node, timespan: TimeSpan): Node => {
 
 			return ts
 				.setTime(firstIfTrue(childsStart, ts.time(), (a, b) => a < b))
-				.setEnd(firstIfTrue(childsEnd, ts.timeEnd(), (a, b) => a > b))
+				.setEnd(firstIfTrue(childsEnd, ts.end(), (a, b) => a > b))
 		}
 		return ts
 	})

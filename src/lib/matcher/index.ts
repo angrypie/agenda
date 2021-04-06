@@ -102,7 +102,7 @@ const suggestTaskTimeSpan = (
 		return []
 	}
 
-	const getHours = (a: Spot) => NewTime(a.time).get('hours').value()
+	const getHours = (a: Spot) => NewTime(a.time).get('hours')
 
 	const groups = groupWith((a: Spot, b) => getHours(a) === getHours(b), history)
 	const pairs = map(group => [group.length, group] as [number, Spot[]], groups)
@@ -135,7 +135,7 @@ const suggestTaskTimeSpan = (
 	return [suggestion]
 }
 
-const getDefaultSleepSpot = (time: number): Spot =>
+export const getDefaultSleepSpot = (time: number): Spot =>
 	pipe(
 		NewTime,
 		t => t.dayStart().add(23, 'hours'),

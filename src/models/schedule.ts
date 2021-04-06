@@ -1,6 +1,6 @@
 import { types, Instance } from 'mobx-state-tree'
 import { newSpots, siblingDaysSpan, Spot } from 'lib/spots'
-import { newMatcher } from 'lib/labels'
+import { newMatcher } from 'lib/matcher'
 import { v4 as uuidv4 } from 'uuid'
 import { FreeSpotPlan, SleepSpotPlan, TimeSpan } from 'lib/spots/spot'
 import { pipe } from 'rambda'
