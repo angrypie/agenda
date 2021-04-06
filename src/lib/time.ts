@@ -60,6 +60,7 @@ export const NewTime = (time: number) => {
 	return {
 		add: nt(t.add.bind(t)),
 		subtract: nt(t.subtract.bind(t)),
+		get: nt(t.get.bind(t)),
 		dayEnd: nt(() => t.endOf('day')),
 		dayStart: nt(() => t.startOf('day')),
 		value: t.valueOf.bind(t),

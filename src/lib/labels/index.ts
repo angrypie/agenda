@@ -1,17 +1,19 @@
 import { Features, timeToFeatures } from './tags'
-import { Arr, concat, head, last } from 'lib/collections'
+import { Arr, head, last } from 'lib/collections'
 import {
 	FreeSpotPlan,
 	NewSleepSpot,
+	NewTimeSpanDuration,
 	SleepSpotPlan,
 	Spot,
 	TimeSpan,
 	timeSpanInclusion,
 } from 'lib/spots/spot'
-import { NewTime } from 'lib/time'
 import { newSpots } from 'lib/spots'
 import { v4 as uuidv4 } from 'uuid'
 import { SpotsRepository } from 'lib/repository'
+import { groupWith, map, pipe, sort } from 'rambda'
+import { getDayStart, NewTime } from 'lib/time'
 
 export interface Task {
 	id: string
@@ -36,19 +38,18 @@ export function newMatcher<T extends Task>(storage: SpotsRepository) {
 		return [...log.values()].slice(Math.max(log.size - 3, 1))
 	}
 
-	//TODO suggest task based on history from storage
 	const suggestTask = (timespan: TimeSpan): SpotSuggestion[] => {
-		const t = NewTime(timespan.time).dayStart().add(23, 'hours')
-		const sleepSpan = {
-			time: t.value(),
-			end: t.add(8, 'hours').value(),
+		const sleepHistory = storage.getByPlan(SleepSpotPlan.id)
+		if (sleepHistory.length === 0) {
+			//TODO do not hardcode default sleep and other defaults
+			sleepHistory.push(getDefaultSleepSpot(timespan.time))
 		}
-		//If sleep span not suite for selected spot
-		if (!timeSpanInclusion(sleepSpan, timespan)) {
+		const suggestions = suggestTaskTimeSpan(timespan, sleepHistory)
+		if (suggestions.length === 0) {
 			return []
 		}
 
-		const spot = NewSleepSpot({ ...sleepSpan, id: uuidv4() })
+		const spot = suggestions[0].spot
 		return [{ spot, prob: 1 }]
 	}
 
@@ -69,10 +70,11 @@ export function newMatcher<T extends Task>(storage: SpotsRepository) {
 				({ spot }) => spot.plan === SleepSpotPlan.id && injected.push(spot)
 			)
 		})
+
 		return injected.length === 0
 			? spots
 			: injectSuggestedTasks(
-					newSpots(concat(spots, injected)).slice(wholeTimeSpan)
+					newSpots(spots.concat(injected)).slice(wholeTimeSpan)
 			  )
 	}
 
@@ -91,3 +93,56 @@ export function newMatcher<T extends Task>(storage: SpotsRepository) {
 		createSuggestedTasks: injectSuggestedTasks,
 	}
 }
+
+const suggestTaskTimeSpan = (
+	timespan: TimeSpan,
+	history: Spot[]
+): SpotSuggestion[] => {
+	if (history.length === 0) {
+		return []
+	}
+
+	const getHours = (a: Spot) => NewTime(a.time).get('hours').value()
+
+	const groups = groupWith((a: Spot, b) => getHours(a) === getHours(b), history)
+	const pairs = map(group => [group.length, group] as [number, Spot[]], groups)
+	const sorted = sort((a, b) => b[0] - a[0], pairs)
+
+	const spot = sorted[0][1][0]
+
+	const fromDayStart = spot.time - getDayStart(spot.time)
+	const spotDuration = spot.end - spot.time
+	const dayStart = getDayStart(timespan.time)
+
+	const newSpotTime = NewTimeSpanDuration(dayStart + fromDayStart, spotDuration)
+
+	const newSpot = {
+		...spot,
+		...newSpotTime.get(),
+		id: uuidv4(),
+	}
+
+	//TODO pick another time
+	if (!timeSpanInclusion(newSpot, timespan)) {
+		return []
+	}
+
+	const suggestion = {
+		spot: newSpot,
+		prob: 1,
+	}
+
+	return [suggestion]
+}
+
+const getDefaultSleepSpot = (time: number): Spot =>
+	pipe(
+		NewTime,
+		t => t.dayStart().add(23, 'hours'),
+		t =>
+			NewSleepSpot({
+				id: uuidv4(),
+				time: t.value(),
+				end: t.add(8, 'hours').value(),
+			})
+	)(time)

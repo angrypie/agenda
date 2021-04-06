@@ -1,6 +1,5 @@
 import { types, Instance } from 'mobx-state-tree'
-import { newSpots, Spot } from 'lib/spots'
-import { NewTime } from 'lib/time'
+import { newSpots, siblingDaysSpan, Spot } from 'lib/spots'
 import { newMatcher } from 'lib/labels'
 import { v4 as uuidv4 } from 'uuid'
 import { FreeSpotPlan, SleepSpotPlan, TimeSpan } from 'lib/spots/spot'
@@ -123,9 +122,3 @@ export const Schedule = types
 
 const minSufficientSiblingDays = (todayTime: number): TimeSpan =>
 	siblingDaysSpan(todayTime, 2)
-
-const siblingDaysSpan = (todayTime: number, n: number): TimeSpan =>
-	pipe(NewTime, t => ({
-		time: t.subtract(n, 'day').dayStart().value(),
-		end: t.add(n, 'day').dayEnd().value(),
-	}))(todayTime)

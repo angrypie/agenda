@@ -7,6 +7,8 @@ import {
 	sliceTreeByTime,
 } from './tree'
 import { head, curry, Arr } from 'lib/collections'
+import { NewTime } from 'lib/time'
+import { pipe } from 'rambda'
 export type { Spot }
 
 export interface Spots {
@@ -60,3 +62,9 @@ export const isActiveSpot = curry(
 export const isCurrentSpot = curry(
 	(now: number, t: TimeSpan): boolean => now > t.time && now < t.end
 )
+
+export const siblingDaysSpan = (todayTime: number, n: number): TimeSpan =>
+	pipe(NewTime, t => ({
+		time: t.subtract(n, 'day').dayStart().value(),
+		end: t.add(n, 'day').dayEnd().value(),
+	}))(todayTime)
