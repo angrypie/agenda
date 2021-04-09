@@ -13,7 +13,7 @@ import { newSpots } from 'lib/spots'
 import { v4 as uuidv4 } from 'uuid'
 import { SpotsRepository } from 'lib/repository'
 import { groupWith, map, pipe, sort } from 'rambda'
-import { getDayStart, NewTime } from 'lib/time'
+import { formatTimeDebug, getDayStart, NewTime } from 'lib/time'
 
 export interface Task {
 	id: string
@@ -112,19 +112,28 @@ const suggestTaskTimeSpan = (
 
 	const fromDayStart = spot.time - getDayStart(spot.time)
 	const spotDuration = spot.end - spot.time
-	const dayStart = getDayStart(timespan.time)
 
-	const newSpotTime = NewTimeSpanDuration(dayStart + fromDayStart, spotDuration)
+	const isTimeWrong = (suggested: TimeSpan) =>
+		!timeSpanInclusion(suggested, timespan)
+
+	const tryNewTime = (dayTime: number): TimeSpan =>
+		NewTimeSpanDuration(getDayStart(dayTime) + fromDayStart, spotDuration).get()
+
+	//TODO choose more eficient way to pick next suitable time
+	let newTime = tryNewTime(timespan.time)
+
+	if (isTimeWrong(newTime)) {
+		const nextDay = tryNewTime(NewTime(timespan.time).add(1, 'day').value())
+		if (isTimeWrong(nextDay)) {
+			return []
+		}
+		newTime = nextDay
+	}
 
 	const newSpot = {
 		...spot,
-		...newSpotTime.get(),
+		...newTime,
 		id: uuidv4(),
-	}
-
-	//TODO pick another time
-	if (!timeSpanInclusion(newSpot, timespan)) {
-		return []
 	}
 
 	const suggestion = {

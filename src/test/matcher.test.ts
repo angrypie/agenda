@@ -13,22 +13,6 @@ import { getUnixTimeMs, NewTime } from 'lib/time'
 import { pipe } from 'rambda'
 import { v4 as uuidv4 } from 'uuid'
 
-const getHours = (a: number) => NewTime(a).get('hours')
-const msToHours = (msDuration: number) =>
-	Math.floor(msDuration / 1000 / 60 / 60)
-
-const createSleepSpot = (start: number, duration: number) =>
-	pipe(
-		NewTime,
-		t => t.dayStart().add(start, 'hours'),
-		t =>
-			NewSleepSpot({
-				id: uuidv4(),
-				time: t.value(),
-				end: t.add(duration, 'hours').value(),
-			})
-	)(getUnixTimeMs()) //TODO use different days instead of current time
-
 //sleepSuggestionCases matches sleep history to expected spot suggestion
 //First item of test case contains history of sleeps,
 //and second one expected sleep suggestion defined as [start, duration] tuple.
@@ -38,7 +22,7 @@ const sleepSuggestionCases = [
 	//With one history sleep spot, same as default
 	[[[23, 8]], [23, 8]],
 	//With one history sleep spot, different from default
-	[[[22, 6]], [22, 6]],
+	[[[1, 9]], [1, 9]],
 	//With one history sleep spot, different from default
 	[
 		[
@@ -62,8 +46,6 @@ test.each(sleepSuggestionCases)(
 		const matcher = newMatcher(spotsRepo)
 
 		const siblingDays = 2
-		//TODO check total sleep sugestions
-		const totalDays = siblingDays * 2 + 1
 		const freeSpots: Arr<Spot> = [
 			NewFreeSpot({
 				id: uuidv4(),
@@ -74,7 +56,8 @@ test.each(sleepSuggestionCases)(
 		const suggestions = matcher.createSuggestedTasks(freeSpots)
 		const onlySleepSpots = suggestions.filter(s => s.plan === SleepSpotPlan.id)
 
-		//expect(onlySleepSpots.length).toBe(totalDays)
+		const minSleeps = siblingDays * 2
+		expect(onlySleepSpots.length).toBeGreaterThanOrEqual(minSleeps)
 
 		onlySleepSpots.forEach(spot => {
 			const actualTime = [
@@ -85,3 +68,19 @@ test.each(sleepSuggestionCases)(
 		})
 	}
 )
+
+const getHours = (a: number) => NewTime(a).get('hours')
+const msToHours = (msDuration: number) =>
+	Math.floor(msDuration / 1000 / 60 / 60)
+
+const createSleepSpot = (start: number, duration: number) =>
+	pipe(
+		NewTime,
+		t => t.dayStart().add(start, 'hours'),
+		t =>
+			NewSleepSpot({
+				id: uuidv4(),
+				time: t.value(),
+				end: t.add(duration, 'hours').value(),
+			})
+	)(getUnixTimeMs()) //TODO use different days instead of current time
