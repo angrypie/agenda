@@ -57,10 +57,10 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 								onValuesChange={onSliderChange}
 								min={store.timespan.start}
 								max={store.timespan.end}
-								step={300000} //5 minutes step
 								allowOverlap={false}
 								snapped
-								minMarkerOverlapDistance={40}
+								step={300000} //5 minutes step
+								minMarkerOverlapStepDistance={2} // 2 times $step = 10 minutes min interval
 							/>
 						</View>
 					</View>
