@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ScrollView, View, StyleSheet } from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
@@ -11,7 +11,7 @@ import { ModalHeader } from './layout'
 import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { Button } from './touchable'
 import { Styles } from 'lib/style'
-import MultiSlider from '@ptomasroos/react-native-multi-slider'
+import { TimeRange } from './time-range'
 
 export interface SpotManagerProps {
 	spot: Spot
@@ -22,8 +22,6 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 	const store = useSpotManager(spot)
 
 	const doneButton = () => schedule.updateTask(store.spot, store.current)
-
-	const [layoutWidth, setLayoutWidth] = useState(300)
 
 	const onSliderChange = ([start, end]: number[]) => {
 		store.setSpotStart(start)
@@ -43,26 +41,15 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 						}}
 					/>
 
-					<View
-						onLayout={event => setLayoutWidth(event.nativeEvent.layout.width)}
-						style={{ opacity: 0.6 }}
-					>
+					<View style={{ opacity: 0.6 }}>
 						<TaskHeader name={store.current.name} time={store.time} />
 						<SpotsSeparator />
 						<TaskHeader name='' time={store.spotEnd} />
-						<View style={{ marginLeft: 10 }}>
-							<MultiSlider
-								values={[store.time, store.spotEnd]}
-								sliderLength={layoutWidth - 20}
-								onValuesChange={onSliderChange}
-								min={store.timespan.start}
-								max={store.timespan.end}
-								allowOverlap={false}
-								snapped
-								step={300000} //5 minutes step
-								minMarkerOverlapStepDistance={2} // 2 times $step = 10 minutes min interval
-							/>
-						</View>
+						<TimeRange
+							values={[store.time, store.spotEnd]}
+							onValuesChange={onSliderChange}
+							range={store.timespan}
+						/>
 					</View>
 					<Description />
 
@@ -101,7 +88,7 @@ const useSpotManager = (spot: Spot) => {
 		return {
 			selected: new Map<string, IPlan>(selected),
 			//Initil spot time span
-			timespan: { start: maxStart, end: maxEnd },
+			timespan: { time: maxStart, end: maxEnd },
 			time: remainingTime.time,
 			end: remainingTime.end,
 			select(plan: IPlan) {
