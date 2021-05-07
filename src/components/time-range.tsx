@@ -16,7 +16,6 @@ export const TimeRange = ({
 	onValuesChange,
 }: TimeRangeProps) => {
 	const [layoutWidth, setLayoutWidth] = useState(300)
-
 	return (
 		<View
 			onLayout={event => setLayoutWidth(event.nativeEvent.layout.width)}

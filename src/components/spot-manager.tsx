@@ -12,6 +12,7 @@ import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { Button } from './touchable'
 import { Styles } from 'lib/style'
 import { TimeRange } from './time-range'
+import { max, min } from 'rambda'
 
 export interface SpotManagerProps {
 	spot: Spot
@@ -25,9 +26,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 
 	const onSliderChange = ([start, end]: number[]) => {
 		store.setSpotStart(start)
-		const maxEnd = store.timespan.end
-		//TODO setup slider to not allow such things
-		store.setSpotEnd(end > store.timespan.end ? maxEnd : end)
+		store.setSpotEnd(end)
 	}
 	return (
 		<Observer>
@@ -106,11 +105,11 @@ const useSpotManager = (spot: Spot) => {
 			},
 
 			setSpotStart(startTime: number) {
-				store.time = startTime
+				store.time = max(startTime, store.timespan.time)
 			},
 
 			setSpotEnd(endTime: number) {
-				store.end = endTime
+				store.end = min(endTime, store.timespan.end)
 			},
 
 			isSelected(id: string): boolean {
