@@ -11,7 +11,7 @@ import { ModalHeader } from './layout'
 import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { Button } from './touchable'
 import { Styles } from 'lib/style'
-import { TimeRange } from './time-range'
+import { TimeRangeSlider } from './time-range'
 import { max, min } from 'rambda'
 
 export interface SpotManagerProps {
@@ -29,39 +29,45 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		store.setSpotEnd(end)
 	}
 	return (
-		<Observer>
-			{() => (
-				<SafeView>
-					<ModalHeader
-						done={{
-							disabled: !store.isChanged,
-							onPress: doneButton,
-							name: 'Save',
-						}}
-					/>
-
-					<View style={{ opacity: 0.6 }}>
-						<TaskHeader name={store.current.name} time={store.time} />
-						<SpotsSeparator />
-						<TaskHeader name='' time={store.spotEnd} />
-						<TimeRange
-							values={[store.time, store.spotEnd]}
-							onValuesChange={onSliderChange}
-							range={store.timespan}
-						/>
-					</View>
-					<Description />
-
-					<ScrollView showsVerticalScrollIndicator={false}>
+		<SafeView>
+			<View>
+				<Observer>
+					{() => (
 						<View>
-							{Array.from(schedule.plans.values())
-								.sort(p => (p.id === spot.plan ? -1 : 1)) //current plan on top
-								.map(plan => PlanItem(plan, store))}
+							<ModalHeader
+								done={{
+									disabled: !store.isChanged,
+									onPress: doneButton,
+									name: 'Save',
+								}}
+							/>
+							<TaskHeader name={store.current.name} time={store.time} />
+							<SpotsSeparator />
+							<TaskHeader name='' time={store.spotEnd} />
 						</View>
-					</ScrollView>
-				</SafeView>
-			)}
-		</Observer>
+					)}
+				</Observer>
+				<TimeRangeSlider
+					start={store.time}
+					end={store.spotEnd}
+					min={store.timespan.time}
+					max={store.timespan.end}
+					onValuesChange={onSliderChange}
+				/>
+				<Description />
+				<Observer>
+					{() => (
+						<ScrollView showsVerticalScrollIndicator={false}>
+							<View>
+								{Array.from(schedule.plans.values())
+									.sort(p => (p.id === spot.plan ? -1 : 1)) //current plan on top
+									.map(plan => PlanItem(plan, store))}
+							</View>
+						</ScrollView>
+					)}
+				</Observer>
+			</View>
+		</SafeView>
 	)
 }
 
