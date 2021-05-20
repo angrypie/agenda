@@ -5,17 +5,25 @@ import { Text, Header } from 'components/text'
 import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore, IPlan } from 'models'
 import { FreeSpotPlan, NewTimeSpan, TimeSpan } from 'lib/spots/spot'
-import { TaskHeader } from './task'
 import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
 import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { Button } from './touchable'
 import { Styles } from 'lib/style'
-import { TimeRangeSlider } from './time-range'
-import { max, min } from 'rambda'
+import { RangeSlider, useRangeSlider } from './time-range'
 
 export interface SpotManagerProps {
 	spot: Spot
+}
+
+export function formatTimeWorklet(ms: number): string {
+	'worklet'
+	//TODO is Intl on UI thread?
+	const d = new Date(ms)
+	const hrs = d.getHours()
+	const min = d.getMinutes()
+
+	return hrs + ':' + min
 }
 
 export const SpotManager = ({ spot }: SpotManagerProps) => {
@@ -28,6 +36,14 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		store.setSpotStart(start)
 		store.setSpotEnd(end)
 	}
+	const slider = useRangeSlider({
+		start: store.time,
+		end: store.spotEnd,
+		min: store.timespan.time,
+		max: store.timespan.end,
+		onValuesChange: onSliderChange,
+		formatValue: formatTimeWorklet,
+	})
 	return (
 		<SafeView>
 			<View>
@@ -41,19 +57,15 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 									name: 'Save',
 								}}
 							/>
-							<TaskHeader name={store.current.name} time={store.time} />
-							<SpotsSeparator />
-							<TaskHeader name='' time={store.spotEnd} />
+							<Header>{store.current.name}</Header>
 						</View>
 					)}
 				</Observer>
-				<TimeRangeSlider
-					start={store.time}
-					end={store.spotEnd}
-					min={store.timespan.time}
-					max={store.timespan.end}
-					onValuesChange={onSliderChange}
-				/>
+				<View style={styles.timeRange}>
+					<Header animated={slider.startText} />
+					<Header animated={slider.endText} />
+				</View>
+				<RangeSlider {...slider} />
 				<Description />
 				<Observer>
 					{() => (
@@ -111,11 +123,11 @@ const useSpotManager = (spot: Spot) => {
 			},
 
 			setSpotStart(startTime: number) {
-				store.time = max(startTime, store.timespan.time)
+				store.time = Math.max(startTime, store.timespan.time)
 			},
 
 			setSpotEnd(endTime: number) {
-				store.end = min(endTime, store.timespan.end)
+				store.end = Math.min(endTime, store.timespan.end)
 			},
 
 			isSelected(id: string): boolean {
@@ -188,5 +200,10 @@ const styles = StyleSheet.create({
 		height: 30,
 		marginTop: 25,
 		marginBottom: 10,
+	},
+	timeRange: {
+		marginVertical: 20,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 	},
 })

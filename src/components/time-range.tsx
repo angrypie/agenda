@@ -13,7 +13,6 @@ import {
 	PanGestureHandler,
 	PanGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler'
-import { Text } from './text'
 
 type MarkerGHContext = {
 	startX: number
@@ -64,12 +63,9 @@ interface SliderProps {
 	end: number
 	min: number
 	max: number
-	onValuesChange: (values: number[]) => void | undefined
+	onValuesChange: (values: number[]) => void
+	formatValue: (value: number) => string
 }
-
-export const TimeRangeSlider = (props: SliderProps) => (
-	<RangeSlider {...props} />
-)
 
 const useAnimatedRail = (range: Range) => {
 	const [start, end] = range
@@ -103,15 +99,33 @@ const useAnimatedRail = (range: Range) => {
 	return [wrapRail] as const
 }
 
-export function formatTimeWorklet(ms: number): string {
-	'worklet'
-	return new Date(ms).toLocaleString('en-US', {
-		hour: 'numeric', // numeric, 2-digit
-		minute: 'numeric', // numeric, 2-digit
-	})
+export const DefaultRangeSlider = (props: SliderProps) => {
+	const slider = useRangeSlider(props)
+	return <RangeSlider {...slider} />
 }
 
-export const RangeSlider = (props: SliderProps) => {
+export const RangeSlider = (props: SliderSharedValues) => {
+	const { wrapRail, wrapStart, wrapEnd } = props
+	return (
+		<View>
+			<View
+				style={{
+					height: 30,
+					justifyContent: 'center',
+				}}
+			>
+				{wrapRail()}
+				{wrapStart(<Marker color='orange' />)}
+				{wrapEnd(<Marker color='green' />)}
+			</View>
+		</View>
+	)
+}
+
+export type SliderSharedValues = ReturnType<typeof useRangeSlider>
+
+export const useRangeSlider = (props: SliderProps) => {
+	const { formatValue } = props
 	const layoutWidth = 300
 	const ratio = (props.max - props.min) / layoutWidth
 
@@ -125,14 +139,6 @@ export const RangeSlider = (props: SliderProps) => {
 	const [wrapStart] = useMarker(start, [min, end])
 	const [wrapEnd] = useMarker(end, [start, max])
 
-	//(start.value * ratio + props.min).toString()
-	const startText = useDerivedValue(() => {
-		return formatTimeWorklet(start.value * ratio + props.min)
-	})
-	const endText = useDerivedValue(() => {
-		return formatTimeWorklet(end.value * ratio + props.min)
-	})
-
 	useAnimatedReaction(
 		() => [start.value * ratio + props.min, end.value * ratio + props.min],
 		value => runOnJS(props.onValuesChange)(value),
@@ -141,24 +147,14 @@ export const RangeSlider = (props: SliderProps) => {
 
 	const [wrapRail] = useAnimatedRail([start, end])
 
-	return (
-		<View>
-			<View>
-				<Text animated={startText} />
-				<Text animated={endText} />
-			</View>
-			<View
-				style={{
-					height: 30,
-					justifyContent: 'center',
-				}}
-			>
-				{wrapRail()}
-				{wrapStart(<Marker color='orange' />)}
-				{wrapEnd(<Marker color='green' />)}
-			</View>
-		</View>
+	const startText = useDerivedValue(() =>
+		formatValue(start.value * ratio + props.min)
 	)
+	const endText = useDerivedValue(() =>
+		formatValue(end.value * ratio + props.min)
+	)
+
+	return { start, end, wrapRail, wrapStart, wrapEnd, startText, endText }
 }
 
 export const Marker = ({ color }: { color: string }) => {
