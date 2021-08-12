@@ -1,5 +1,5 @@
 import React from 'react'
-import { ScrollView, View, StyleSheet } from 'react-native'
+import { ScrollView, View, StyleSheet, useWindowDimensions } from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
 import { isCurrentSpot, Spot } from 'lib/spots'
@@ -10,6 +10,7 @@ import { ModalHeader } from './layout'
 import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { Button } from './touchable'
 import { Styles } from 'lib/style'
+import { SafeAreaPadding } from 'components/safe-area'
 import { RangeSlider, useRangeSlider } from './time-range'
 
 export interface SpotManagerProps {
@@ -22,8 +23,9 @@ export function formatTimeWorklet(ms: number): string {
 	const addTralingZero = (num: number) => (num < 10 ? '0' + num : num)
 
 	//TODO is Intl on UI thread?
-	const minutes = Math.floor((ms / (1000 * 60)) % 60)
-	const hours = Math.floor((ms / (1000 * 60 * 60)) % 24)
+	const t = new Date(ms)
+	const hours = t.getHours()
+	const minutes = t.getMinutes()
 
 	return addTralingZero(hours) + ':' + addTralingZero(minutes)
 }
@@ -38,6 +40,9 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		store.setSpotStart(start)
 		store.setSpotEnd(end)
 	}
+
+	const layoutWidth = useWindowDimensions().width - SafeAreaPadding * 2
+
 	const slider = useRangeSlider({
 		start: store.time,
 		end: store.spotEnd,
@@ -45,6 +50,8 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		max: store.timespan.end,
 		onValuesChange: onSliderChange,
 		formatValue: formatTimeWorklet,
+		width: layoutWidth,
+		markerWidth: 30,
 	})
 	return (
 		<SafeView>

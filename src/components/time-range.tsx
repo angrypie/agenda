@@ -65,6 +65,8 @@ interface SliderProps {
 	max: number
 	onValuesChange: (values: number[]) => void
 	formatValue: (value: number) => string
+	width: number
+	markerWidth: number
 }
 
 const useAnimatedRail = (range: Range) => {
@@ -125,19 +127,24 @@ export const RangeSlider = (props: SliderSharedValues) => {
 export type SliderSharedValues = ReturnType<typeof useRangeSlider>
 
 export const useRangeSlider = (props: SliderProps) => {
-	const { formatValue } = props
-	const layoutWidth = 300
+	const { formatValue, markerWidth } = props
+	const layoutWidth = props.width - markerWidth * 2
 	const ratio = (props.max - props.min) / layoutWidth
+
+	// const newRatio = (props.max - props.min) / (props.width - markerWidth * 2)
 
 	const toPosition = (n: number) => (n - props.min) / ratio
 
-	const start = useSharedValue(toPosition(props.start))
-	const end = useSharedValue(toPosition(props.end))
 	const min = useSharedValue(toPosition(props.min))
-	const max = useSharedValue(toPosition(props.max))
+	const max = useSharedValue(toPosition(props.max) + markerWidth)
+	const start = useSharedValue(toPosition(props.start))
+	const endPos = useSharedValue(toPosition(props.end) + markerWidth)
+
+	const startEdge = useDerivedValue(() => start.value + markerWidth)
+	const end = useDerivedValue(() => endPos.value - markerWidth)
 
 	const [wrapStart] = useMarker(start, [min, end])
-	const [wrapEnd] = useMarker(end, [start, max])
+	const [wrapEnd] = useMarker(endPos, [startEdge, max])
 
 	useAnimatedReaction(
 		() => [start.value * ratio + props.min, end.value * ratio + props.min],
@@ -145,7 +152,7 @@ export const useRangeSlider = (props: SliderProps) => {
 		[props.onValuesChange]
 	)
 
-	const [wrapRail] = useAnimatedRail([start, end])
+	const [wrapRail] = useAnimatedRail([start, endPos])
 
 	const startText = useDerivedValue(() =>
 		formatValue(start.value * ratio + props.min)
