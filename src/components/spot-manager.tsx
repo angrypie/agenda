@@ -18,12 +18,14 @@ export interface SpotManagerProps {
 
 export function formatTimeWorklet(ms: number): string {
 	'worklet'
-	//TODO is Intl on UI thread?
-	const d = new Date(ms)
-	const hrs = d.getHours()
-	const min = d.getMinutes()
 
-	return hrs + ':' + min
+	const addTralingZero = (num: number) => (num < 10 ? '0' + num : num)
+
+	//TODO is Intl on UI thread?
+	const minutes = Math.floor((ms / (1000 * 60)) % 60)
+	const hours = Math.floor((ms / (1000 * 60 * 60)) % 24)
+
+	return addTralingZero(hours) + ':' + addTralingZero(minutes)
 }
 
 export const SpotManager = ({ spot }: SpotManagerProps) => {
