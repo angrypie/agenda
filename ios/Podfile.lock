@@ -451,7 +451,7 @@ SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 7b423f9e248eae65987838148c36eec1dbfe0b53
-  FBReactNativeSpec: 4ac3a7145082c368dc324b629a94cc04df2c20dc
+  FBReactNativeSpec: 5bfa7ab2a04eb782f2198dac68ebdd9db359830d
   glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   hermes-engine: 7d97ba46a1e29bacf3e3c61ecb2804a5ddd02d4f
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
@@ -489,4 +489,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: d024594a2134770a8ee3864ac6d9686b2671cffa
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.10.2
