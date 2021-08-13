@@ -102,6 +102,10 @@ export const Schedule = types
 					self.plans.put({ name, id })
 				},
 
+				removePlan(id: string) {
+					self.plans.delete(id)
+				},
+
 				updateTask(spot: Spot, plan: IPlan): boolean {
 					const task = self.tasks.get(spot.id)
 					const { id, name } = plan

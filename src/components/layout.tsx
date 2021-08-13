@@ -15,9 +15,12 @@ interface ModalHeaderProps {
 		onPress: () => boolean
 		name?: string
 	}
+	cancel?: {
+		name?: string
+	}
 }
 
-export const ModalHeader = ({ done }: ModalHeaderProps) => {
+export const ModalHeader = ({ done, cancel }: ModalHeaderProps) => {
 	const navigation = useNavigation()
 	const goBack = () => navigation.goBack()
 
@@ -30,7 +33,7 @@ export const ModalHeader = ({ done }: ModalHeaderProps) => {
 				height: 50,
 			}}
 		>
-			<TextButton onPress={goBack}>Cancel</TextButton>
+			<TextButton onPress={goBack}>{cancel?.name || 'Cancel'}</TextButton>
 			{done === undefined ? null : (
 				<TextButton
 					disabled={done.disabled}

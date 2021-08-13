@@ -92,13 +92,11 @@ export const AddTask = () => {
 		<TouchableOpacity onPress={onPress}>
 			<Text
 				style={{
-					marginTop: -7,
-					fontSize: 33,
-					fontWeight: '200',
+					fontSize: 16,
 					paddingLeft: 10,
 				}}
 			>
-				+
+				Tasks
 			</Text>
 		</TouchableOpacity>
 	)

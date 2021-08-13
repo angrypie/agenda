@@ -1,17 +1,22 @@
 import React from 'react'
-import { ScrollView, View, StyleSheet, useWindowDimensions } from 'react-native'
+import {
+	ScrollView,
+	View,
+	StyleSheet,
+	useWindowDimensions,
+} from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
 import { isCurrentSpot, Spot } from 'lib/spots'
 import { useStore, IPlan } from 'models'
 import { FreeSpotPlan, NewTimeSpan, TimeSpan } from 'lib/spots/spot'
-import { AddTask } from './task-list'
 import { ModalHeader } from './layout'
 import { useLocalObservable, Observer } from 'mobx-react-lite'
 import { Button } from './touchable'
 import { Styles } from 'lib/style'
 import { SafeAreaPadding } from 'components/safe-area'
 import { RangeSlider, useRangeSlider } from './time-range'
+import {AddTask} from './task-list'
 
 export interface SpotManagerProps {
 	spot: Spot
@@ -172,8 +177,6 @@ const useSpotManager = (spot: Spot) => {
 
 const remainingTimeSpan = (now: number, span: TimeSpan): TimeSpan =>
 	isCurrentSpot(now, span) ? NewTimeSpan(span).setTime(now).get() : span
-
-const SpotsSeparator = () => <View style={styles.spotsSeparator} />
 
 const Description = () => (
 	<View style={[styles.description, Styles.rowBetween]}>
