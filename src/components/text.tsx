@@ -39,7 +39,7 @@ Animated.addWhitelistedNativeProps({ text: true })
 
 interface AnimatedTextProps {
 	text: Animated.SharedValue<string>
-	style?: Animated.AnimateProps<TextStyle, NativeTextProps>['style']
+	style?: Animated.AnimateProps<NativeTextProps>['style']
 }
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput)

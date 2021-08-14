@@ -21,7 +21,15 @@ type MarkerGHContext = {
 type SharedNumber = Animated.SharedValue<number>
 type Range = [SharedNumber, SharedNumber]
 
-const useMarker = (current: SharedNumber, range: Range) => {
+const chooseNextPosition = (value: number, step: number = 1): number => {
+	'worklet'
+	const stepDiff = value % step
+	const prev = value - stepDiff
+	const next = prev + step
+	return stepDiff > step / 2 ? next : prev
+}
+
+const useMarker = (current: SharedNumber, range: Range, step: number = 1) => {
 	const [min, max] = range
 
 	const gestureHandler = useAnimatedGestureHandler<
@@ -43,7 +51,7 @@ const useMarker = (current: SharedNumber, range: Range) => {
 		return {
 			transform: [
 				{
-					translateX: current.value,
+					translateX: chooseNextPosition(current.value, step),
 				},
 			],
 		}
@@ -67,6 +75,7 @@ interface SliderProps {
 	formatValue: (value: number) => string
 	width: number
 	markerWidth: number
+	step?: number
 }
 
 const useAnimatedRail = (range: Range) => {
@@ -130,10 +139,14 @@ export const useRangeSlider = (props: SliderProps) => {
 	const { formatValue, markerWidth } = props
 	const layoutWidth = props.width - markerWidth * 2
 	const ratio = (props.max - props.min) / layoutWidth
-
-	// const newRatio = (props.max - props.min) / (props.width - markerWidth * 2)
-
+	const { step = ratio * 0.5 } = props //every half of pixel is a default step
+	const positionStep = step / ratio
 	const toPosition = (n: number) => (n - props.min) / ratio
+
+	const toValue = (position: SharedNumber): number => {
+		'worklet'
+		return chooseNextPosition(position.value * ratio + props.min, step)
+	}
 
 	const min = useSharedValue(toPosition(props.min))
 	const max = useSharedValue(toPosition(props.max) + markerWidth)
@@ -143,23 +156,19 @@ export const useRangeSlider = (props: SliderProps) => {
 	const startEdge = useDerivedValue(() => start.value + markerWidth)
 	const end = useDerivedValue(() => endPos.value - markerWidth)
 
-	const [wrapStart] = useMarker(start, [min, end])
-	const [wrapEnd] = useMarker(endPos, [startEdge, max])
+	const [wrapStart] = useMarker(start, [min, end], positionStep)
+	const [wrapEnd] = useMarker(endPos, [startEdge, max], positionStep)
 
 	useAnimatedReaction(
-		() => [start.value * ratio + props.min, end.value * ratio + props.min],
+		() => [toValue(start), toValue(end)],
 		value => runOnJS(props.onValuesChange)(value),
 		[props.onValuesChange]
 	)
 
 	const [wrapRail] = useAnimatedRail([start, endPos])
 
-	const startText = useDerivedValue(() =>
-		formatValue(start.value * ratio + props.min)
-	)
-	const endText = useDerivedValue(() =>
-		formatValue(end.value * ratio + props.min)
-	)
+	const startText = useDerivedValue(() => formatValue(toValue(start)))
+	const endText = useDerivedValue(() => formatValue(toValue(end)))
 
 	return { start, end, wrapRail, wrapStart, wrapEnd, startText, endText }
 }

@@ -57,6 +57,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 		formatValue: formatTimeWorklet,
 		width: layoutWidth,
 		markerWidth: 30,
+		step: 5 * 60 * 1000,
 	})
 	return (
 		<SafeView>
