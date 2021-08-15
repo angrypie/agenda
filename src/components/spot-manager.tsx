@@ -56,7 +56,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 	})
 	return (
 		<SafeView>
-			<View>
+			<View style={{ flex: 1}}>
 				<Observer>
 					{() => (
 						<View>
@@ -77,17 +77,17 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 				</View>
 				<RangeSlider {...slider} />
 				<Description />
-				<Observer>
-					{() => (
-						<ScrollView showsVerticalScrollIndicator={false}>
-							<View>
+				<View style={{ flex: 1, flexGrow: 1}}>
+					<Observer>
+						{() => (
+							<ScrollView showsVerticalScrollIndicator={false}>
 								{Array.from(schedule.plans.values())
 									.sort(p => (p.id === spot.plan ? -1 : 1)) //current plan on top
 									.map(plan => PlanItem(plan, store))}
-							</View>
-						</ScrollView>
-					)}
-				</Observer>
+							</ScrollView>
+						)}
+					</Observer>
+				</View>
 			</View>
 		</SafeView>
 	)
