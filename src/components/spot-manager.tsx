@@ -7,11 +7,12 @@ import { useStore, IPlan } from 'models'
 import { FreeSpotPlan, NewTimeSpan, TimeSpan } from 'lib/spots/spot'
 import { ModalHeader } from './layout'
 import { useLocalObservable, Observer } from 'mobx-react-lite'
-import { Button } from './touchable'
+import { Button, TextButton } from './touchable'
 import { Styles } from 'lib/style'
 import { SafeAreaPadding } from 'components/safe-area'
 import { RangeSlider, useRangeSlider } from './time-range'
 import { AddTask } from './task-list'
+import { useNavigation } from '@react-navigation/core'
 
 export interface SpotManagerProps {
 	spot: Spot
@@ -56,7 +57,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 	})
 	return (
 		<SafeView>
-			<View style={{ flex: 1}}>
+			<View style={{ flex: 1 }}>
 				<Observer>
 					{() => (
 						<View>
@@ -77,7 +78,7 @@ export const SpotManager = ({ spot }: SpotManagerProps) => {
 				</View>
 				<RangeSlider {...slider} />
 				<Description />
-				<View style={{ flex: 1, flexGrow: 1}}>
+				<View style={{ flex: 1, flexGrow: 1 }}>
 					<Observer>
 						{() => (
 							<ScrollView showsVerticalScrollIndicator={false}>
@@ -174,14 +175,24 @@ const useSpotManager = (spot: Spot) => {
 const remainingTimeSpan = (now: number, span: TimeSpan): TimeSpan =>
 	isCurrentSpot(now, span) ? NewTimeSpan(span).setTime(now).get() : span
 
-const Description = () => (
-	<View style={[styles.description, Styles.rowBetween]}>
-		<Text style={{ opacity: 0.6, fontSize: 15 }}>
-			Assign existing or add new task
-		</Text>
-		<AddTask />
-	</View>
-)
+const Description = () => {
+	const navigation = useNavigation()
+	const onPress = () => navigation.navigate('AddTaskModal')
+
+	return (
+		<View style={styles.description}>
+			<Text
+				style={{ opacity: 0.6, fontSize: 15 }}
+			>{`Assign existing or add\xa0`}</Text>
+			<TextButton
+				onPress={onPress}
+				style={{ fontSize: 15, marginTop: -1, opacity: 0.9 }}
+			>
+				new task
+			</TextButton>
+		</View>
+	)
+}
 
 const PlanItem = ({ id, name }: IPlan, store: SpotManagerStore) => (
 	<Button key={id} onPress={() => store.select({ id, name })}>
@@ -205,7 +216,7 @@ const styles = StyleSheet.create({
 		height: 35,
 	},
 	description: {
-		height: 30,
+		flexDirection: 'row',
 		marginTop: 25,
 		marginBottom: 10,
 	},
