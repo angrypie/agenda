@@ -1,10 +1,5 @@
 import React from 'react'
-import {
-	ScrollView,
-	View,
-	StyleSheet,
-	useWindowDimensions,
-} from 'react-native'
+import { ScrollView, View, StyleSheet, useWindowDimensions } from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { Text, Header } from 'components/text'
 import { isCurrentSpot, Spot } from 'lib/spots'
@@ -16,7 +11,7 @@ import { Button } from './touchable'
 import { Styles } from 'lib/style'
 import { SafeAreaPadding } from 'components/safe-area'
 import { RangeSlider, useRangeSlider } from './time-range'
-import {AddTask} from './task-list'
+import { AddTask } from './task-list'
 
 export interface SpotManagerProps {
 	spot: Spot
