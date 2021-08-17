@@ -91,16 +91,16 @@ const useAnimatedRail = (range: Range) => {
 		<View
 			style={{
 				height: 2,
-				backgroundColor: 'gray',
+				backgroundColor: '#777',
 			}}
 		>
 			<Animated.View
 				style={[
 					animatedStyle,
 					{
-						height: 2,
+						height: 3,
 						width: 1,
-						backgroundColor: 'red',
+						backgroundColor: '#ddd',
 					},
 				]}
 			/>
@@ -126,8 +126,8 @@ export const RangeSlider = (props: SliderSharedValues) => {
 				}}
 			>
 				{wrapRail()}
-				{wrapStart(<Marker color='orange' />)}
-				{wrapEnd(<Marker color='green' />)}
+				{wrapStart(<Marker color='#bbb' />)}
+				{wrapEnd(<Marker color='#bbb' />)}
 			</View>
 		</View>
 	)

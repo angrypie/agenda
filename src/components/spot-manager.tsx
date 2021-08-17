@@ -186,7 +186,7 @@ const Description = () => {
 			>{`Assign existing or add\xa0`}</Text>
 			<TextButton
 				onPress={onPress}
-				style={{ fontSize: 15, marginTop: -1, opacity: 0.9 }}
+				style={{ fontSize: 15, marginTop: -3, opacity: 0.9 }}
 			>
 				new task
 			</TextButton>

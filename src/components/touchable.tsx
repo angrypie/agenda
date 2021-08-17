@@ -47,7 +47,9 @@ export interface TextButtonProps extends ButtonProps {
 
 export const TextButton = ({ children, style, ...button }: TextButtonProps) => (
 	<Button {...button}>
-		<Text style={{ fontSize: 16, ...style }}>{children}</Text>
+		<Text style={{ fontSize: 16, ...style, paddingTop: 2, paddingBottom: 2 }}>
+			{children}
+		</Text>
 	</Button>
 )
 
