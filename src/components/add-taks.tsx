@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Header } from 'components/text'
 import {
 	View,
@@ -11,15 +11,57 @@ import {
 } from 'react-native'
 import { SafeView } from 'components/safe-area'
 import { useStore } from 'models'
-import { useNavigation } from '@react-navigation/native'
 import { ModalHeader } from './layout'
-import { Observer } from 'mobx-react-lite'
+import { observer, Observer, useLocalObservable } from 'mobx-react-lite'
 import { Button } from './touchable'
 import { Plan } from 'lib/spots/spot'
+import Fuse from 'fuse.js'
+
+function fuzzyPlansSort(source: Map<string, Plan>, name: string): Plan[] {
+	const plans = Array.from(source.values())
+	if (name === '') {
+		return plans
+	}
+	//TODO use index to speedup process
+	const f = new Fuse(plans, { keys: ['name'] })
+	const result = f.search(name)
+
+	return result.map(item => item.item).concat()
+}
+
+interface AddTaskStore {
+	searchInput: string
+	addPlan(): void
+	setSearchInput(value: string): void
+	isValidNewPlan: boolean
+}
 
 //TODO move react navigaiton dependencie outside
 export function AddTaskScreen() {
 	const { schedule } = useStore()
+	const store = useLocalObservable(() => ({
+		searchInput: '',
+		setSearchInput(value: string) {
+			store.searchInput = value
+		},
+		addPlan(): boolean {
+			if (store.searchInput === '') {
+				return false
+			}
+			schedule.addPlan(store.searchInput)
+			store.setSearchInput('')
+			return false
+		},
+
+		get isValidNewPlan(): boolean {
+			console.log(store.searchInput !== '')
+			console.log(schedule.plans.get(store.searchInput) === undefined)
+			return (
+				store.searchInput !== '' &&
+				schedule.plans.get(store.searchInput) === undefined
+			)
+		},
+	}))
 
 	const removePlanAlert = (plan: Plan) =>
 		Alert.alert('Delete Task', `Confirm removing\n '${plan.name}'`, [
@@ -37,7 +79,17 @@ export function AddTaskScreen() {
 
 	return (
 		<SafeView>
-			<ModalHeader />
+			<Observer>
+				{() => (
+					<ModalHeader
+						done={{
+							name: 'Add',
+							disabled: !store.isValidNewPlan,
+							onPress: store.addPlan,
+						}}
+					/>
+				)}
+			</Observer>
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
 				style={{ flex: 1 }}
@@ -48,13 +100,13 @@ export function AddTaskScreen() {
 						justifyContent: 'center',
 					}}
 				>
-					<InputName />
+					<InputName store={store} />
 				</View>
 				<View style={{ flex: 1 }}>
 					<Observer>
 						{() => (
 							<ScrollView showsVerticalScrollIndicator={false}>
-								{Array.from(schedule.plans.values()).map(plan => (
+								{fuzzyPlansSort(schedule.plans, store.searchInput).map(plan => (
 									<View key={plan.id} style={{ paddingVertical: 13 }}>
 										<Button onPress={() => removePlanAlert(plan)}>
 											<Header>{plan.name}</Header>
@@ -70,31 +122,19 @@ export function AddTaskScreen() {
 	)
 }
 
-const InputName = () => {
-	const [value, setValue] = useState('')
-	const { schedule } = useStore()
-	const addPlan = () => {
-		if (value === '') {
-			return
-		}
-		schedule.addPlan(value)
-		setValue('')
-	}
-
-	return (
-		<TextInput
-			style={styles.input}
-			onChangeText={(text: string) => setValue(text)}
-			keyboardAppearance='dark'
-			returnKeyType='done'
-			placeholder='Search or add task'
-			placeholderTextColor='rgba(255,255,255,.2)'
-			value={value}
-			onSubmitEditing={addPlan}
-			autoFocus
-		/>
-	)
-}
+const InputName = observer(({ store }: { store: AddTaskStore }) => (
+	<TextInput
+		style={styles.input}
+		autoCorrect={false}
+		onChangeText={store.setSearchInput}
+		keyboardAppearance='dark'
+		returnKeyType='search'
+		placeholder='Search or add task'
+		placeholderTextColor='rgba(255,255,255,.2)'
+		value={store.searchInput}
+		autoFocus
+	/>
+))
 
 const styles = StyleSheet.create({
 	input: {
