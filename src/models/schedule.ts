@@ -91,6 +91,10 @@ export const Schedule = types
 				getPlan(id: string): IPlan | undefined {
 					return self.plans.get(id)
 				},
+
+				getPlanByName(name: string): IPlan | undefined {
+					return Array.from(self.plans.values()).find(el => el.name === name)
+				},
 			},
 			actions: {
 				suggestByTime(time: number): Spot[] {

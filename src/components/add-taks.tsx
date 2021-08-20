@@ -17,16 +17,23 @@ import { Button } from './touchable'
 import { Plan } from 'lib/spots/spot'
 import Fuse from 'fuse.js'
 
-function fuzzyPlansSort(source: Map<string, Plan>, name: string): Plan[] {
+interface PlanSearchResult extends Plan {
+	matches?: readonly Fuse.FuseResultMatch[]
+}
+
+function fuzzyPlansSort(
+	source: Map<string, Plan>,
+	name: string
+): PlanSearchResult[] {
 	const plans = Array.from(source.values())
 	if (name === '') {
 		return plans
 	}
 	//TODO use index to speedup process
-	const f = new Fuse(plans, { keys: ['name'] })
+	const f = new Fuse(plans, { keys: ['name'], includeMatches: true })
 	const result = f.search(name)
 
-	return result.map(item => item.item).concat()
+	return result.map(item => ({ ...item.item, matches: item.matches })).concat()
 }
 
 interface AddTaskStore {
@@ -54,11 +61,9 @@ export function AddTaskScreen() {
 		},
 
 		get isValidNewPlan(): boolean {
-			console.log(store.searchInput !== '')
-			console.log(schedule.plans.get(store.searchInput) === undefined)
 			return (
 				store.searchInput !== '' &&
-				schedule.plans.get(store.searchInput) === undefined
+				schedule.getPlanByName(store.searchInput) === undefined
 			)
 		},
 	}))
@@ -109,7 +114,7 @@ export function AddTaskScreen() {
 								{fuzzyPlansSort(schedule.plans, store.searchInput).map(plan => (
 									<View key={plan.id} style={{ paddingVertical: 13 }}>
 										<Button onPress={() => removePlanAlert(plan)}>
-											<Header>{plan.name}</Header>
+											<PlanSearchName plan={plan} />
 										</Button>
 									</View>
 								))}
@@ -120,6 +125,33 @@ export function AddTaskScreen() {
 			</KeyboardAvoidingView>
 		</SafeView>
 	)
+}
+
+const PlanSearchName = ({ plan }: { plan: PlanSearchResult }) => {
+	const { name, matches } = plan
+	if (matches === undefined) {
+		return <Header style={{ opacity: 0.7 }}>{name}</Header>
+	}
+
+	const makePart = (start: number, end: number, h: boolean = false) => (
+		<Header style={{ opacity: h ? 1 : 0.7 }}>
+			{name.substring(start, end)}
+		</Header>
+	)
+	const parts = matches.flatMap(match => {
+		return [
+			makePart(0, match.indices[0][0]),
+			...match.indices.flatMap(([start, end], i) => {
+				const next = match.indices[i + 1]
+				return [
+					makePart(start, end + 1, true),
+					makePart(end + 1, next !== undefined ? next[0] : name.length),
+				]
+			}),
+		]
+	})
+
+	return <View style={{ flexDirection: 'row' }}>{parts}</View>
 }
 
 const InputName = observer(({ store }: { store: AddTaskStore }) => (
@@ -138,7 +170,7 @@ const InputName = observer(({ store }: { store: AddTaskStore }) => (
 
 const styles = StyleSheet.create({
 	input: {
-		color: 'rgba(255,255,255,.6)',
+		color: 'rgba(255,255,255,1)',
 		fontSize: 36,
 		fontWeight: 'bold' as 'bold',
 	},
