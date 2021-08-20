@@ -110,7 +110,10 @@ export function AddTaskScreen() {
 				<View style={{ flex: 1 }}>
 					<Observer>
 						{() => (
-							<ScrollView showsVerticalScrollIndicator={false}>
+							<ScrollView
+								showsVerticalScrollIndicator={false}
+								keyboardShouldPersistTaps='always'
+							>
 								{fuzzyPlansSort(schedule.plans, store.searchInput).map(plan => (
 									<View key={plan.id} style={{ paddingVertical: 13 }}>
 										<Button onPress={() => removePlanAlert(plan)}>
@@ -160,7 +163,7 @@ const InputName = observer(({ store }: { store: AddTaskStore }) => (
 		autoCorrect={false}
 		onChangeText={store.setSearchInput}
 		keyboardAppearance='dark'
-		returnKeyType='search'
+		returnKeyType='done'
 		placeholder='Search or add task'
 		placeholderTextColor='rgba(255,255,255,.2)'
 		value={store.searchInput}
